@@ -168,7 +168,7 @@ You should regulalaly monitor your lands stake and price relative to its neighbo
 Here is a snapshot of the current state of the game: 
 If the information you need is not here then you can query the graphql api for more information.
 
-Here are your token balances: 
+Here are your token balances. Remember that when spending tokens all values should be in wei, so x10^18: 
 
 {{balances}}
 

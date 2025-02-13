@@ -75,7 +75,7 @@ async function main() {
     const masterProcessor = new MasterProcessor(
         llmClient,
         defaultCharacter,
-        balances,
+        ()  => getBalances(),
         loglevel
     );
 
@@ -211,7 +211,7 @@ async function main() {
         execute: async (data: any) => {
             const { query } = data.payload ?? {};
 
-            if (query == "balance") {
+            if (query == "balances") {
 
                 let balances: Balance[] = await Providers.fetchGraphQL(
                     env.GRAPHQL_URL + "/graphql",
@@ -244,7 +244,7 @@ async function main() {
                 address: ${auction.land_location}`).join("\n");
 
                 return auction_str;
-            } else if (query == "lands") {
+            } else if (query == "owned-lands") {
                 let lands = await Providers.fetchGraphQL(
                     env.GRAPHQL_URL + "/graphql",
                     land_query,
@@ -322,6 +322,7 @@ async function main() {
         role: Types.HandlerRole.INPUT,
         execute: async () => {
             console.log(chalk.blue("🧠 Generating thoughts..."));
+            dreams.stepManager.clear();
             const thought = await consciousness.start();
 
             // If no thought was generated or it was already processed, skip
@@ -391,7 +392,7 @@ async function main() {
             "johnny",
             "consciousness_thoughts",
             {},
-            30000
+            100000
         );
     
 
