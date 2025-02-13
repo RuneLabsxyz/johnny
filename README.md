@@ -1,4 +1,4 @@
-# ponzilord
+# johnny
 
 To install dependencies:
 
@@ -7,7 +7,6 @@ bun install
 ```
 
 To run:
-
 ```bash
 bun run index.ts
 ```
