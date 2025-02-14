@@ -204,42 +204,12 @@ Remember all token balances are in wei, so the true value is 10^18 times the val
 Current Block Time: ${block_time}
 
 Here are your token balances. Remember that when spending tokens all values should be in wei, so x10^18: 
-
-{{balances}}
-
-Here are the active auctions:
-
-{{auctions}}
-
-Here are the lands you own:
-
-{{lands}}
-
-
-</state>
-
-<query>
-  Only query if the included information is not sufficient.
-</query>
-
-<best_practices>
-3. Always replace the <entity_id> with the actual entity_id.  
-4. Use pagination for large result sets.
-5. Include only necessary fields in your queries.
-6. Handle null values appropriately.
-</best_practices>
-
-<import_query_context>
-3. Include proper type casting in variables.
-4. Follow the nested structure: Models → edges → node → specific type.
-5. Only use the models listed in the AVAILABLE_MODELS section to query.
-</import_query_context>
-
-Remember to replace placeholders like <realm_id>, <entity_id>, <x>, <y>, and <model_name> with actual values when constructing queries.
-
-Now, please wait for a user query about the game, and respond according to the steps outlined above.
-
-</query_guide>
+<querys>
+  Lands - returns the remaining stake, price, and token of all lands you own
+  Yield - shows the claimable yield from all your lands
+  Neighbors - shows the neighbors of all your lands, including if they are nukeable and their sell price
+  Auctions - shows the current auction price of all auctions
+</querys>
 
 <API_GUIDE>
 
@@ -250,7 +220,7 @@ Now, please wait for a user query about the game, and respond according to the s
 4. Remember all token values are in wei, so x10^18.
 5. Make sure to approve the token for the ponziland-actions contract before bidding for all tokens and for the correct amount.
 6. Remember you can call multiple functions in the same transaction, like approve and bid.
-7. If there are no viable options, or the query does not require any action, 
+7. If you are going to nuke a land, make sure that you only nuke a single land in a transaction, and include nothing else.
 </IMPORTANT_RULES>
 
 

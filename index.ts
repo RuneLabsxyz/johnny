@@ -8,7 +8,7 @@
  */
 
 import { LLMClient, ChainOfThought, ChromaVectorDB, Logger, Consciousness } from "../daydreams/packages/core/src";
-import { CONTEXT } from "./ponziland-context.ts";
+import { CONTEXT, get_auctions_str, get_lands_str } from "./ponziland-context.ts";
 import * as readline from "readline";
 import chalk from "chalk";
 import { z } from "zod";
@@ -137,7 +137,7 @@ async function main() {
         lastUpdated: new Date(),
     });
     // Initialize the main reasoning engine
-    const dreams = new ChainOfThought(llmClient, memory, {
+    const dreams = new ChainOfThought(llmClient, memory, getBalances, {
         worldState: CONTEXT,
     }, {
         logLevel: Types.LogLevel.DEBUG,
@@ -214,59 +214,29 @@ async function main() {
 
             if (query == "balances") {
 
-                let balances: Balance[] = await Providers.fetchGraphQL(
-                    env.GRAPHQL_URL + "/graphql",
-                    balance_query,
-                    {}
-                  ).then((res: any) => res.tokenBalances.edges.map((edge: any) => edge.node));
+                let balances = await getBalances();
 
-                balances.forEach((balance: Balance) => {
-                    balance.tokenMetadata.amount = (BigInt(balance.tokenMetadata.amount)/BigInt(10**18)).toString();
-                    console.log(balance.tokenMetadata.symbol, balance.tokenMetadata.amount);
-                    });
-                  
-
-                
-                let balance_str = balances.map((balance: Balance) => `
-                ${balance.tokenMetadata.symbol}: ${balance.tokenMetadata.amount} 
-                address: ${balance.tokenMetadata.contractAddress}`).join("\n");
-
-                return balance_str;
+                return balances;
             } else if (query == "auctions") {
 
-                let auctions = await Providers.fetchGraphQL(
-                    env.GRAPHQL_URL + "/graphql",
-                    auction_query,
-                    {}
-                ).then((res: any) => res.ponziLandAuctionModels.edges.map((edge: any) => edge.node));
-
-                let auction_str = auctions.map((auction: any) => `
-                ${auction.start_time}: ${auction.start_price}
-                address: ${auction.land_location}`).join("\n");
+                let auction_str = await get_auctions_str();
 
                 return auction_str;
-            } else if (query == "owned-lands") {
-                let lands = await Providers.fetchGraphQL(
-                    env.GRAPHQL_URL + "/graphql",
-                    land_query,
-                    {}
-                ).then((res: any) => res.ponziLandLandModels.edges.map((edge: any) => edge.node));
-
-                let land_info = await Promise.all(lands.map((land: any) => {
-                    let info = ponziLandContract.call("get_neighbors_yield", [land.location]);
-                    return info;
-                  }));
-                  
-                  lands.forEach((land: any, index: number) => {
-                    land.remaining_stake_time = BigInt(land_info[index].remaining_stake_time / BigInt(60)).toString();
-                  }); 
-
-                  let land_str = lands.map((land: any) => 
-                    `location: ${BigInt(land.location).toString()} - Remaining Stake Time: ${land.remaining_stake_time} minutes`).join("\n");
-                  
-                  
+            } else if (query == "lands") {
+                
+                let land_str = await get_lands_str();
 
                 return land_str;
+            } else if (query == "yield") {
+
+                let yield_str = await get_lands_str();
+
+                return yield_str;
+            } else if (query == "neighbors") {
+
+                let neighbors_str = await get_lands_str();
+
+                return neighbors_str;
             }
             
 
@@ -359,7 +329,7 @@ async function main() {
     });
 
     core.registerIOHandler({
-        name: "twitter_thought",
+        name: "tweet",
         role: Types.HandlerRole.OUTPUT,
         execute: async (data: unknown) => {
             const thoughtData = data as { content: string };
@@ -417,7 +387,7 @@ async function main() {
 
         // If we want to stop the streaming IO handler:
         core.removeIOHandler("discord_stream");
-        core.removeIOHandler("twitter_thought");
+        core.removeIOHandler("tweet");
         core.removeIOHandler("ponziland_action");
         core.removeIOHandler("consciousness_thoughts");
         // Also remove any other handlers or do cleanup
