@@ -91,7 +91,6 @@ export const get_lands_str = async () => {
     {}
   ).then((res: any) => res.ponziLandLandModels.edges.map((edge: any) => edge.node));
   let land_info = await Promise.all(lands.map((land: any) => {
-    console.log(land)
     let info = ponziLandContract.call("get_neighbors_yield", [land.location]);
     return info;
   }));
@@ -116,12 +115,12 @@ export const get_lands_str = async () => {
       let claims: any[] = [];
       for (let contract of contracts) {
         if (claim.token === contract.address) {
-          claims.push({token: contract.name, amount: claim.amount});
+          land.claims += `${contract.name} (${claim.token}): ${claim.amount}\n`;
         }
       }
       return claims;
     });
-    land.remaining_stake_time = estimateNukeTime(land.sell_price, land.stake_amount, land.neighbor_number);
+    land.remaining_stake_time = estimateNukeTime(land.sell_price, land.stake_amount, land.neighbor_number) - (block_time - land.last_pay_time);
     console.log('land.remaining_stake_time', land.remaining_stake_time)
   }); 
 
@@ -137,6 +136,52 @@ export const get_lands_str = async () => {
     Yield: ${land.yield}`).join("\n");
 
   return land_str;
+}
+
+export const get_claims_str = async () => {
+  let lands = await Providers.fetchGraphQL(
+    env.GRAPHQL_URL + "/graphql",
+    land_query,
+    {}
+  ).then((res: any) => res.ponziLandLandModels.edges.map((edge: any) => edge.node));
+  let land_info = await Promise.all(lands.map((land: any) => {
+    let info = ponziLandContract.call("get_neighbors_yield", [land.location]);
+    return info;
+  }));
+  let land_claims = await Promise.all(lands.map((land: any) => {
+    return ponziLandContract.call("get_next_claim_info", [land.location]);
+  }));
+  let claims_str = "";
+  lands.forEach((land: any, land_index: number) => {
+    land.neighbors_info = land_info.map((land_info: any, neighbor_index: number) => {
+      return land_info.yield_info.map((info: any) => {
+        return `
+          location: ${info.location}
+          token: ${info.token}
+          sell_price: ${info.sell_price}
+          per hour: ${info.per_hour}
+          nukeable: ${info.nukeable}
+        `;
+      }).join("\n");
+    });
+    land.neighbor_number = land_claims[land_index].length;
+    land.claims = land_claims[land_index].map((claim: any) => {
+      let claim_str = "";
+      for (let contract of contracts) {
+        if (claim.token === contract.address) {
+          claim_str += `${contract.name} (${claim.token}): ${claim.amount}\n`;
+        }
+      }
+      return claim_str;
+    });
+
+    claims_str += land.claims.map((claim: any) => {
+      return claim;
+    }).join("\n");
+
+  }); 
+  console.log(claims_str)
+  return claims_str;
 }
 
 export const get_auctions_str = async () => {
@@ -167,12 +212,53 @@ export const get_auctions_str = async () => {
   return auction_str;
 }
 
+export const get_neighbors_str = async () => {
+  let lands = await Providers.fetchGraphQL(
+    env.GRAPHQL_URL + "/graphql",
+    land_query,
+    {}
+  ).then((res: any) => res.ponziLandLandModels.edges.map((edge: any) => edge.node));
+  let land_info = await Promise.all(lands.map((land: any) => {
+    let info = ponziLandContract.call("get_neighbors_yield", [land.location]);
+    return info;
+  }));
 
+  let neighbors = lands.map((land: any, index: number) => {
+    let info = land_info[index];
+    let neighbors = info.yield_info.map((yield_info: any) => {
+      return yield_info;
+    })
+    return neighbors;
+  })
+
+  let neighbor_data = await Promise.all(neighbors.flat().map((info: any) => {
+    return ponziLandContract.call("get_next_claim_info", [info.location]);
+  }))
+
+  let flat_data = neighbor_data.flat();
+
+  let res = neighbors.flat().map((neighbor: any, index: number) => {
+    let yield_info = neighbor;
+    let data = flat_data[index];
+    console.log('yield_info', yield_info)
+    console.log('data', data)
+    return `
+        location: ${yield_info.location}
+        token: ${yield_info.token}
+        sell_price: ${yield_info.sell_price}
+        nukeable: ${data.can_be_nuked}`;
+  }).join("\n");
+  console.log(res)
+  return res;
+}
+
+let neighbors_str = await get_neighbors_str();
 let balance_str = await getBalances();
 
 let auction_str = await get_auctions_str();
 
 let land_str = await get_lands_str();
+let claims_str = await get_claims_str();
 
 let PONZILAND_CONTEXT = `
 You are a player of a game called Ponziland, a onchain game where you buy land with various ERC20 tokens on starknet.
@@ -217,10 +303,11 @@ Here are your token balances. Remember that when spending tokens all values shou
 1. If you receive an error, you may need to try again, the error message should tell you what went wrong.
 2. To verify a successful transaction, read the response you get back. You don't need to query anything.
 3. Never include slashes in your calldata.
-4. Remember all token values are in wei, so x10^18.
+4. Remember all token values are in wei so, so remember that the amount used in function calls is the 10^18 * the value relative to the state.
 5. Make sure to approve the token for the ponziland-actions contract before bidding for all tokens and for the correct amount.
-6. Remember you can call multiple functions in the same transaction, like approve and bid.
+6. Remember you can call multiple functions in the same transaction, like approve and bid, but only bid on one land at a time.
 7. If you are going to nuke a land, make sure that you only nuke a single land in a transaction, and include nothing else.
+8. You can bundle multiple claims together, or bundle approves with other transactions, but try to only do one thing at a time.
 </IMPORTANT_RULES>
 
 
@@ -232,7 +319,7 @@ Here are your token balances. Remember that when spending tokens all values shou
       </DESCRIPTION>
       <PARAMETERS>
         - token_address: The address of the token to approve
-        - amount: The amount to approve (in wei, so x10^18)
+        - amount: The amount to approve
         Amount is u256, which in cairo means it has a high and low value and you must pass in a 0 as the low value.
         Make sure the token address is correct based on the graphql query.
         This should be called for both estark when bidding and any erc20 used for staking
@@ -431,7 +518,9 @@ Here are your token balances. Remember that when spending tokens all values shou
 export const CONTEXT = injectTags({
   balances: balance_str,
   auctions: auction_str,
-  lands: land_str
+  lands: land_str,
+  neighbors: neighbors_str,
+  claims: claims_str
 }, PONZILAND_CONTEXT);
 
 // API DOCs etc

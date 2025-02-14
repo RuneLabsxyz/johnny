@@ -8,7 +8,7 @@
  */
 
 import { LLMClient, ChainOfThought, ChromaVectorDB, Logger, Consciousness } from "../daydreams/packages/core/src";
-import { CONTEXT, get_auctions_str, get_lands_str } from "./ponziland-context.ts";
+import { CONTEXT, get_auctions_str, get_lands_str, get_claims_str } from "./ponziland-context.ts";
 import * as readline from "readline";
 import chalk from "chalk";
 import { z } from "zod";
@@ -33,6 +33,7 @@ import { TwitterClient } from "../daydreams/packages/core/src/core/io/twitter.ts
 import { balance_query, auction_query, land_query } from "./querys";
 import { type Balance } from "./types";
 import { getBalances } from "./ponziland-context";
+
 
 
 /**
@@ -215,26 +216,28 @@ async function main() {
             if (query == "balances") {
 
                 let balances = await getBalances();
-
+                console.log('fetch balances', balances)
                 return balances;
             } else if (query == "auctions") {
 
                 let auction_str = await get_auctions_str();
-
+                console.log('fetch auctions', auction_str)
                 return auction_str;
             } else if (query == "lands") {
                 
                 let land_str = await get_lands_str();
-
+                console.log('fetch lands', land_str)
                 return land_str;
-            } else if (query == "yield") {
+            } else if (query == "claims") {
 
-                let yield_str = await get_lands_str();
+                let yield_str = await get_claims_str();
+                console.log('fetch claims', yield_str)
 
                 return yield_str;
             } else if (query == "neighbors") {
 
                 let neighbors_str = await get_lands_str();
+                console.log('fetch neighbors', neighbors_str)
 
                 return neighbors_str;
             }
@@ -244,7 +247,7 @@ async function main() {
         outputSchema: z
             .object({
                 query: z.string()
-                    .describe(`"balances" or "auctions" or "owned-lands"`),
+                    .describe(`"balances" or "auctions" or "lands" or "claims" or "neighbors"`),
             })
             .describe(
                 "The payload to fetch data from the Eternum GraphQL API, never include slashes or comments"
@@ -363,7 +366,7 @@ async function main() {
             "johnny",
             "consciousness_thoughts",
             {},
-            100000
+            50000
         );
     
 
