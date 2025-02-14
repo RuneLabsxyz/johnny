@@ -42,3 +42,31 @@ export const land_query = `query GetOwnedLands {
   }
   }
   }`
+
+  export const estimateNukeTime = (
+    sellPrice: number,
+    remainingStake: number,
+    neighbourNumber: number,
+  ) => {
+    console.log(
+      'estimating nuke time',
+      sellPrice,
+      remainingStake,
+      neighbourNumber,
+    );
+  
+    const gameSpeed = 4;
+    const taxRate = 0.02;
+    const baseTime = 3600;
+    const maxNeighbours = 8;
+  
+    const maxRate = sellPrice * taxRate * gameSpeed;
+    const maxRatePerNeighbour = maxRate / maxNeighbours;
+    const rateOfActualNeighbours = maxRatePerNeighbour * neighbourNumber;
+  
+    const remainingHours = remainingStake / rateOfActualNeighbours;
+    const remainingSeconds = remainingHours * baseTime;
+  
+    console.log('estimated seconds', remainingSeconds);
+    return remainingSeconds;
+  };

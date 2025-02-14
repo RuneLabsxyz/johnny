@@ -6,6 +6,7 @@ import manifest from "./manifest.json";
 import { Contract, RpcProvider, type Abi } from "starknet";
 import { balance_query, auction_query, land_query } from "./querys";
 import { type Balance } from "./types";
+import { estimateNukeTime } from "./querys";
 
 let provider = new RpcProvider({ nodeUrl: env.STARKNET_RPC_URL });
 let abi = manifest.contracts[0].abi;
@@ -28,6 +29,13 @@ const estarkContract = new Contract(estarkAbi, estarkAddress, provider);
 const ebrotherContract = new Contract(ebrotherAbi, ebrotherAddress, provider);
 const elordsContract = new Contract(elordsAbi, elordsAddress, provider);
 const epaperContract = new Contract(epaperAbi, epaperAddress, provider);
+
+let contracts = [
+  {name: "estark", contract: estarkContract, address: estarkAddress},
+  {name: "ebrother", contract: ebrotherContract, address: ebrotherAddress},
+  {name: "elords", contract: elordsContract, address: elordsAddress},
+  {name: "epaper", contract: epaperContract, address: epaperAddress},
+]
 
 if (estarkAbi === undefined) {
   throw new Error('no abi.');
@@ -72,6 +80,8 @@ const starknetChain = new Chains.StarknetChain({
 });
 
 
+
+
 let ponziLandContract = (new Contract(abi, manifest.contracts[0].address, provider)).typedv2(abi as Abi);
 
 
@@ -103,31 +113,39 @@ let initial_prices = await Promise.all(initial_auctions.map((auction: any) => {
 }));
 
 let land_info = await Promise.all(initial_lands.map((land: any) => {
+  console.log(land)
   let info = ponziLandContract.call("get_neighbors_yield", [land.location]);
   return info;
 }));
 
-initial_lands.forEach((land: any, index: number) => {
-  land.remaining_stake_time = BigInt(land_info[index].remaining_stake_time / BigInt(60)).toString();
-}); 
-
-/*
-let remaining_stake = initial_lands.filter((land: any) => !initial_balances.some((balance: Balance) => {
-  let remaining_stake = starknetChain.read(
-      {
-          contractAddress: '0x1f058fe3a5a82cc12c1e38444d3f9f3fd3511ef4c95851a3d4e07ad195e0af6',
-          entrypoint: "get_remaining_stake",
-          calldata: [land.location]
-      }
-  ).then((res: any) => BigInt(res[0])/BigInt(10**18));
-  return remaining_stake;
+let land_claims = await Promise.all(initial_lands.map((land: any) => {
+  return ponziLandContract.call("get_next_claim_info", [land.location]);
 }));
 
-
 initial_lands.forEach((land: any, index: number) => {
-  land.remaining_stake = remaining_stake[index];
-});
-*/
+  land.neighbors_info = land_info.map((land_info: any) => {
+    return land_info.yield_info.map((info: any) => {
+      return `
+        location: ${info.location}
+        token: ${info.token}
+        sell_price: ${info.sell_price}
+        per hour: ${info.per_hour}
+        nukeable: ${info.nukeable}
+      `;
+    }).join("\n");
+  });
+  land.neighbor_number = land_claims[index].length;
+  land.claims = land_claims[index].map((claim: any) => {
+    let claims: any[] = [];
+    for (let contract of contracts) {
+      if (claim.token === contract.address) {
+        claims.push({token: contract.name, amount: claim.amount});
+      }
+    }
+    return claims;
+  });
+  land.remaining_stake_time = estimateNukeTime(land.sell_price, land.stake_amount, land.neighbor_number);
+}); 
 
 initial_auctions.forEach((auction: any, index: number) => {
   auction.current_price = initial_prices[index];
@@ -137,7 +155,15 @@ let auction_str = initial_auctions.map((auction: any) =>
   `location: ${BigInt(auction.land_location).toString()} - Current Price: ${auction.current_price}`).join("\n");
 
 let land_str = initial_lands.map((land: any) => 
-  `location: ${BigInt(land.location).toString()} - Remaining Stake Time: ${land.remaining_stake_time} minutes`).join("\n");
+  `location: ${BigInt(land.location).toString()} - 
+  Remaining Stake
+  Amount: ${BigInt(land.stake_amount).toString()}
+  Token: ${BigInt(land.token_used).toString()}
+  Time: ${land.remaining_stake_time/60} minutes
+
+  Listed Price: ${BigInt(land.sell_price).toString()}
+
+  Yield: ${land.yield}`).join("\n");
 
 
 
@@ -179,6 +205,7 @@ Here are the active auctions (price in estark):
 Here are the lands you own:
 
 {{lands}}
+
 
 </state>
 
@@ -302,6 +329,61 @@ Now, please wait for a user query about the game, and respond according to the s
 
       </EXAMPLE>
     </INCREASE_STAKE>
+    <CLAIM>
+      <DESCRIPTION>
+        Claims the yield from a land.
+      </DESCRIPTION>
+      <PARAMETERS>
+        - land_location: Location of the land to bid on
+      </PARAMETERS>
+      <EXAMPLE>
+    
+          {
+            "contractAddress": "<ponziland-actions>",
+            "entrypoint": "claim",
+            "calldata": [
+              <land_location>,         
+            ]
+          }
+
+      </EXAMPLE>
+    </CLAIM>
+    <BUY_LAND>
+      <DESCRIPTION>
+        Buys a land.
+      </DESCRIPTION>
+      <PARAMETERS>
+        - land_location: Location of the land to buy
+        - token_for_sale: Contract address of the token to bid with
+        - sell_price: The price the land will be listed for after the auction ends (in wei, so x10^18)
+        - amount_to_stake: The amount to be staked to pay the lands taxes (in wei, so x10^18)
+        - liquidity_pool: The liquidity pool to be used for the stake
+
+        Sell Price and Amount to Stake are u256, which in cairo means they have a high and low value and you must pass in a 0 as the low value.
+        Make sure the land location is correct based on the graphql query.
+        The sell price and the amount to stake should be about 10 to 100 (*10^18), but make sure you can afford the stake.
+        Make sure you approve the token for the ponziland-actions contract before bidding.
+        Remember that you must approve the token that the land is listed for, which is not always estark.
+
+      </PARAMETERS>
+      <EXAMPLE>
+    
+          {
+            "contractAddress": "<ponziland-actions>",
+            "entrypoint": "buy",
+            "calldata": [
+              <land_location>,         
+              <sale_token_address>,           
+              <sell_price>,
+              0,
+              <amount_to_stake>,
+              0,
+              <liquidity_pool>
+            ]
+          }
+
+      </EXAMPLE>  
+    </BUY_LAND>
     <BID>
       <DESCRIPTION>
         Bids on an auction.
@@ -337,7 +419,31 @@ Now, please wait for a user query about the game, and respond according to the s
 
       </EXAMPLE>
     </BID>
+    <NUKE>
+      <DESCRIPTION>
+        Nukes a land that is out of stake.
+      </DESCRIPTION>
+      <PARAMETERS>
+        - land_location: Location of the land to nuke
+      </PARAMETERS>
+      <EXAMPLE>
+          {
+            "contractAddress": "<ponziland-actions>",
+            "entrypoint": "nuke",
+            "calldata": [
+              <land_location>,
+            ]
+          }
+
+    </NUKE>
   </FUNCTIONS>
+
+  <EXECUTE_TRANSACTION_INFORMATION>
+    Remember that you can make multiple function calls in the same transaction.
+    This means EXECUTE_TRANSACTION should only ever be called once per output, and should include all calls as an array.
+    You should keep calls to a minimum, and only try to do one thing at a time. 
+    If you include multiple transactions that spend tokens, make sure to approve enough for all of them
+  </EXECUTE_TRANSACTION_INFORMATION>
 
   </API_GUIDE>
 

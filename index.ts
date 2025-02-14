@@ -180,8 +180,8 @@ async function main() {
         role: Types.HandlerRole.OUTPUT,
         execute: async (data: any) => {
             const result = await starknetChain.write(data.payload)
-            
             console.log("execute transaction result", result);
+
 
             return result;
         },
@@ -202,7 +202,7 @@ async function main() {
             .describe(
                 "The payload to execute the call, never include slashes or comments"
             ),
-        ).describe("Array of all calls to execute in transaction")
+        ).describe("Array of all calls to execute in transaction. Include all transactions here, instead of using this multiple times")
     });
 
     dreams.registerOutput({
@@ -273,7 +273,7 @@ async function main() {
         outputSchema: z
             .object({
                 query: z.string()
-                    .describe(`"balances" or "auctions" or "lands"`),
+                    .describe(`"balances" or "auctions" or "owned-lands"`),
             })
             .describe(
                 "The payload to fetch data from the Eternum GraphQL API, never include slashes or comments"
