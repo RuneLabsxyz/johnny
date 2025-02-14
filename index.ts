@@ -8,7 +8,7 @@
  */
 
 import { LLMClient, ChainOfThought, ChromaVectorDB, Logger, Consciousness } from "../daydreams/packages/core/src";
-import { CONTEXT, get_auctions_str, get_lands_str, get_claims_str } from "./ponziland-context.ts";
+import { CONTEXT, get_auctions_str, get_lands_str, get_claims_str, get_neighbors_str } from "./ponziland-context.ts";
 import * as readline from "readline";
 import chalk from "chalk";
 import { z } from "zod";
@@ -236,7 +236,7 @@ async function main() {
                 return yield_str;
             } else if (query == "neighbors") {
 
-                let neighbors_str = await get_lands_str();
+                let neighbors_str = await get_neighbors_str();
                 console.log('fetch neighbors', neighbors_str)
 
                 return neighbors_str;

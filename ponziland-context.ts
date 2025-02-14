@@ -144,44 +144,35 @@ export const get_claims_str = async () => {
     land_query,
     {}
   ).then((res: any) => res.ponziLandLandModels.edges.map((edge: any) => edge.node));
-  let land_info = await Promise.all(lands.map((land: any) => {
-    let info = ponziLandContract.call("get_neighbors_yield", [land.location]);
-    return info;
-  }));
+
   let land_claims = await Promise.all(lands.map((land: any) => {
     return ponziLandContract.call("get_next_claim_info", [land.location]);
   }));
-  let claims_str = "";
-  lands.forEach((land: any, land_index: number) => {
-    land.neighbors_info = land_info.map((land_info: any, neighbor_index: number) => {
-      return land_info.yield_info.map((info: any) => {
-        return `
-          location: ${info.location}
-          token: ${info.token}
-          sell_price: ${info.sell_price}
-          per hour: ${info.per_hour}
-          nukeable: ${info.nukeable}
-        `;
-      }).join("\n");
-    });
-    land.neighbor_number = land_claims[land_index].length;
-    land.claims = land_claims[land_index].map((claim: any) => {
-      let claim_str = "";
-      for (let contract of contracts) {
-        if (claim.token === contract.address) {
-          claim_str += `${contract.name} (${claim.token}): ${claim.amount}\n`;
+
+  console.log('land_claims', land_claims)
+
+  // Flatten the claims data and format it
+  let claims = lands.map((land: any, index: number) => {
+    let landClaims = land_claims[index]
+      .map((claim: any) => {
+        // Find matching contract for the token
+        for (let contract of contracts) {
+          if (BigInt(claim.token_address) === BigInt(contract.address)) {
+            return `    ${contract.name}: ${BigInt(claim.amount)}`;
+          }
         }
-      }
-      return claim_str;
-    });
+        return '';
+      })
+      .filter((claim: any) => claim !== '')
+      .join('\n');
 
-    claims_str += land.claims.map((claim: any) => {
-      return claim;
-    }).join("\n");
+    return `Land ${land.location}:\n${landClaims}`;
+  }).join('\n\n');
 
-  }); 
-  console.log(claims_str)
-  return claims_str;
+
+  console.log('claims_str', claims)
+
+  return claims;
 }
 
 export const get_auctions_str = async () => {
@@ -240,15 +231,12 @@ export const get_neighbors_str = async () => {
   let res = neighbors.flat().map((neighbor: any, index: number) => {
     let yield_info = neighbor;
     let data = flat_data[index];
-    console.log('yield_info', yield_info)
-    console.log('data', data)
     return `
         location: ${yield_info.location}
         token: ${yield_info.token}
         sell_price: ${yield_info.sell_price}
         nukeable: ${data.can_be_nuked}`;
   }).join("\n");
-  console.log(res)
   return res;
 }
 
