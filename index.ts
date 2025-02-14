@@ -180,7 +180,8 @@ async function main() {
         role: Types.HandlerRole.OUTPUT,
         execute: async (data: any) => {
             const result = await starknetChain.write(data.payload)
-            console.log("execute transaction result", result);
+            
+            console.log("execute transaction result events", result.events);
 
 
             return result;

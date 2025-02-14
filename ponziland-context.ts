@@ -10,6 +10,12 @@ import { estimateNukeTime } from "./querys";
 
 let provider = new RpcProvider({ nodeUrl: env.STARKNET_RPC_URL });
 let abi = manifest.contracts[0].abi;
+const starknetChain = new Chains.StarknetChain({
+  rpcUrl: env.STARKNET_RPC_URL,
+  address: env.STARKNET_ADDRESS,
+  privateKey: env.STARKNET_PRIVATE_KEY,
+});
+
 
 const address = env.STARKNET_ADDRESS;
 
@@ -29,6 +35,8 @@ const estarkContract = new Contract(estarkAbi, estarkAddress, provider);
 const ebrotherContract = new Contract(ebrotherAbi, ebrotherAddress, provider);
 const elordsContract = new Contract(elordsAbi, elordsAddress, provider);
 const epaperContract = new Contract(epaperAbi, epaperAddress, provider);
+let ponziLandContract = (new Contract(abi, manifest.contracts[0].address, provider)).typedv2(abi as Abi);
+
 
 let contracts = [
   {name: "estark", contract: estarkContract, address: estarkAddress},
@@ -40,6 +48,8 @@ let contracts = [
 if (estarkAbi === undefined) {
   throw new Error('no abi.');
 }
+
+let block_time = await starknetChain.getBlockTime();
 
 export const getBalances = async () => {
   let estarkBalance: string = (await estarkContract.call("balanceOf", [address])).toString();
@@ -73,99 +83,96 @@ export const getBalances = async () => {
   `
 }
 
-const starknetChain = new Chains.StarknetChain({
-  rpcUrl: env.STARKNET_RPC_URL,
-  address: env.STARKNET_ADDRESS,
-  privateKey: env.STARKNET_PRIVATE_KEY,
-});
 
+export const get_lands_str = async () => {
+  let lands = await Providers.fetchGraphQL(
+    env.GRAPHQL_URL + "/graphql",
+    land_query,
+    {}
+  ).then((res: any) => res.ponziLandLandModels.edges.map((edge: any) => edge.node));
+  let land_info = await Promise.all(lands.map((land: any) => {
+    console.log(land)
+    let info = ponziLandContract.call("get_neighbors_yield", [land.location]);
+    return info;
+  }));
+  let land_claims = await Promise.all(lands.map((land: any) => {
+    return ponziLandContract.call("get_next_claim_info", [land.location]);
+  }));
+  
+  lands.forEach((land: any, index: number) => {
+    land.neighbors_info = land_info.map((land_info: any) => {
+      return land_info.yield_info.map((info: any) => {
+        return `
+          location: ${info.location}
+          token: ${info.token}
+          sell_price: ${info.sell_price}
+          per hour: ${info.per_hour}
+          nukeable: ${info.nukeable}
+        `;
+      }).join("\n");
+    });
+    land.neighbor_number = land_claims[index].length;
+    land.claims = land_claims[index].map((claim: any) => {
+      let claims: any[] = [];
+      for (let contract of contracts) {
+        if (claim.token === contract.address) {
+          claims.push({token: contract.name, amount: claim.amount});
+        }
+      }
+      return claims;
+    });
+    land.remaining_stake_time = estimateNukeTime(land.sell_price, land.stake_amount, land.neighbor_number);
+    console.log('land.remaining_stake_time', land.remaining_stake_time)
+  }); 
 
+  let land_str = lands.map((land: any) => 
+    `location: ${BigInt(land.location).toString()} - 
+    Remaining Stake
+    Amount: ${BigInt(land.stake_amount).toString()}
+    Token: ${BigInt(land.token_used).toString()}
+    Time: ${land.remaining_stake_time/60} minutes
+  
+    Listed Price: ${BigInt(land.sell_price).toString()}
+  
+    Yield: ${land.yield}`).join("\n");
 
+  return land_str;
+}
 
-let ponziLandContract = (new Contract(abi, manifest.contracts[0].address, provider)).typedv2(abi as Abi);
+export const get_auctions_str = async () => {
+  let auctions = await Providers.fetchGraphQL(
+    env.GRAPHQL_URL + "/graphql",
+    auction_query,
+    {}
+  ).then((res: any) => res.ponziLandAuctionModels.edges.map((edge: any) => edge.node));
 
+  let initial_prices = await Promise.all(auctions.map((auction: any) => {
+    let current_price = starknetChain.read(
+        {
+            contractAddress: ponzilandAddress,
+            entrypoint: "get_current_auction_price",
+            calldata: [auction.land_location]
+        }
+    ).then((res: any) => BigInt(res[0])/BigInt(10**18));
+    return current_price;
+  }));
 
-let initial_auctions: any = await Providers.fetchGraphQL(
-  env.GRAPHQL_URL + "/graphql",
-  auction_query,
-  {}
-).then((res: any) => res.ponziLandAuctionModels.edges.map((edge: any) => edge.node));
+  auctions.forEach((auction: any, index: number) => {
+    auction.current_price = initial_prices[index];
+  });
+  
+  let auction_str = auctions.map((auction: any) => 
+    `location: ${BigInt(auction.land_location).toString()} - Current Price: ${auction.current_price}`).join("\n");
 
-let initial_lands: any = await Providers.fetchGraphQL(
-  env.GRAPHQL_URL + "/graphql",
-  land_query,
-  {}
-).then((res: any) => res.ponziLandLandModels.edges.map((edge: any) => edge.node));
+  return auction_str;
+}
 
-let block_time = await starknetChain.getBlockTime();
 
 let balance_str = await getBalances();
 
-let initial_prices = await Promise.all(initial_auctions.map((auction: any) => {
-  let current_price = starknetChain.read(
-      {
-          contractAddress: ponzilandAddress,
-          entrypoint: "get_current_auction_price",
-          calldata: [auction.land_location]
-      }
-  ).then((res: any) => BigInt(res[0])/BigInt(10**18));
-  return current_price;
-}));
+let auction_str = await get_auctions_str();
 
-let land_info = await Promise.all(initial_lands.map((land: any) => {
-  console.log(land)
-  let info = ponziLandContract.call("get_neighbors_yield", [land.location]);
-  return info;
-}));
-
-let land_claims = await Promise.all(initial_lands.map((land: any) => {
-  return ponziLandContract.call("get_next_claim_info", [land.location]);
-}));
-
-initial_lands.forEach((land: any, index: number) => {
-  land.neighbors_info = land_info.map((land_info: any) => {
-    return land_info.yield_info.map((info: any) => {
-      return `
-        location: ${info.location}
-        token: ${info.token}
-        sell_price: ${info.sell_price}
-        per hour: ${info.per_hour}
-        nukeable: ${info.nukeable}
-      `;
-    }).join("\n");
-  });
-  land.neighbor_number = land_claims[index].length;
-  land.claims = land_claims[index].map((claim: any) => {
-    let claims: any[] = [];
-    for (let contract of contracts) {
-      if (claim.token === contract.address) {
-        claims.push({token: contract.name, amount: claim.amount});
-      }
-    }
-    return claims;
-  });
-  land.remaining_stake_time = estimateNukeTime(land.sell_price, land.stake_amount, land.neighbor_number);
-}); 
-
-initial_auctions.forEach((auction: any, index: number) => {
-  auction.current_price = initial_prices[index];
-});
-
-let auction_str = initial_auctions.map((auction: any) => 
-  `location: ${BigInt(auction.land_location).toString()} - Current Price: ${auction.current_price}`).join("\n");
-
-let land_str = initial_lands.map((land: any) => 
-  `location: ${BigInt(land.location).toString()} - 
-  Remaining Stake
-  Amount: ${BigInt(land.stake_amount).toString()}
-  Token: ${BigInt(land.token_used).toString()}
-  Time: ${land.remaining_stake_time/60} minutes
-
-  Listed Price: ${BigInt(land.sell_price).toString()}
-
-  Yield: ${land.yield}`).join("\n");
-
-
+let land_str = await get_lands_str();
 
 let PONZILAND_CONTEXT = `
 You are a player of a game called Ponziland, a onchain game where you buy land with various ERC20 tokens on starknet.
@@ -193,12 +200,14 @@ You should regulalaly monitor your lands stake and price relative to its neighbo
 
 Here is a snapshot of the current state of the game: 
 If the information you need is not here then you can query the graphql api for more information.
+Remember all token balances are in wei, so the true value is 10^18 times the value in the state.
+Current Block Time: ${block_time}
 
 Here are your token balances. Remember that when spending tokens all values should be in wei, so x10^18: 
 
 {{balances}}
 
-Here are the active auctions (price in estark):
+Here are the active auctions:
 
 {{auctions}}
 
