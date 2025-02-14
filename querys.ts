@@ -43,6 +43,16 @@ export const land_query = `query GetOwnedLands {
   }
   }`
 
+  export const nuke_query = `query GetNukeableLands {
+    ponziLandLandModels(where:{stake_amount: "0"}){
+      edges{
+        node{
+          location
+        }
+      }
+    }
+  }`
+
   export const estimateNukeTime = (
     sellPrice: number,
     remainingStake: number,

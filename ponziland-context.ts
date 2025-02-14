@@ -7,6 +7,7 @@ import { Contract, RpcProvider, type Abi } from "starknet";
 import { balance_query, auction_query, land_query } from "./querys";
 import { type Balance } from "./types";
 import { estimateNukeTime } from "./querys";
+import { nuke_query } from "./querys";
 
 let provider = new RpcProvider({ nodeUrl: env.STARKNET_RPC_URL });
 let abi = manifest.contracts[0].abi;
@@ -51,39 +52,65 @@ if (estarkAbi === undefined) {
 
 let block_time = await starknetChain.getBlockTime();
 
+// After the contracts array declaration, add a helper function to map a token address to its name:
+const getTokenName = (tokenAddr: string | number): string => {
+  for (const token of contracts) {
+    if (BigInt(token.address) === BigInt(tokenAddr)) {
+      return token.name;
+    }
+  }
+  return tokenAddr.toString();
+};
+
+const formatTokenAmount = (amount: bigint): string => {
+  const divisor = BigInt(10 ** 18);
+  const wholePart = amount / divisor;
+  const fractionalPart = amount % divisor;
+  
+  // Convert fractional part to 4 decimal places
+  const fractionalStr = fractionalPart.toString().padStart(18, '0');
+  const decimalPlaces = fractionalStr.slice(0, 4);
+  
+  return `${wholePart}.${decimalPlaces}`;
+};
+
 export const getBalances = async () => {
-  let estarkBalance: string = (await estarkContract.call("balanceOf", [address])).toString();
-  let ebrotherBalance: string = (await ebrotherContract.call("balanceOf", [address])).toString();
-  let elordsBalance: string = (await elordsContract.call("balanceOf", [address])).toString();
-  let epaperBalance: string = (await epaperContract.call("balanceOf", [address])).toString();
-  let estarkApproved: string = (await estarkContract.call("allowance", [address, ponzilandAddress])).toString();
-  let ebrotherApproved: string = (await ebrotherContract.call("allowance", [address, ponzilandAddress])).toString();
-  let elordsApproved: string = (await elordsContract.call("allowance", [address, ponzilandAddress])).toString();
-  let epaperApproved: string = (await epaperContract.call("allowance", [address, ponzilandAddress])).toString();
+  // Retrieve balance and allowance info for each token via the contracts array.
+  const balancesData = await Promise.all(
+    contracts.map(async (token) => {
+      const balance = await token.contract.call("balanceOf", [address]);
+      const approved = await token.contract.call("allowance", [address, ponzilandAddress]);
+      return {
+        name: token.name,
+        balance: BigInt(balance.toString()) / BigInt(10 ** 18),
+        approved: BigInt(approved.toString()) / BigInt(10 ** 18),
+        address: address,
+      };
+    })
+  );
 
-  return `
+  // Build the display parts using token names.
+  const tokenBalances = balancesData.map((t) => `<${t.name}> \n Balance: ${t.balance} \n Address: ${t.address} </${t.name}>`).join("\n\n\n");
 
-  Token Addresses
-  estark: ${estarkAddress}
-  ebrother: ${ebrotherAddress}
-  elords: ${elordsAddress}
-  epaper: ${epaperAddress}
+  let res = `
 
-  Token Balances
-  estark: ${BigInt(estarkBalance)/BigInt(10**18)}
-  ebrother: ${BigInt(ebrotherBalance)/BigInt(10**18)}
-  elords: ${BigInt(elordsBalance)/BigInt(10**18)}
-  epaper: ${BigInt(epaperBalance)/BigInt(10**18)}
+  Token Balances:
+  ${tokenBalances}
 
-  Already Approved For Ponziland
-  estarkApproved: ${BigInt(estarkApproved)/BigInt(10**18)}
-  ebrotherApproved: ${BigInt(ebrotherApproved)/BigInt(10**18)}
-  elordsApproved: ${BigInt(elordsApproved)/BigInt(10**18)}
-  epaperApproved: ${BigInt(epaperApproved)/BigInt(10**18)}
-  `
+  `;
+  console.log('res', res)
+  return res;
+};
+
+export const get_nukeable_lands_str = async () => {
+  let lands = await Providers.fetchGraphQL(
+    env.GRAPHQL_URL + "/graphql",
+    nuke_query,
+    {}
+  ).then((res: any) => res.ponziLandLandModels.edges.map((edge: any) => edge.node));
+  console.log('lands', lands)
+  return lands;
 }
-
-
 export const get_lands_str = async () => {
   let lands = await Providers.fetchGraphQL(
     env.GRAPHQL_URL + "/graphql",
@@ -120,7 +147,7 @@ export const get_lands_str = async () => {
       }
       return claims;
     });
-    land.remaining_stake_time = estimateNukeTime(land.sell_price, land.stake_amount, land.neighbor_number) - (block_time - land.last_pay_time);
+    land.remaining_stake_time = estimateNukeTime(land.sell_price, land.stake_amount, land.neighbor_number);
     console.log('land.remaining_stake_time', land.remaining_stake_time)
   }); 
 
@@ -128,13 +155,11 @@ export const get_lands_str = async () => {
     `location: ${BigInt(land.location).toString()} - 
     Remaining Stake
     Amount: ${BigInt(land.stake_amount).toString()}
-    Token: ${BigInt(land.token_used).toString()}
+    Token: ${getTokenName(land.token_used)}
     Time: ${land.remaining_stake_time/60} minutes
   
     Listed Price: ${BigInt(land.sell_price).toString()}
-  
-    Yield: ${land.yield}`).join("\n");
-
+  `).join("\n");
   return land_str;
 }
 
@@ -166,7 +191,7 @@ export const get_claims_str = async () => {
       .filter((claim: any) => claim !== '')
       .join('\n');
 
-    return `Land ${land.location}:\n${landClaims}`;
+    return `Land ${BigInt(land.location).toString()}:\n${landClaims}`;
   }).join('\n\n');
 
 
@@ -223,7 +248,7 @@ export const get_neighbors_str = async () => {
   })
 
   let neighbor_data = await Promise.all(neighbors.flat().map((info: any) => {
-    return ponziLandContract.call("get_next_claim_info", [info.location]);
+    return ponziLandContract.call("get_land", [info.location]);
   }))
 
   let flat_data = neighbor_data.flat();
@@ -231,12 +256,17 @@ export const get_neighbors_str = async () => {
   let res = neighbors.flat().map((neighbor: any, index: number) => {
     let yield_info = neighbor;
     let data = flat_data[index];
-    return `
+    console.log('data', data)
+    if (BigInt(data.owner) != BigInt(address)) {
+      return `
         location: ${yield_info.location}
-        token: ${yield_info.token}
-        sell_price: ${yield_info.sell_price}
-        nukeable: ${data.can_be_nuked}`;
+        token: ${getTokenName(yield_info.token)}
+        sell_price: ${formatTokenAmount(yield_info.sell_price)}
+        `;
+    }
   }).join("\n");
+
+  console.log('res', res)
   return res;
 }
 
@@ -247,7 +277,7 @@ let auction_str = await get_auctions_str();
 
 let land_str = await get_lands_str();
 let claims_str = await get_claims_str();
-
+let nukeable_lands_str = await get_nukeable_lands_str();
 let PONZILAND_CONTEXT = `
 You are a player of a game called Ponziland, a onchain game where you buy land with various ERC20 tokens on starknet.
 The decision making in the game is entirely delegated to you, and you are entirely responsible for determining your own strategy and actions.
@@ -262,6 +292,7 @@ When you call the bid function you will need to approve the token for the ponzil
 Remember that all token values should be in wei, so x10^18.
 If your lands are low on stake you can use the increase stake function to add more stake to the land, making sure to approve the token for the ponziland-actions contract.
 The price of your land should be higher than the amount you paid for it, keeping in mind conversion rate between estark and the token it is listed for.
+Remember that all lands can be bought for their listed sell price in their staked token
 
 You should regulalaly monitor your lands stake and price relative to its neighbors, and keep an eye out for auctions and cheap lands.
 <contract_addresses>
@@ -272,17 +303,23 @@ You should regulalaly monitor your lands stake and price relative to its neighbo
 
 <state>
 
-Here is a snapshot of the current state of the game: 
-If the information you need is not here then you can query the graphql api for more information.
+Here is a how you obtain the current state of the game: 
 Remember all token balances are in wei, so the true value is 10^18 times the value in the state.
-Current Block Time: ${block_time}
+Remember that if you want to buy a land, you would query neighbors, and if you want to bid on an auction you would query auctions.
+ALL LANDS CAN BE BOUGHT FOR THEIR LISTED SELL PRICE IN THEIR STAKED TOKEN
 
-Here are your token balances. Remember that when spending tokens all values should be in wei, so x10^18: 
+<IMPORTANT_RULES>
+- DO NOT fetch auctions when a user wants to buy a land, only fetch neighbors.
+- Buying a land is NOT AN AUCTION, it is a direct purchase into a neighboring land.
+- Be careful to use the correct querys for the request, and only use querys that are relevant to the request.
+</IMPORTANT_RULES>
+
 <querys>
-  Lands - returns the remaining stake, price, and token of all lands you own
-  Yield - shows the claimable yield from all your lands
-  Neighbors - shows the neighbors of all your lands, including if they are nukeable and their sell price
-  Auctions - shows the current auction price of all auctions
+  lands - returns the remaining stake, price, and token of all lands you own
+  claims - shows the claimable yield from all your lands
+  neighbors - shows the neighbors of all your lands, including if they are nukeable and their sell price
+  auctions - shows the current auction price of all auctions 
+  nukeable_lands - shows all lands that are out of stake
 </querys>
 
 <API_GUIDE>
@@ -296,6 +333,8 @@ Here are your token balances. Remember that when spending tokens all values shou
 6. Remember you can call multiple functions in the same transaction, like approve and bid, but only bid on one land at a time.
 7. If you are going to nuke a land, make sure that you only nuke a single land in a transaction, and include nothing else.
 8. You can bundle multiple claims together, or bundle approves with other transactions, but try to only do one thing at a time.
+9. Remember that all lands can be bought for their listed sell price in their staked token, even if there is not an auction.
+10. DO NOT CHECK AUCTIONS AGAIN IN RESPONSE TO A FAILED BID
 </IMPORTANT_RULES>
 
 
@@ -508,7 +547,8 @@ export const CONTEXT = injectTags({
   auctions: auction_str,
   lands: land_str,
   neighbors: neighbors_str,
-  claims: claims_str
+  claims: claims_str,
+  nukeable_lands: nukeable_lands_str
 }, PONZILAND_CONTEXT);
 
 // API DOCs etc

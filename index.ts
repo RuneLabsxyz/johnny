@@ -8,7 +8,7 @@
  */
 
 import { LLMClient, ChainOfThought, ChromaVectorDB, Logger, Consciousness } from "../daydreams/packages/core/src";
-import { CONTEXT, get_auctions_str, get_lands_str, get_claims_str, get_neighbors_str } from "./ponziland-context.ts";
+import { CONTEXT, get_auctions_str, get_lands_str, get_claims_str, get_neighbors_str, get_nukeable_lands_str } from "./ponziland-context.ts";
 import * as readline from "readline";
 import chalk from "chalk";
 import { z } from "zod";
@@ -58,7 +58,7 @@ async function main() {
     // Initialize core components
     const llmClient = new LLMClient({
         model: "openrouter:google/gemini-2.0-flash-001",
-        temperature: 0.15
+        temperature: 0.3
     });
 
     const starknetChain = new Chains.StarknetChain({
@@ -167,7 +167,7 @@ async function main() {
         intervalMs: 300000, // Think every 5 minutes
         minConfidence: 0.7,
         logLevel: loglevel,
-    }, defaultCharacter);
+    }, getBalances, defaultCharacter);
 
     let provider = new RpcProvider({ nodeUrl: env.STARKNET_RPC_URL });
     let abi = manifest.contracts[0].abi;    
@@ -211,7 +211,9 @@ async function main() {
         name: "FETCH",
         role: Types.HandlerRole.OUTPUT,
         execute: async (data: any) => {
-            const { query } = data.payload ?? {};
+            let { query } = data.payload ?? {};
+
+            query = query.toLowerCase();
 
             if (query == "balances") {
 
@@ -240,6 +242,12 @@ async function main() {
                 console.log('fetch neighbors', neighbors_str)
 
                 return neighbors_str;
+            } else if (query == "nukeable_lands") {
+
+                let nukeable_lands_str = await get_nukeable_lands_str();
+                console.log('fetch nukeable_lands', nukeable_lands_str)
+
+                return nukeable_lands_str;
             }
             
 
@@ -247,10 +255,10 @@ async function main() {
         outputSchema: z
             .object({
                 query: z.string()
-                    .describe(`"balances" or "auctions" or "lands" or "claims" or "neighbors"`),
+                    .describe(`"balances" or "auctions" or "lands" or "claims" or "neighbors" or "nukeable_lands"`),
             })
             .describe(
-                "The payload to fetch data from the Eternum GraphQL API, never include slashes or comments"
+                "Remember to use neighbors for buying, and auctions for bidding"
             ),
     });
     // Set up event logging
@@ -366,7 +374,7 @@ async function main() {
             "johnny",
             "consciousness_thoughts",
             {},
-            50000
+            300000
         );
     
 
