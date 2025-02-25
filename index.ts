@@ -35,7 +35,6 @@ import { type Balance } from "./types";
 import { getBalances } from "./ponziland-context";
 
 
-
 /**
  * Helper function to get user input from CLI
  */
@@ -68,8 +67,10 @@ async function main() {
     });
 
 
-    const memory = new ChromaVectorDB("agent_memory");
-
+    const memory = new ChromaVectorDB("johnny");
+    console.log('memory', memory)
+    memory.purge();
+    console.log('memory purged')
     const conversationManager = new ConversationManager(memory);
     let balances = await getBalances();
 
@@ -127,8 +128,6 @@ async function main() {
     // Start scheduler service
     scheduler.start();
 
-    await memory.purge(); // Clear previous session data
-
     // Load initial context documents
     await memory.storeDocument({
         title: "Game Context",
@@ -158,7 +157,7 @@ async function main() {
         {
             username: env.TWITTER_USERNAME,
             password: env.TWITTER_PASSWORD,
-            email: env.TWITTER_EMAIL,
+            email: ""
         },
         loglevel
     );

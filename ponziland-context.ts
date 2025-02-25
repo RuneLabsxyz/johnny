@@ -257,6 +257,7 @@ export const get_neighbors_str = async () => {
     let yield_info = neighbor;
     let data = flat_data[index];
     console.log('data', data)
+    console.log('address', BigInt(address))
     if (BigInt(data.owner) != BigInt(address)) {
       return `
         location: ${yield_info.location}

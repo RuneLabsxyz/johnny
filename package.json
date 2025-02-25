@@ -6,6 +6,7 @@
     "@mendable/firecrawl-js": "^1.15.7",
     "ajv": "^8.17.1",
     "chalk": "^5.4.1",
+    "chromadb": "^1.10.4",
     "cors": "^2.8.5",
     "discord.js": "^14.17.3",
     "express": "^4.21.2",
