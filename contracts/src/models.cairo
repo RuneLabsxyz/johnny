@@ -3,8 +3,10 @@ use starknet::ContractAddress;
 #[derive(Copy, Drop, Serde, Introspect)]
 pub enum Status {
     None,
-    Moving,
-    Working,
+    Planting,
+    Tending,
+    Moving: u64,
+
 }
 
 #[derive(Copy, Drop, Serde, Introspect)]
