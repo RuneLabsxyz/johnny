@@ -7,7 +7,8 @@ trait IJohnnyActions<T> {
     fn plant(ref self: T);
     fn tend(ref self: T);
     fn refresh(ref self: T);
-    fn johnny_status(self: @T) -> Johnny;
+    fn get_johnny(self: @T) -> Johnny;
+    fn get_johnny_location(self: @T) -> (u64, u64);
 }
 
 #[dojo::contract]
@@ -16,8 +17,8 @@ mod johnny_actions {
     use starknet::{ContractAddress, get_caller_address, get_block_timestamp};
     use orchard::ponziland::consts::JOHNNY_ADDRESS;
     use orchard::ponziland::coords::{left, right, up, down};
-    use orchard::models::{Johnny, Status, Orchard, Stage};
-
+    use orchard::models::{Johnny, Status, Orchard, OrchardTrait, Stage};
+    use orchard::ponziland::coords::index_to_position;
 
     use dojo::model::{ModelStorage};
     use dojo::event::EventStorage;
@@ -45,7 +46,7 @@ mod johnny_actions {
             let mut world = self.world(@"orchards");
             let mut johnny: Johnny = world.read_model(JOHNNY_ADDRESS);
 
-            assert!(can_act(johnny), "Johnny cannot act");
+            assert!(_can_act(johnny), "Johnny cannot act");
 
             //TODO: HANDLE UNWRAP SAFELY
             let valid = location == left(johnny.location).unwrap() || 
@@ -69,7 +70,7 @@ mod johnny_actions {
             let mut world = self.world(@"orchards");
             let mut johnny: Johnny = world.read_model(JOHNNY_ADDRESS);
 
-            assert!(can_act(johnny), "Johnny cannot act");
+            assert!(_can_act(johnny), "Johnny cannot act");
 
             let mut orchard: Orchard = world.read_model(johnny.location);
 
@@ -88,9 +89,9 @@ mod johnny_actions {
             assert!(caller.into() == JOHNNY_ADDRESS, "Not Johnny");
             let mut world = self.world(@"orchards");
 
-            let johnny: Johnny = world.read_model(JOHNNY_ADDRESS);
+            let mut johnny: Johnny = world.read_model(JOHNNY_ADDRESS);
 
-            assert!(can_act(johnny), "Johnny cannot act");
+            assert!(_can_act(johnny), "Johnny cannot act");
 
             let mut orchard: Orchard = world.read_model(johnny.location);
 
@@ -107,20 +108,26 @@ mod johnny_actions {
         }
 
         fn refresh(ref self: ContractState) {
-            let res = self.refresh_johnny();
+            let res = _refresh_johnny(ref self);
             if !res {
                 panic!("Refresh Unncessary");
             }
         }
 
-        fn johnny_status(self: @ContractState) -> Johnny {
+        fn get_johnny(self: @ContractState) -> Johnny {
             let mut world = self.world(@"orchards");
             let johnny: Johnny = world.read_model(JOHNNY_ADDRESS);
             return johnny;
         }
+
+        fn get_johnny_location(self: @ContractState) -> (u64, u64) {
+            let mut world = self.world(@"orchards");
+            let johnny: Johnny = world.read_model(JOHNNY_ADDRESS);
+            return index_to_position(johnny.location);
+        }
     }
 
-    fn can_act(johnny: Johnny) -> bool {
+    fn _can_act(johnny: Johnny) -> bool {
         let time_passed = get_block_timestamp() - johnny.last_action_time;
 
         match johnny.status {
@@ -137,11 +144,11 @@ mod johnny_actions {
         }
     }
 
-    fn refresh_johnny(ref self: ContractState) -> bool {
+    fn _refresh_johnny(ref self: ContractState) -> bool {
         let mut world = self.world(@"orchards");
         let mut johnny: Johnny = world.read_model(JOHNNY_ADDRESS);
 
-        let can_act = can_act(johnny);
+        let can_act = _can_act(johnny);
 
         if can_act {
             match johnny.status {
@@ -149,11 +156,7 @@ mod johnny_actions {
 
                 },
                 Status::Planting => {
-                    let mut orchard: Orchard = world.read_model(johnny.location);
-                    orchard.planted_time = get_block_timestamp();
-                    orchard.stage = Stage::Nursery;
-                    orchard.health = 100;
-                    orchard.last_tend_time = get_block_timestamp();
+                    let mut orchard: Orchard = OrchardTrait::new(johnny.location, get_block_timestamp());
                     world.write_model(@orchard);
                 },
                 Status::Tending => {
