@@ -47,8 +47,7 @@ mod johnny_actions {
 
             assert!(can_act(johnny), "Johnny cannot act");
 
-
-            //TODO: HANDLE UNWRAP BETTER
+            //TODO: HANDLE UNWRAP SAFELY
             let valid = location == left(johnny.location).unwrap() || 
                 location == right(johnny.location).unwrap() || 
                 location == up(johnny.location).unwrap() || 
@@ -74,14 +73,13 @@ mod johnny_actions {
 
             let mut orchard: Orchard = world.read_model(johnny.location);
 
-            assert!(orchard.planted_time == 0, "Orchard already planted");
+            assert!(orchard.planted_time == 0, "Orchard already planted here");
 
-            orchard.planted_time = get_block_timestamp();
-            orchard.stage = Stage::Nursery;
-            orchard.health = 100;
-            orchard.last_tend_time = get_block_timestamp();
+            johnny.status = Status::Planting;
+            johnny.last_action_time = get_block_timestamp();
 
             world.write_model(@orchard);
+            world.write_model(@johnny);
         }
 
         fn tend(ref self: ContractState) {
@@ -98,47 +96,21 @@ mod johnny_actions {
 
             assert!(orchard.planted_time != 0, "Orchard not planted");
 
+            johnny.status = Status::Tending;
+            johnny.last_action_time = get_block_timestamp();
+
             orchard.last_tend_time = get_block_timestamp();
             orchard.health = 100;
+
             world.write_model(@orchard);
+            world.write_model(@johnny);
         }
 
         fn refresh(ref self: ContractState) {
-
-            let mut world = self.world(@"orchards");
-            let mut johnny: Johnny = world.read_model(JOHNNY_ADDRESS);
-
-            let can_act = can_act(johnny);
-
-            if can_act {
-                match johnny.status {
-                    Status::None => {
-
-                    },
-                    Status::Planting => {
-                        let mut orchard: Orchard = world.read_model(johnny.location);
-                        orchard.planted_time = get_block_timestamp();
-                        orchard.stage = Stage::Nursery;
-                        orchard.health = 100;
-                        orchard.last_tend_time = get_block_timestamp();
-                        world.write_model(@orchard);
-                    },
-                    Status::Tending => {
-                        let mut orchard: Orchard = world.read_model(johnny.location);
-                        orchard.last_tend_time = get_block_timestamp();
-                        orchard.health = 100;
-                        world.write_model(@orchard);
-                    },
-                    Status::Moving(location) => {
-                        johnny.location = location;
-
-                    },
-                }
+            let res = self.refresh_johnny();
+            if !res {
+                panic!("Refresh Unncessary");
             }
-
-            johnny.status = Status::None;
-
-            world.write_model(@johnny);
         }
 
         fn johnny_status(self: @ContractState) -> Johnny {
@@ -165,4 +137,43 @@ mod johnny_actions {
         }
     }
 
+    fn refresh_johnny(ref self: ContractState) -> bool {
+        let mut world = self.world(@"orchards");
+        let mut johnny: Johnny = world.read_model(JOHNNY_ADDRESS);
+
+        let can_act = can_act(johnny);
+
+        if can_act {
+            match johnny.status {
+                Status::None => {
+
+                },
+                Status::Planting => {
+                    let mut orchard: Orchard = world.read_model(johnny.location);
+                    orchard.planted_time = get_block_timestamp();
+                    orchard.stage = Stage::Nursery;
+                    orchard.health = 100;
+                    orchard.last_tend_time = get_block_timestamp();
+                    world.write_model(@orchard);
+                },
+                Status::Tending => {
+                    let mut orchard: Orchard = world.read_model(johnny.location);
+                    orchard.last_tend_time = get_block_timestamp();
+                    orchard.health = 100;
+                    world.write_model(@orchard);
+                },
+                Status::Moving(location) => {
+                    johnny.location = location;
+
+                },
+            }
+
+
+            johnny.status = Status::None;
+
+            world.write_model(@johnny);
+        }
+
+        return can_act;
+    }
 }
