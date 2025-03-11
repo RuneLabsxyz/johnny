@@ -32,7 +32,7 @@ export const consciousness = input({
   
         let res = await generateText({ 
           model: openrouter("google/gemini-2.0-flash-001"),
-          prompt: "Give me a random thought that could be the basis for a social media post considering the following character information: " + character,
+          prompt: "Give me a random thought you want to share on social media considering the following character information: " + character + `don't make the post itself, just say something like "I want to tweet about x"`,
           temperature: 0.5,
         })
   

@@ -1,11 +1,11 @@
-import { render } from "../fork/daydreams/packages/core/src/";
-import { env } from "./env";
-import { fetchGraphQL } from "../fork/daydreams/packages/core/src/";
-import manifest from "./manifest.json";
+import { render } from "../../fork/daydreams/packages/core/src";
+import { env } from "../env";
+import { fetchGraphQL } from "../../fork/daydreams/packages/core/src";
+import manifest from "../manifest.json";
 import { Contract, RpcProvider, type Abi } from "starknet";
-import { balance_query, auction_query, land_query } from "./querys";
-import { estimateNukeTime } from "./querys";
-import { nuke_query } from "./querys";
+import { balance_query, auction_query, land_query } from "../querys";
+import { estimateNukeTime } from "../querys";
+import { nuke_query } from "../querys";
 
 let provider = new RpcProvider({ nodeUrl: env.STARKNET_RPC_URL });
 let abi = manifest.contracts[0].abi;
