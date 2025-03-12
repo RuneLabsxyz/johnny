@@ -28,8 +28,10 @@ export const consciousness = input({
       }),
     subscribe(send, { container }) {
       // Check mentions every minute
+      let index = 0;
+
       const interval = setInterval(async () => {
-  
+        
         let res = await generateText({ 
           model: openrouter("google/gemini-2.0-flash-001"),
           prompt: "Give me a random thought you want to share on social media considering the following character information: " + character + `don't make the post itself, just say something like "I want to tweet about x"`,
@@ -38,7 +40,9 @@ export const consciousness = input({
   
         console.log('new thought: ' + res.text)
 
-        send(consciousnessContext, { userId: "1" }, { text: res.text })
+        send(consciousnessContext, { userId: "thought: " + index }, { text: res.text });
+
+        index += 1;
         
       }, 300000);
   

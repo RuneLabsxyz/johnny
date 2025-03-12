@@ -1,8 +1,8 @@
-import { render } from "../fork/daydreams/packages/core/src/";
-import { env } from "./env";
-import manifest from "./manifest.json";
+import { render } from "../../fork/daydreams/packages/core/src";
+import { env } from "../env";
+import manifest from "../manifest.json";
 import { Contract, RpcProvider, type Abi } from "starknet";
-import manifest_sepolia from "./contracts/manifest_sepolia.json";
+import manifest_sepolia from "../contracts/manifest_sepolia.json";
 
 let provider = new RpcProvider({ nodeUrl: env.STARKNET_RPC_URL });
 let abi = manifest.contracts[0].abi;

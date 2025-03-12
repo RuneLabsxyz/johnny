@@ -7,10 +7,10 @@ import { balance_query, auction_query, land_query } from "../querys";
 import { estimateNukeTime } from "../querys";
 import { nuke_query } from "../querys";
 
-let provider = new RpcProvider({ nodeUrl: env.STARKNET_RPC_URL });
+let provider = new RpcProvider({ nodeUrl: process.env.STARKNET_RPC_URL });
 let abi = manifest.contracts[0].abi;
 
-const address = env.STARKNET_ADDRESS;
+const address = process.env.STARKNET_ADDRESS!;
 
 const ponzilandAddress = '0x1f058fe3a5a82cc12c1e38444d3f9f3fd3511ef4c95851a3d4e07ad195e0af6';
 const estarkAddress = '0x71de745c1ae996cfd39fb292b4342b7c086622e3ecf3a5692bd623060ff3fa0';
