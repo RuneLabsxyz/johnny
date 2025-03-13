@@ -3,7 +3,7 @@ import { z } from "zod";
 import { generateText } from "ai";
 import { createOpenRouter } from "@openrouter/ai-sdk-provider";
 import { context } from "../fork/daydreams/packages/core/src";
-import { character } from "./characters/quain";
+import { character } from "./characters/johnny";
 
 let openrouter = createOpenRouter({
     apiKey: process.env.OPENROUTER_API_KEY!,

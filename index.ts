@@ -2,7 +2,7 @@ import { Action, createDreams, createMemoryStore, LogLevel, memory, action, Acti
 import { createOpenRouter } from "@openrouter/ai-sdk-provider";
 import { createChromaVectorStore, discord } from "../fork/daydreams/packages/core/src/extensions";
 import { createGroq } from "@ai-sdk/groq";
-import { character } from "./characters/quain";
+import { character } from "./characters/johnny";
 import { z } from "zod";
 import { generateText } from "ai";
 import { consciousness } from "./consciousness";

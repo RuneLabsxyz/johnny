@@ -61,11 +61,17 @@ export class TwitterClient {
   async initialize() {
     if (!this.isInitialized) {
       try {
+
+        await this.scraper.setCookies([process.env.TWITTER_COOKIES!]);
         await this.scraper.login(
           this.credentials.username,
           this.credentials.password,
-          this.credentials.email
+          this.credentials.email,
         );
+
+        let cookies = await this.scraper.getCookies();
+
+        console.log(cookies);
         this.isInitialized = true;
         this.logger.info("TwitterClient", "Initialized successfully");
       } catch (error) {
