@@ -1,4 +1,4 @@
-import { Scraper, SearchMode, type Tweet, } from "agent-twitter-client";
+import { Scraper, SearchMode, type Tweet } from "agent-twitter-client";
 import type { JSONSchemaType } from "ajv";
 import { Logger } from "@daydreamsai/core";
 import { LogLevel } from "@daydreamsai/core";
@@ -61,12 +61,13 @@ export class TwitterClient {
   async initialize() {
     if (!this.isInitialized) {
       try {
+        let cookie = [process.env.TWITTER_COOKIES];
 
+        console.log(cookie)
         await this.scraper.setCookies([process.env.TWITTER_COOKIES!]);
         await this.scraper.login(
           this.credentials.username,
           this.credentials.password,
-          this.credentials.email,
         );
 
         let cookies = await this.scraper.getCookies();
@@ -101,6 +102,8 @@ export class TwitterClient {
         if (mention) {
           let hasReplied = await this.checkHasRepliedToTweet(mention.conversationId!, mention.id!);
           console.log("Has replied", mention.id, hasReplied);
+
+
           if (hasReplied) {
             continue;
           }
@@ -193,6 +196,7 @@ export class TwitterClient {
         return true;
       }
     }
+
     return false;
   }
 
