@@ -62,9 +62,11 @@ export class TwitterClient {
     if (!this.isInitialized) {
       try {
         let cookie = [process.env.TWITTER_COOKIES];
+   //
+    //    this.scraper.setCookies(cookie);
+        console.log('scraper cookies', await this.scraper.getCookies())
 
         console.log(cookie)
-        await this.scraper.setCookies([process.env.TWITTER_COOKIES!]);
         await this.scraper.login(
           this.credentials.username,
           this.credentials.password,
@@ -101,7 +103,6 @@ export class TwitterClient {
       for await (const mention of mentions.tweets) {
         if (mention) {
           let hasReplied = await this.checkHasRepliedToTweet(mention.conversationId!, mention.id!);
-          console.log("Has replied", mention.id, hasReplied);
 
 
           if (hasReplied) {
@@ -117,7 +118,6 @@ export class TwitterClient {
             this.lastCheckedTweetId &&
             BigInt(mention.id ?? "") <= this.lastCheckedTweetId
           ) {
-            console.log("old")
             continue;
           }
         }
@@ -189,10 +189,10 @@ export class TwitterClient {
 
   async checkHasRepliedToTweet(conversationId: string, tweetId: string): Promise<boolean> {
     const query = `conversation_id:${conversationId} from:${this.credentials.username}`;
-    const search = (await this.scraper.searchTweets(query, 100, SearchMode.Latest));
+    const search = (await this.scraper.searchTweets(query, 250, SearchMode.Latest));
 
     for await (const tweet of search) {
-      if (tweet.username === this.credentials.username) {
+      if (tweet.username?.toLowerCase() === this.credentials.username.toLowerCase()) {
         return true;
       }
     }

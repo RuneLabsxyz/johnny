@@ -76,7 +76,8 @@ export const twitter = extension({
               }
             );
           }
-        }, 600000);
+
+        }, 250000);
 
         return () => clearInterval(interval);
       },
@@ -116,7 +117,7 @@ export const twitter = extension({
 
     "twitter:tweet": output({
       schema: z.object({
-        content: z.string().max(200).describe("tweet content, keep it short"),
+        content: z.string().max(280).describe("tweet content, keep it short"),
         reasoning: z.string().optional()
       }),
       description: "Use this to post a new tweet. Remember not to include any slashes in your response, And remember tweest are outputs, not actions",
