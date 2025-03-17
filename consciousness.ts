@@ -17,7 +17,7 @@ const consciousnessContext = context({
   }),
 });
 
-export const consciousness = input({
+export const consciousness = (prompt: string) => input({
     schema: z.object({
       text: z.string(),
     }),
@@ -43,7 +43,7 @@ export const consciousness = input({
         timeout = setTimeout(async () => {
           let res = await generateText({ 
             model: openrouter("google/gemini-2.0-flash-001"),
-            prompt: "Give me a random thought you want to share on social media considering the following character information: " + character + `don't make the post itself, just say something like "I want to tweet about x"`,
+            prompt,
             temperature: 0.5,
           });
     

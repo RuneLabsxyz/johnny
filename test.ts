@@ -9,6 +9,7 @@ import { consciousness } from "./consciousness";
 import { twitter } from "./twitter/twitter";
 import { get_balances } from "./actions/get-balances";
 import { execute_transaction } from "./actions/execute-transaction";
+import { orchard } from "./actions/orchard-action";
 
 let openrouter = createOpenRouter({
   apiKey: process.env.OPENROUTER_API_KEY!,
@@ -20,23 +21,17 @@ const chain = new StarknetChain({rpcUrl: process.env.STARKNET_RPC_URL ?? "",
     privateKey: process.env.STARKNET_PRIVATE_KEY ?? "" 
 })
 
-
-
-
 const agent = createDreams({
   logger: LogLevel.TRACE,
   model: openrouter("google/gemini-2.0-flash-001"),
-  extensions: [cli],
+  extensions: [discord, orchard(chain)],
   character: character,
   memory: {
     store: createMemoryStore(),
     vector: createChromaVectorStore("agent", "http://localhost:8000"),
     vectorModel: openrouter("google/gemini-2.0-flash-001"),
   },
-  actions: [get_balances(chain), execute_transaction(chain)]
 });
-
-
 
 // Start the agent
 await agent.start();

@@ -29,7 +29,6 @@ export const execute_transaction = (chain: StarknetChain) => action({
     ).describe("Array of all calls to execute in transaction. Include all transactions here, instead of using this multiple times"),
     }),
     handler(call, ctx, agent) {
-
         console.log(call);
 
         let i = 0;

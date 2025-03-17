@@ -19,6 +19,8 @@ const chain = new StarknetChain({rpcUrl: process.env.STARKNET_RPC_URL ?? "",
                                   privateKey: process.env.STARKNET_PRIVATE_KEY ?? "" 
 })
 
+let c = consciousness("Give me a random thought you want to share on social media considering the following character information: " + character + `don't make the post itself, just say something like "I want to tweet about x")`)
+
 const agent = createDreams({
   logger: LogLevel.TRACE,
   model: openrouter("google/gemini-2.0-flash-001"),
@@ -29,7 +31,7 @@ const agent = createDreams({
     vector: createChromaVectorStore("agent", "http://localhost:8000"),
     vectorModel: openrouter("google/gemini-2.0-flash-001"),
   },
-  inputs: {"consciousness": consciousness},
+  inputs: {"consciousness": c},
   actions: [get_balances(chain)]
 }); 
 
