@@ -3,7 +3,7 @@ import { z } from "zod";
 import { render } from "../../fork/daydreams/packages/core/src";
 import { StarknetChain } from "../../fork/daydreams/packages/core/src";
 import manifest  from "../contracts/manifest_sepolia.json"
-
+import { Contract, Abi } from "starknet";
 const orchardContext = context({
   type: "orchard",
   key: ({ userId }) => userId.toString(),
@@ -31,7 +31,7 @@ export const orchard_action = (chain: StarknetChain) => action({
 
 })
 
-export const check_status = (chain: StarknetChain) => input({
+export const check_status = (orchard_contract: Contract) => input({
   schema: z.object({
     text: z.string(),
   }),
@@ -56,15 +56,14 @@ export const check_status = (chain: StarknetChain) => input({
       
       timeout = setTimeout(async () => {
 
-        let status = await chain.read({
-          contractAddress: manifest.contracts[0].address,
-          entrypoint: "get_johnny_status",
-          calldata: []
-        })
+        let status = await orchard_contract.get_johnny()
 
         console.log(status);
 
-        send(orchardContext, { userId: "thought: " + index }, { text: "Your status is: " + status });
+        let status_text = `Your avatar is currently at location ${status.location} and is ${status.status}`
+
+
+        send(orchardContext, { userId: "thought: " + index }, { text: status_text });
         index += 1;
         
         // Schedule the next thought
@@ -81,15 +80,21 @@ export const check_status = (chain: StarknetChain) => input({
 
 
 
-export const orchard = (chain: StarknetChain) => extension({
+export const orchard = (chain: StarknetChain) => {
+
+  let orchard_contract = new Contract(manifest.contracts[0].abi, manifest.contracts[0].address, chain.provider).typedv2(manifest.contracts[0].abi as Abi);
+    
+  return extension({
   name: "orchard",
   contexts: {
     orchard: orchardContext,
   },
   inputs: {
-    "check_status": check_status(chain),
+    "check_status": check_status(orchard_contract),
   },
   actions: [
     orchard_action(chain),
   ],
-});
+
+  });
+}
