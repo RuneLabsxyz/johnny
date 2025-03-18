@@ -23,9 +23,13 @@ mod johnny_actions {
     use dojo::model::{ModelStorage};
     use dojo::event::EventStorage;
 
+    pub fn namespace() -> @ByteArray {
+        @"orchards2"
+    }
+
     fn dojo_init(ref self: ContractState) {
 
-        let mut world = self.world(@"orchards");
+        let mut world = self.world(namespace());
 
         let johnny = Johnny {
             address: starknet::contract_address_const::<JOHNNY_ADDRESS>(),
@@ -43,7 +47,7 @@ mod johnny_actions {
 
             let caller = get_caller_address();
             assert!(caller.into() == JOHNNY_ADDRESS, "Not Johnny");
-            let mut world = self.world(@"orchards");
+            let mut world = self.world(namespace());
             let mut johnny: Johnny = world.read_model(JOHNNY_ADDRESS);
 
             assert!(_can_act(johnny), "Johnny cannot act");
@@ -67,7 +71,7 @@ mod johnny_actions {
 
             let caller = get_caller_address();
             assert!(caller.into() == JOHNNY_ADDRESS, "Not Johnny");
-            let mut world = self.world(@"orchards");
+            let mut world = self.world(namespace());
             let mut johnny: Johnny = world.read_model(JOHNNY_ADDRESS);
 
             assert!(_can_act(johnny), "Johnny cannot act");
@@ -87,7 +91,7 @@ mod johnny_actions {
 
             let caller = get_caller_address();
             assert!(caller.into() == JOHNNY_ADDRESS, "Not Johnny");
-            let mut world = self.world(@"orchards");
+            let mut world = self.world(namespace());
 
             let mut johnny: Johnny = world.read_model(JOHNNY_ADDRESS);
 
@@ -115,13 +119,13 @@ mod johnny_actions {
         }
 
         fn get_johnny(self: @ContractState) -> Johnny {
-            let mut world = self.world(@"orchards");
+            let mut world = self.world(namespace());
             let johnny: Johnny = world.read_model(JOHNNY_ADDRESS);
             return johnny;
         }
 
         fn get_johnny_location(self: @ContractState) -> (u64, u64) {
-            let mut world = self.world(@"orchards");
+            let mut world = self.world(namespace());
             let johnny: Johnny = world.read_model(JOHNNY_ADDRESS);
             return index_to_position(johnny.location);
         }
@@ -145,7 +149,7 @@ mod johnny_actions {
     }
 
     fn _refresh_johnny(ref self: ContractState) -> bool {
-        let mut world = self.world(@"orchards");
+        let mut world = self.world(namespace());
         let mut johnny: Johnny = world.read_model(JOHNNY_ADDRESS);
 
         let can_act = _can_act(johnny);
