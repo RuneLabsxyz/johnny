@@ -9,6 +9,7 @@ import { consciousness } from "./consciousness";
 import { twitter } from "./twitter/twitter";
 import { get_balances } from "./actions/get-balances";
 import { StarknetChain } from "../fork/daydreams/packages/core/src";
+import { orchard } from "./actions/orchard-action";
 
 let openrouter = createOpenRouter({
   apiKey: process.env.OPENROUTER_API_KEY!,
@@ -24,7 +25,7 @@ let c = consciousness("Give me a random thought you want to share on social medi
 const agent = createDreams({
   logger: LogLevel.TRACE,
   model: openrouter("google/gemini-2.0-flash-001"),
-  extensions: [twitter, discord],
+  extensions: [twitter, discord, orchard(chain)],
   character: character,
   memory: {
     store: createMemoryStore(),
