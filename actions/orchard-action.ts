@@ -6,11 +6,18 @@ import manifest  from "../contracts/manifest_sepolia.json"
 import { Contract, Abi, Call } from "starknet";
 
 const template = `
+  Here is the status of your avatar in the ponziland frontier:
+
   Location: {{location}}
   Status: {{status}}
 
   Neighbors: {{neighbors}}
   Goal: {{goal}}
+
+
+  --------------------------------
+  Make sure that you stop on a successful action, or if you find you cannot act.
+  Remember to only include a location if you are moving
 `;
 
 const orchardContext = context({
@@ -97,8 +104,8 @@ export const check_status = (orchard_contract: Contract) => input({
     // Function to schedule the next thought with random timing
     const scheduleNextThought = async () => {
       // Random delay between 3 and 10 minutes (180000-600000 ms)
-      const minDelay = 180000; // 3 minutes
-      const maxDelay = 3000000; // 10 minutes
+      const minDelay = 18000; // 3 minutes
+      const maxDelay = 30000; // 10 minutes
       const randomDelay = Math.floor(Math.random() * (maxDelay - minDelay + 1)) + minDelay;
       
       console.log(`Scheduling next orchard check in ${randomDelay/60000} minutes`);
@@ -106,8 +113,6 @@ export const check_status = (orchard_contract: Contract) => input({
       timeout = setTimeout(async () => {
 
         let status = await orchard_contract.get_johnny()
-
-        console.log(status);
 
         let text = `Decide what to do next if you are able to tend to your orchard`
 
@@ -118,8 +123,8 @@ export const check_status = (orchard_contract: Contract) => input({
 
         let context = {
           id: "orchard",
-          location: status.location,
-          status: status.status,
+          location: status.location.toString(),
+          status: status.status.variant.toString(),
           neighbors: neighbors,
           goal: goal
         }
