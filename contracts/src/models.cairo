@@ -1,4 +1,4 @@
-use starknet::ContractAddress;
+use starknet::{ContractAddress, get_block_timestamp};
 
 #[derive(Copy, Drop, Serde, Introspect)]
 pub enum Status {
@@ -25,6 +25,32 @@ pub struct Johnny {
     pub location: u64,
     pub status: Status,
     pub last_action_time: u64,
+}
+
+#[generate_trait]
+pub impl JohnnyImpl of JohnnyTrait {
+    fn time_until_act(self: @Johnny) -> u64 {
+        let time_passed = get_block_timestamp() - *self.last_action_time;
+        match self.status {
+            Status::None => {
+                return 0;
+            },
+            Status::Planting => {
+                return 600 - time_passed;
+            },
+            Status::Tending => {
+                return 6000 - time_passed;
+            },
+            Status::Moving => {
+                return 60000 - time_passed;
+            },
+        }
+    }
+
+    fn can_act(self: @Johnny) -> bool {
+        return self.time_until_act() == 0;
+    }
+
 }
 
 #[derive(Copy, Drop, Serde)]

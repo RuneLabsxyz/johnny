@@ -1,4 +1,4 @@
-use orchard::models::Johnny;
+use orchard::models::{Johnny, Orchard};
 
 
 #[starknet::interface]
@@ -9,6 +9,9 @@ trait IJohnnyActions<T> {
     fn refresh(ref self: T);
     fn get_johnny(self: @T) -> Johnny;
     fn get_johnny_location(self: @T) -> (u64, u64);
+    // returns Johnny, the neighbor locations, the time until Johnny can act, and the orchard at Johnny's location
+    fn get_status(self: @T) -> (Johnny, Array<u64>, u64, Option<Orchard>);
+    fn get_orchard(self: @T, location: u64) -> Option<Orchard>;
 }
 
 #[dojo::contract]
@@ -17,7 +20,7 @@ mod johnny_actions {
     use starknet::{ContractAddress, get_caller_address, get_block_timestamp};
     use orchard::ponziland::consts::JOHNNY_ADDRESS;
     use orchard::ponziland::coords::{left, right, up, down};
-    use orchard::models::{Johnny, Status, Orchard, OrchardTrait, Stage};
+    use orchard::models::{Johnny, JohnnyTrait, Status, Orchard, OrchardTrait, Stage};
     use orchard::ponziland::coords::index_to_position;
 
     use dojo::model::{ModelStorage};
@@ -113,9 +116,7 @@ mod johnny_actions {
 
         fn refresh(ref self: ContractState) {
             let res = _refresh_johnny(ref self);
-            if !res {
-                panic!("Refresh Unncessary");
-            }
+            
         }
 
         fn get_johnny(self: @ContractState) -> Johnny {
@@ -129,6 +130,31 @@ mod johnny_actions {
             let johnny: Johnny = world.read_model(JOHNNY_ADDRESS);
             return index_to_position(johnny.location);
         }
+
+        fn get_orchard(self: @ContractState, location: u64) -> Option<Orchard> {
+            let mut world = self.world(namespace());
+            let orchard: Orchard = world.read_model(location);
+            if orchard.planted_time == 0 {
+                return Option::None;
+            }
+            return Option::Some(orchard);
+        }
+
+        fn get_status(self: @ContractState) -> (Johnny, Array<u64>, u64, Option<Orchard>) {
+            let mut world = self.world(namespace());
+            let johnny: Johnny = world.read_model(JOHNNY_ADDRESS);
+            let orchard: Orchard = world.read_model(johnny.location);
+
+            let neighbors = _get_neighbors(johnny.location);
+
+            let time_until_act = johnny.time_until_act();
+
+            if orchard.planted_time == 0 {
+                return (johnny, neighbors, time_until_act, Option::None);
+            }
+            return (johnny, neighbors, time_until_act, Option::Some(orchard));
+        }
+
     }
 
     fn _can_act(johnny: Johnny) -> bool {
@@ -154,6 +180,15 @@ mod johnny_actions {
 
         let can_act = _can_act(johnny);
 
+        if johnny.last_action_time == 0 {
+            johnny = Johnny {
+                address: starknet::contract_address_const::<JOHNNY_ADDRESS>(),
+                location: 70,
+                status: Status::None,
+                last_action_time: get_block_timestamp(),
+            };
+        }
+
         if can_act {
             match johnny.status {
                 Status::None => {
@@ -175,12 +210,54 @@ mod johnny_actions {
                 },
             }
 
-
             johnny.status = Status::None;
 
             world.write_model(@johnny);
         }
 
         return can_act;
+    }
+
+    fn _get_neighbors(location: u64) -> Array<u64> {
+        let mut neighbors = array![];
+
+        if let Option::Some(left) = left(location) {
+            neighbors.append(left);
+        }
+        if let Option::Some(right) = right(location) {
+            neighbors.append(right);
+        }
+        if let Option::Some(up) = up(location) {
+            neighbors.append(up);
+        }
+        if let Option::Some(down) = down(location) {
+            neighbors.append(down);
+        }
+
+        return neighbors;
+    }
+
+    fn _check_valid_move(start: u64, to: u64) -> bool {
+        if let Option::Some(left) = left(start) {
+            if left == to {
+                return true;
+            }
+        }
+        if let Option::Some(right) = right(start) {
+            if right == to {
+                return true;
+            }
+        }
+        if let Option::Some(up) = up(start) {
+            if up == to {
+                return true;
+            }
+        }
+        if let Option::Some(down) = down(start) {
+            if down == to {
+                return true;
+            }
+        }
+        return false;
     }
 }

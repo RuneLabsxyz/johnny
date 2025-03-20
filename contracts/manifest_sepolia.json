@@ -1313,7 +1313,7 @@
   "contracts": [
     {
       "address": "0x639bb1113a6e3464dc2b0c1d62443452d6811c48ede42ba9297f59fcc825d6",
-      "class_hash": "0x14c86f156c978568469f2805e955aa5bc669cd75cb284dd3e58559b239ce269",
+      "class_hash": "0x10b5bc45a3fe07eb66ade9dab8420befe355d449de4c25493ae17ccd52a9eaf",
       "abi": [
         {
           "type": "impl",
@@ -1422,6 +1422,68 @@
           ]
         },
         {
+          "type": "enum",
+          "name": "orchard::models::Stage",
+          "variants": [
+            {
+              "name": "Nursery",
+              "type": "()"
+            },
+            {
+              "name": "Young",
+              "type": "()"
+            },
+            {
+              "name": "Mature",
+              "type": "()"
+            }
+          ]
+        },
+        {
+          "type": "struct",
+          "name": "orchard::models::Orchard",
+          "members": [
+            {
+              "name": "location",
+              "type": "core::integer::u64"
+            },
+            {
+              "name": "planted_time",
+              "type": "core::integer::u64"
+            },
+            {
+              "name": "stage",
+              "type": "orchard::models::Stage"
+            },
+            {
+              "name": "health",
+              "type": "core::integer::u8"
+            },
+            {
+              "name": "last_tend_time",
+              "type": "core::integer::u64"
+            },
+            {
+              "name": "time_healthy",
+              "type": "core::integer::u64"
+            }
+          ]
+        },
+        {
+          "type": "enum",
+          "name": "core::option::Option::<orchard::models::Orchard>",
+          "variants": [
+            {
+              "name": "Some",
+              "type": "orchard::models::Orchard"
+            },
+            {
+              "name": "None",
+              "type": "()"
+            }
+          ]
+        },
+        {
           "type": "interface",
           "name": "orchard::systems::johnny_actions::IJohnnyActions",
           "items": [
@@ -1476,6 +1538,33 @@
               "outputs": [
                 {
                   "type": "(core::integer::u64, core::integer::u64)"
+                }
+              ],
+              "state_mutability": "view"
+            },
+            {
+              "type": "function",
+              "name": "get_status",
+              "inputs": [],
+              "outputs": [
+                {
+                  "type": "(orchard::models::Johnny, core::array::Array::<core::integer::u64>, core::integer::u64, core::option::Option::<orchard::models::Orchard>)"
+                }
+              ],
+              "state_mutability": "view"
+            },
+            {
+              "type": "function",
+              "name": "get_orchard",
+              "inputs": [
+                {
+                  "name": "location",
+                  "type": "core::integer::u64"
+                }
+              ],
+              "outputs": [
+                {
+                  "type": "core::option::Option::<orchard::models::Orchard>"
                 }
               ],
               "state_mutability": "view"

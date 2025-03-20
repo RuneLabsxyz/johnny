@@ -4,9 +4,6 @@ import { render } from "../../fork/daydreams/packages/core/src";
 
 const template = `
 
-// inject more information about how you want it to play....
-
-
 Goal: {{goal}} 
 Tasks: {{tasks}}
 Current Task: {{currentTask}}

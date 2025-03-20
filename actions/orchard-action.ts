@@ -14,7 +14,6 @@ const template = `
   Neighbors: {{neighbors}}
   Goal: {{goal}}
 
-
   --------------------------------
   Make sure that you stop on a successful action, or if you find you cannot act.
   Remember to only include a location if you are moving
@@ -120,6 +119,8 @@ export const check_status = (orchard_contract: Contract) => input({
 
         //todo: get neighbors
         let neighbors = [""]
+
+        console.log(status.status.variant)
 
         let context = {
           id: "orchard",

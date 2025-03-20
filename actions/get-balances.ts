@@ -14,7 +14,6 @@ export const get_balances = (chain: StarknetChain) => action({
     async handler(call: ActionCall<{}>, ctx: any, agent: Agent) {
         
        //todo
-
        let balances = await getBalances();
 
         return balances
