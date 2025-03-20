@@ -9,7 +9,7 @@ import { consciousness } from "./consciousness";
 import { twitter } from "./twitter/twitter";
 import { get_balances } from "./actions/get-balances";
 import { StarknetChain } from "../fork/daydreams/packages/core/src";
-import { orchard } from "./actions/orchard-action";
+import { orchard } from "./extensions/orchard";
 
 let openrouter = createOpenRouter({
   apiKey: process.env.OPENROUTER_API_KEY!,
