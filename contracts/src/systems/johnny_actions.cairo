@@ -1,6 +1,5 @@
 use orchard::models::{Johnny, Orchard};
 
-
 #[starknet::interface]
 trait IJohnnyActions<T> {
     fn move(ref self: T, location: u64);
@@ -71,7 +70,6 @@ mod johnny_actions {
         }
 
         fn plant(ref self: ContractState) {
-
             let caller = get_caller_address();
             assert!(caller.into() == JOHNNY_ADDRESS, "Not Johnny");
             let mut world = self.world(namespace());
@@ -180,7 +178,7 @@ mod johnny_actions {
 
         let can_act = _can_act(johnny);
 
-        if johnny.last_action_time == 0 {
+        if johnny.location == 0 {
             johnny = Johnny {
                 address: starknet::contract_address_const::<JOHNNY_ADDRESS>(),
                 location: 70,

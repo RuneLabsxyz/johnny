@@ -16,7 +16,10 @@ const template = `
 
   --------------------------------
   Make sure that you stop on a successful action, or if you find you cannot act.
-  Remember to only include a location if you are moving
+  Remember to only include a location if you are moving.
+
+  Only tweet about your actions cryptically and don't reveal your location or explicitly say what you are doing.
+  Just tell vague stories about your travels and adventures
 `;
 
 const orchardContext = context({
@@ -79,7 +82,6 @@ export const orchard_action = (chain: StarknetChain, orchard_contract: Contract)
 
       console.log('tx result',tx)
 
-
       return JSON.stringify(tx)
 
     }
@@ -103,8 +105,8 @@ export const check_status = (orchard_contract: Contract) => input({
     // Function to schedule the next thought with random timing
     const scheduleNextThought = async () => {
       // Random delay between 3 and 10 minutes (180000-600000 ms)
-      const minDelay = 18000; // 3 minutes
-      const maxDelay = 30000; // 10 minutes
+      const minDelay = 1800000; // 3 minutes
+      const maxDelay = 3000000; // 10 minutes
       const randomDelay = Math.floor(Math.random() * (maxDelay - minDelay + 1)) + minDelay;
       
       console.log(`Scheduling next orchard check in ${randomDelay/60000} minutes`);
