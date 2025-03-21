@@ -4,15 +4,28 @@ import { render } from "../../fork/daydreams/packages/core/src";
 import { StarknetChain } from "../../fork/daydreams/packages/core/src";
 import manifest  from "../contracts/manifest_sepolia.json"
 import { Contract, Abi, Call } from "starknet";
+import { execute_transaction } from "../actions/execute-transaction";
+import { get_balances } from "../actions/get-balances";
+import { get_lands_str, 
+        get_auctions_str, 
+        get_claims_str, 
+        get_nukeable_lands_str, 
+        get_neighbors_str 
+    } from "../contexts/ponziland-context";
 
+import { PONZILAND_GUIDE } from "../contexts/ponziland-context";
+import { getBalances } from "../contexts/ponziland-context";
 const template = `
-  Here is the status of your avatar in the ponziland frontier:
 
-  Location: {{location}}
-  Status: {{status}}
+  {{guide}}
 
-  Neighbors: {{neighbors}}
+  -------------------------------
+  Here is the current ponziland context:
+
+  Your Lands: {{lands}}
   Goal: {{goal}}
+
+  Token Balances: {{balance}}
 
   --------------------------------
   Make sure that you stop on a successful action, or if you find you cannot act.
@@ -22,14 +35,13 @@ const template = `
   Just tell vague stories about your travels and adventures
 `;
 
-const orchardContext = context({
-  type: "orchard",
+const ponzilandContext = context({
+  type: "ponziland",
   schema: z.object({
     id: z.string(),
-    location: z.string(),
-    status: z.string(),
-    neighbors: z.array(z.string()),
+    lands: z.array(z.string()),
     goal: z.string(),
+    balance: z.string(),
   }),
 
   key({ id }) {
@@ -38,57 +50,23 @@ const orchardContext = context({
 
   create(state) {
     return {
-      location: state.args.location,
-      status: state.args.status,
-      neighbors: state.args.neighbors,
+      lands: state.args.lands,
+      balance: state.args.balance,
       goal: state.args.goal,
     };
   },
 
   render({ memory }) {
     return render(template, {
-      location: memory.location,
-      status: memory.status,
-      neighbors: memory.neighbors.join("\n"),
+      guide: PONZILAND_GUIDE,
+      lands: memory.lands.join("\n"),
+      balance: memory.balance,
       goal: memory.goal,
     });
   },
 });
 
-export const orchard_action = (chain: StarknetChain, orchard_contract: Contract) => action({
-    name: "orchard_action",
-    description: "tend to your orchards in the ponziland frontier",
-    schema: z.object({
-        action: z.enum(["move", "plant", "tend"]).describe(`must be "move", "plant", or "tend" `),
-        location: z.number().optional().describe(`location to move to choosing to move`)
-    }),
-    async handler(call: ActionCall<{
-        action: 
-            | "move"
-            | "plant"
-            | "tend"
-        location?: number | undefined
-    }>, ctx: any, agent: Agent) {
-
-      let choice = call.data.action;
-
-      let orchard_call: Call = {
-        contractAddress: orchard_contract.address,
-        entrypoint: choice,
-        calldata: call.data.location ? [call.data.location] : []
-      }
-
-      let tx = await chain.write(orchard_call)
-
-      console.log('tx result',tx)
-
-      return JSON.stringify(tx)
-
-    }
-
-})
-
-export const check_status = (orchard_contract: Contract) => input({
+export const ponziland_check = (chain: StarknetChain) => input({
   schema: z.object({
     text: z.string(),
   }),
@@ -109,30 +87,25 @@ export const check_status = (orchard_contract: Contract) => input({
       const maxDelay = 3000000; // 10 minutes
       const randomDelay = Math.floor(Math.random() * (maxDelay - minDelay + 1)) + minDelay;
       
-      console.log(`Scheduling next orchard check in ${randomDelay/60000} minutes`);
+      console.log(`Scheduling next ponziland check in ${randomDelay/60000} minutes`);
       
       timeout = setTimeout(async () => {
 
-        let status = await orchard_contract.get_johnny()
+        let text = `Decide what action to take in ponziland, if any`
 
-        let text = `Decide what to do next if you are able to tend to your orchard`
+        let goal = ""
 
-        let goal = "Spread orchards around the ponziland frontier"
-
-        //todo: get neighbors
-        let neighbors = [""]
-
-        console.log(status.status.variant)
+        let lands = await get_lands_str()
+        let balance = await getBalances()
 
         let context = {
-          id: "orchard",
-          location: status.location.toString(),
-          status: status.status.variant.toString(),
-          neighbors: neighbors,
+          id: "ponziland",
+          lands: lands,
+          balance: balance,
           goal: goal
         }
 
-        send(orchardContext, context, { text });
+        send(ponzilandContext, context, { text });
         index += 1;
         
         // Schedule the next thought
@@ -147,20 +120,18 @@ export const check_status = (orchard_contract: Contract) => input({
   },
 });
 
-export const orchard = (chain: StarknetChain) => {
+export const ponziland = (chain: StarknetChain) => {
 
-  let orchard_contract = new Contract(manifest.contracts[0].abi, manifest.contracts[0].address, chain.provider).typedv2(manifest.contracts[0].abi as Abi);
-  console.log(orchard_contract);
   return extension({
-  name: "orchard",
+  name: "pozniland",
   contexts: {
-    orchard: orchardContext,
+    ponziland: ponzilandContext,
   },
   inputs: {
-    "check_status": check_status(orchard_contract),
+    "ponziland_check": ponziland_check(chain),
   },
   actions: [
-    orchard_action(chain, orchard_contract),
+  //  ponziland_action(chain, ponziland_contract),
   ],
 
   });
