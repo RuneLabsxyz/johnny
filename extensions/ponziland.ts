@@ -15,6 +15,7 @@ import { get_lands_str,
 
 import { PONZILAND_GUIDE } from "../contexts/ponziland-context";
 import { getBalances } from "../contexts/ponziland-context";
+import { get_auctions, get_claims, get_lands, get_neighbors, get_nukeable_lands } from "../actions/ponziland/querys";
 const template = `
 
   {{guide}}
@@ -131,7 +132,12 @@ export const ponziland = (chain: StarknetChain) => {
     "ponziland_check": ponziland_check(chain),
   },
   actions: [
-  //  ponziland_action(chain, ponziland_contract),
+    execute_transaction(chain),
+    get_lands(chain),
+    get_auctions(chain),
+    get_nukeable_lands(chain),
+    get_claims(chain),
+    get_neighbors(chain),
   ],
 
   });

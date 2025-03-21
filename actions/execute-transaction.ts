@@ -39,7 +39,6 @@ export const execute_transaction = (chain: StarknetChain) => action({
             i+=1;
         }
         
-
         return call;
     }
 })
