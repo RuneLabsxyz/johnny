@@ -11,6 +11,9 @@ trait IJohnnyActions<T> {
     // returns Johnny, the neighbor locations, the time until Johnny can act, and the orchard at Johnny's location
     fn get_status(self: @T) -> (Johnny, Array<u64>, u64, Option<Orchard>);
     fn get_orchard(self: @T, location: u64) -> Option<Orchard>;
+    fn get_neighbor_indexs(self: @T, location: u64) -> Array<u64>;
+    fn get_neighbor_coords(self: @T, location: u64) -> Array<(u64, u64)>;
+    fn get_neighboring_orchards(self: @T, location: u64) -> Array<Orchard>;
 }
 
 #[dojo::contract]
@@ -18,7 +21,7 @@ mod johnny_actions {
     use super::{IJohnnyActions};
     use starknet::{ContractAddress, get_caller_address, get_block_timestamp};
     use orchard::ponziland::consts::JOHNNY_ADDRESS;
-    use orchard::ponziland::coords::{left, right, up, down};
+    use orchard::ponziland::coords::{left, right, up, down, get_neighbors_indexs, get_neighbors_coords};
     use orchard::models::{Johnny, JohnnyTrait, Status, Orchard, OrchardTrait, Stage};
     use orchard::ponziland::coords::index_to_position;
 
@@ -151,6 +154,27 @@ mod johnny_actions {
                 return (johnny, neighbors, time_until_act, Option::None);
             }
             return (johnny, neighbors, time_until_act, Option::Some(orchard));
+        }
+
+        fn get_neighbor_indexs(self: @ContractState, location: u64) -> Array<u64> {
+            return get_neighbors_indexs(location);
+        }
+
+        fn get_neighbor_coords(self: @ContractState, location: u64) -> Array<(u64, u64)> {
+            return get_neighbors_coords(location);
+        }
+
+        fn get_neighboring_orchards(self: @ContractState, location: u64) -> Array<Orchard> {
+            let mut orchards = array![];
+            let world = self.world(namespace());
+            let neighbors = get_neighbors_indexs(location);
+            for neighbor in neighbors {
+                let orchard: Orchard = world.read_model(neighbor);
+                if orchard.planted_time != 0 {
+                    orchards.append(orchard);
+                }
+            };
+            return orchards;
         }
 
     }

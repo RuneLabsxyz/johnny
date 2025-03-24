@@ -1313,7 +1313,7 @@
   "contracts": [
     {
       "address": "0x639bb1113a6e3464dc2b0c1d62443452d6811c48ede42ba9297f59fcc825d6",
-      "class_hash": "0x2be211cddc866f9e3038908f89a9fcce64324129806fb4af1c88bd6cc3e7812",
+      "class_hash": "0x5932adee3f9e6270fcd697c7677b14effa9dea3685b14f8f51ca445ea57b20a",
       "abi": [
         {
           "type": "impl",
@@ -1565,6 +1565,54 @@
               "outputs": [
                 {
                   "type": "core::option::Option::<orchard::models::Orchard>"
+                }
+              ],
+              "state_mutability": "view"
+            },
+            {
+              "type": "function",
+              "name": "get_neighbor_indexs",
+              "inputs": [
+                {
+                  "name": "location",
+                  "type": "core::integer::u64"
+                }
+              ],
+              "outputs": [
+                {
+                  "type": "core::array::Array::<core::integer::u64>"
+                }
+              ],
+              "state_mutability": "view"
+            },
+            {
+              "type": "function",
+              "name": "get_neighbor_coords",
+              "inputs": [
+                {
+                  "name": "location",
+                  "type": "core::integer::u64"
+                }
+              ],
+              "outputs": [
+                {
+                  "type": "core::array::Array::<(core::integer::u64, core::integer::u64)>"
+                }
+              ],
+              "state_mutability": "view"
+            },
+            {
+              "type": "function",
+              "name": "get_neighboring_orchards",
+              "inputs": [
+                {
+                  "name": "location",
+                  "type": "core::integer::u64"
+                }
+              ],
+              "outputs": [
+                {
+                  "type": "core::array::Array::<orchard::models::Orchard>"
                 }
               ],
               "state_mutability": "view"
