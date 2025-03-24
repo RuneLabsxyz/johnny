@@ -9,7 +9,8 @@ const template = `
   Here is the status of your avatar in the ponziland frontier:
 
   Location: {{location}}
-  Status: {{status}}
+  Current Action: {{status}}
+  Time to Complete: {{time_until_act}}
 
   Neighbors: {{neighbors}}
   Goal: {{goal}}
@@ -28,8 +29,9 @@ const orchardContext = context({
     id: z.string(),
     location: z.string(),
     status: z.string(),
-    neighbors: z.array(z.string()),
+    neighbors: z.string(),
     goal: z.string(),
+    time_until_act: z.string(),
   }),
 
   key({ id }) {
@@ -41,6 +43,7 @@ const orchardContext = context({
       location: state.args.location,
       status: state.args.status,
       neighbors: state.args.neighbors,
+      time_until_act: state.args.time_until_act,
       goal: state.args.goal,
     };
   },
@@ -49,7 +52,8 @@ const orchardContext = context({
     return render(template, {
       location: memory.location,
       status: memory.status,
-      neighbors: memory.neighbors.join("\n"),
+      time_until_act: memory.time_until_act,
+      neighbors: memory.neighbors,
       goal: memory.goal,
     });
   },
@@ -105,31 +109,38 @@ export const check_status = (orchard_contract: Contract) => input({
     // Function to schedule the next thought with random timing
     const scheduleNextThought = async () => {
       // Random delay between 3 and 10 minutes (180000-600000 ms)
-      const minDelay = 1800000; // 3 minutes
-      const maxDelay = 3000000; // 10 minutes
+      const minDelay = 18000; // 3 minutes
+      const maxDelay = 30000; // 10 minutes
       const randomDelay = Math.floor(Math.random() * (maxDelay - minDelay + 1)) + minDelay;
       
       console.log(`Scheduling next orchard check in ${randomDelay/60000} minutes`);
       
       timeout = setTimeout(async () => {
 
-        let status = await orchard_contract.get_johnny()
+        let status = await orchard_contract.get_status()
 
         let text = `Decide what to do next if you are able to tend to your orchard`
 
         let goal = "Spread orchards around the ponziland frontier"
 
-        //todo: get neighbors
-        let neighbors = [""]
+        let neighbors = await orchard_contract.get_neighbors(status[0].location.toString())
 
-        console.log(status.status.variant)
+        //todo: format orchard data for neighbors 
+        let neighbors_str = neighbors.map((neighbor) => `
+          location: ${neighbor[0]}
+          coords: ${neighbor[1][0].toString()},${neighbor[1][1].toString()}
+          orchard: ${neighbor[2].isSome()}
+        `).join("\n")
+
+        console.log(neighbors_str)
 
         let context = {
           id: "orchard",
-          location: status.location.toString(),
-          status: status.status.variant.toString(),
-          neighbors: neighbors,
-          goal: goal
+          location: status[0].location.toString(),
+          status: status[0].status.variant.toString(),
+          neighbors: neighbors_str,
+          goal: goal,
+          time_until_act: status[1].toString()
         }
 
         send(orchardContext, context, { text });
@@ -151,17 +162,18 @@ export const orchard = (chain: StarknetChain) => {
 
   let orchard_contract = new Contract(manifest.contracts[0].abi, manifest.contracts[0].address, chain.provider).typedv2(manifest.contracts[0].abi as Abi);
   console.log(orchard_contract);
+
   return extension({
-  name: "orchard",
-  contexts: {
-    orchard: orchardContext,
-  },
-  inputs: {
-    "check_status": check_status(orchard_contract),
-  },
-  actions: [
-    orchard_action(chain, orchard_contract),
-  ],
+    name: "orchard",
+    contexts: {
+      orchard: orchardContext,
+    },
+    inputs: {
+      "check_status": check_status(orchard_contract),
+    },
+    actions: [
+      orchard_action(chain, orchard_contract),
+    ],
 
   });
 }

@@ -8,8 +8,8 @@ trait IJohnnyActions<T> {
     fn refresh(ref self: T);
     fn get_johnny(self: @T) -> Johnny;
     fn get_johnny_location(self: @T) -> (u64, u64);
-    // returns Johnny, the neighbor locations, the time until Johnny can act, and the orchard at Johnny's location
-    fn get_status(self: @T) -> (Johnny, Array<u64>, u64, Option<Orchard>);
+    // returns Johnny, the time until Johnny can act, and the orchard at Johnny's location
+    fn get_status(self: @T) -> (Johnny, u64, Option<Orchard>);
     fn get_orchard(self: @T, location: u64) -> Option<Orchard>;
     fn get_neighbors(self: @T, location: u64) -> Array<(u64, (u64,u64), Option<Orchard>)>;
 }
@@ -139,21 +139,19 @@ mod johnny_actions {
             return Option::Some(orchard);
         }
 
-        fn get_status(self: @ContractState) -> (Johnny, Array<u64>, u64, Option<Orchard>) {
+        fn get_status(self: @ContractState) -> (Johnny, u64, Option<Orchard>) {
             let mut world = self.world(namespace());
             let johnny: Johnny = world.read_model(JOHNNY_ADDRESS);
             let orchard: Orchard = world.read_model(johnny.location);
 
-            let neighbors = _get_neighbors(johnny.location);
-
             let time_until_act = johnny.time_until_act();
 
             if orchard.planted_time == 0 {
-                return (johnny, neighbors, time_until_act, Option::None);
+                return (johnny, time_until_act, Option::None);
             }
-            return (johnny, neighbors, time_until_act, Option::Some(orchard));
+            return (johnny, time_until_act, Option::Some(orchard));
         }
-        
+
         fn get_neighbors(self: @ContractState, location: u64) -> Array<(u64, (u64, u64), Option<Orchard>)> {
             let mut res = array![];
             let world = self.world(namespace());

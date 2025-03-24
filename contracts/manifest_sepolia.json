@@ -1313,7 +1313,7 @@
   "contracts": [
     {
       "address": "0x639bb1113a6e3464dc2b0c1d62443452d6811c48ede42ba9297f59fcc825d6",
-      "class_hash": "0x59a86166088c82d9e589a8a97f9dfeb5d33684c1e31e6121c19b3045f2d0f9",
+      "class_hash": "0x59b052756b1cd3d85a38e61bf6687b84387688e8234d53f100f9181949445d4",
       "abi": [
         {
           "type": "impl",
@@ -1548,7 +1548,7 @@
               "inputs": [],
               "outputs": [
                 {
-                  "type": "(orchard::models::Johnny, core::array::Array::<core::integer::u64>, core::integer::u64, core::option::Option::<orchard::models::Orchard>)"
+                  "type": "(orchard::models::Johnny, core::integer::u64, core::option::Option::<orchard::models::Orchard>)"
                 }
               ],
               "state_mutability": "view"

@@ -7,13 +7,9 @@ import { Contract, Abi, Call } from "starknet";
 import { execute_transaction } from "../actions/execute-transaction";
 import { get_balances } from "../actions/get-balances";
 import { get_lands_str, 
-        get_auctions_str, 
-        get_claims_str, 
-        get_nukeable_lands_str, 
-        get_neighbors_str 
     } from "../contexts/ponziland-context";
 
-import { PONZILAND_GUIDE } from "../contexts/ponziland-context";
+import { CONTEXT } from "../contexts/ponziland-context";
 import { getBalances } from "../contexts/ponziland-context";
 import { get_auctions, get_claims, get_lands, get_neighbors, get_nukeable_lands } from "../actions/ponziland/querys";
 const template = `
@@ -29,9 +25,11 @@ const template = `
   Token Balances: {{balance}}
 
   --------------------------------
-  Make sure that you stop on a successful action, or if you find you cannot act.
+  Make sure that you stop on a successful action, or if your attempt to act fails.
   Remember to only include a location if you are moving.
 
+  You should send updates on all your thoughts and actions in this discord channel: 1352657633374371861
+  
   Only tweet about your actions cryptically and don't reveal your location or explicitly say what you are doing.
   Just tell vague stories about your travels and adventures
 `;
@@ -40,7 +38,7 @@ const ponzilandContext = context({
   type: "ponziland",
   schema: z.object({
     id: z.string(),
-    lands: z.array(z.string()),
+    lands: z.string(),
     goal: z.string(),
     balance: z.string(),
   }),
@@ -59,8 +57,8 @@ const ponzilandContext = context({
 
   render({ memory }) {
     return render(template, {
-      guide: PONZILAND_GUIDE,
-      lands: memory.lands.join("\n"),
+      guide: CONTEXT,
+      lands: memory.lands,
       balance: memory.balance,
       goal: memory.goal,
     });
@@ -84,8 +82,8 @@ export const ponziland_check = (chain: StarknetChain) => input({
     // Function to schedule the next thought with random timing
     const scheduleNextThought = async () => {
       // Random delay between 3 and 10 minutes (180000-600000 ms)
-      const minDelay = 1800000; // 3 minutes
-      const maxDelay = 3000000; // 10 minutes
+      const minDelay = 180000; // 3 minutes
+      const maxDelay = 300000; // 10 minutes
       const randomDelay = Math.floor(Math.random() * (maxDelay - minDelay + 1)) + minDelay;
       
       console.log(`Scheduling next ponziland check in ${randomDelay/60000} minutes`);
@@ -94,7 +92,7 @@ export const ponziland_check = (chain: StarknetChain) => input({
 
         let text = `Decide what action to take in ponziland, if any`
 
-        let goal = ""
+        let goal = "Spread cheer in ponziland and don't get rugged"
 
         let lands = await get_lands_str()
         let balance = await getBalances()
@@ -124,7 +122,7 @@ export const ponziland_check = (chain: StarknetChain) => input({
 export const ponziland = (chain: StarknetChain) => {
 
   return extension({
-  name: "pozniland",
+  name: "ponziland",
   contexts: {
     ponziland: ponzilandContext,
   },

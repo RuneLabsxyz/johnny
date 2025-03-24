@@ -36,12 +36,21 @@ pub impl JohnnyImpl of JohnnyTrait {
                 return 0;
             },
             Status::Planting => {
+                if time_passed > 600 {
+                    return 0;
+                }
                 return 600 - time_passed;
             },
             Status::Tending => {
+                if time_passed > 6000 {
+                    return 0;
+                }
                 return 6000 - time_passed;
             },
             Status::Moving => {
+                if time_passed > 60000 {
+                    return 0;
+                }
                 return 60000 - time_passed;
             },
         }
