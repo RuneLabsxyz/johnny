@@ -486,6 +486,13 @@ ALL LANDS CAN BE BOUGHT FOR THEIR LISTED SELL PRICE IN THEIR STAKED TOKEN
         The sell price and the amount to stake should be about 10 to 100, but make sure you can afford the stake.
         Make sure you approve the token for the ponziland-actions contract before bidding.
 
+        Use the following liquidity pools for the given token:
+        - eStrk: "005-01"
+        - ePaper: "1-2"
+        - eBrother: "005-01"
+        - eLords: "1-2"
+        - ePAL: "005-01"
+
       </PARAMETERS>
       <EXAMPLE>
     
@@ -543,11 +550,3 @@ export const CONTEXT = render(PONZILAND_CONTEXT, {
   claims: claims_str,
   nukeable_lands: nukeable_lands_str
 });
-
-// API DOCs etc
-export const PONZILAND_GUIDE = `
-
-<PROVIDER_GUIDE>
-
-</PROVIDER_GUIDE>
-`;

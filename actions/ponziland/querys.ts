@@ -30,6 +30,10 @@ export const get_lands = (chain: StarknetChain) => action({
        //todo
        let lands = await get_lands_str()
 
+       if (lands == "") {
+        return "You do not own any lands"
+       }
+
        return lands
 
     }
@@ -70,7 +74,9 @@ export const get_neighbors = (chain: StarknetChain) => action({
     async handler(call: ActionCall<{}>, ctx: any, agent: Agent) {
         
        //todo
-       let neighbors = await get_neighbors_str()
+       let neighbors = await get_neighbors_str();
+
+       console.log("neighbors", neighbors);
 
        return neighbors
 

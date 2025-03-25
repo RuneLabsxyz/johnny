@@ -11,7 +11,7 @@ const template = `
   Location: {{location}}
   Current Action: {{status}}
   Time to Complete: {{time_until_act}}
-
+  
   Neighbors: {{neighbors}}
   Goal: {{goal}}
 

@@ -53,7 +53,8 @@ mod johnny_actions {
             let mut world = self.world(namespace());
             let mut johnny: Johnny = world.read_model(JOHNNY_ADDRESS);
 
-            assert!(_can_act(johnny), "Johnny cannot act");
+            let can_act = _refresh_johnny(ref self);
+            assert!(can_act, "Johnny cannot act");
 
             //TODO: HANDLE UNWRAP SAFELY
             let valid = location == left(johnny.location).unwrap() || 
@@ -76,7 +77,8 @@ mod johnny_actions {
             let mut world = self.world(namespace());
             let mut johnny: Johnny = world.read_model(JOHNNY_ADDRESS);
 
-            assert!(_can_act(johnny), "Johnny cannot act");
+            let can_act = _refresh_johnny(ref self);
+            assert!(can_act, "Johnny cannot act");
 
             let mut orchard: Orchard = world.read_model(johnny.location);
 
@@ -97,7 +99,8 @@ mod johnny_actions {
 
             let mut johnny: Johnny = world.read_model(JOHNNY_ADDRESS);
 
-            assert!(_can_act(johnny), "Johnny cannot act");
+            let can_act = _refresh_johnny(ref self);
+            assert!(can_act, "Johnny cannot act");
 
             let mut orchard: Orchard = world.read_model(johnny.location);
 

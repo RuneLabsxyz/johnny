@@ -1,9 +1,9 @@
 import { z } from "zod";
-import { context } from "../../fork/daydreams/packages/core/src/context";
-import { service } from "../../fork/daydreams/packages/core/src/serviceProvider";
+import { context } from "../../../fork/daydreams/packages/core/src/context";
+import { service } from "../../../fork/daydreams/packages/core/src/serviceProvider";
 import { TwitterClient } from "./twitter-client";
-import { extension, input, output } from "../../fork/daydreams/packages/core/src";
-import { formatXml } from "../../fork/daydreams/packages/core/src/xml";
+import { extension, input, output } from "../../../fork/daydreams/packages/core/src";
+import { formatXml } from "../../../fork/daydreams/packages/core/src/xml";
 
 // Define Twitter context
 const twitterContext = context({
