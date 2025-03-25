@@ -18,11 +18,12 @@ pub mod player_actions {
     use dojo::model::{ModelStorage};
     use dojo::event::EventStorage;
 
+
     #[abi(embed_v0)]
     impl PlayerActionsImpl of IPlayerActions<ContractState> {
 
         fn claim_apples(ref self: ContractState, location: u64) {
-            let mut world = self.world(@"orchards");
+            let mut world = self.world(namespace());
             let ponziland = self.world(@"ponziland");
 
             let johnny: Johnny = world.read_model(JOHNNY_ADDRESS);
@@ -34,7 +35,7 @@ pub mod player_actions {
         }
 
         fn tend_orchard(ref self: ContractState, location: u64) {
-            let mut world = self.world(@"orchards");
+            let mut world = self.world(namespace());
 
             let ponziland = self.world(@"ponziland");
 
@@ -50,5 +51,9 @@ pub mod player_actions {
         }
 
         
+    }
+
+    pub fn namespace() -> @ByteArray {
+        @"orchards2"
     }
 }

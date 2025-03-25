@@ -1,24 +1,16 @@
-import { injectTags } from "../daydreams/packages/core/src/core/utils";
-import { env } from "./env";
-import { Chains } from "../daydreams/packages/core/src/";
-import { Providers } from "../daydreams/packages/core/src";
-import manifest from "./manifest.json";
+import { render } from "../../fork/daydreams/packages/core/src";
+import { env } from "../env";
+import { fetchGraphQL } from "../../fork/daydreams/packages/core/src";
+import manifest from "../manifest.json";
 import { Contract, RpcProvider, type Abi } from "starknet";
-import { balance_query, auction_query, land_query } from "./querys";
-import { type Balance } from "./types";
-import { estimateNukeTime } from "./querys";
-import { nuke_query } from "./querys";
+import { balance_query, auction_query, land_query } from "../querys";
+import { estimateNukeTime } from "../querys";
+import { nuke_query } from "../querys";
 
-let provider = new RpcProvider({ nodeUrl: env.STARKNET_RPC_URL });
+let provider = new RpcProvider({ nodeUrl: process.env.STARKNET_RPC_URL });
 let abi = manifest.contracts[0].abi;
-const starknetChain = new Chains.StarknetChain({
-  rpcUrl: env.STARKNET_RPC_URL,
-  address: env.STARKNET_ADDRESS,
-  privateKey: env.STARKNET_PRIVATE_KEY,
-});
 
-
-const address = env.STARKNET_ADDRESS;
+const address = process.env.STARKNET_ADDRESS!;
 
 const ponzilandAddress = '0x1f058fe3a5a82cc12c1e38444d3f9f3fd3511ef4c95851a3d4e07ad195e0af6';
 const estarkAddress = '0x71de745c1ae996cfd39fb292b4342b7c086622e3ecf3a5692bd623060ff3fa0';
@@ -50,7 +42,7 @@ if (estarkAbi === undefined) {
   throw new Error('no abi.');
 }
 
-let block_time = await starknetChain.getBlockTime();
+let block_time = (await provider.getBlock()).timestamp;
 
 // After the contracts array declaration, add a helper function to map a token address to its name:
 const getTokenName = (tokenAddr: string | number): string => {
@@ -103,20 +95,21 @@ export const getBalances = async () => {
 };
 
 export const get_nukeable_lands_str = async () => {
-  let lands = await Providers.fetchGraphQL(
+  let lands = await fetchGraphQL(
     env.GRAPHQL_URL + "/graphql",
     nuke_query,
     {}
-  ).then((res: any) => res.ponziLandLandModels.edges.map((edge: any) => edge.node));
+  ).then((res: any) => res.ponziLandLandModels.edges.map((edge: any) => edge?.node));
   console.log('lands', lands)
   return lands;
 }
+
 export const get_lands_str = async () => {
-  let lands = await Providers.fetchGraphQL(
+  let lands = await fetchGraphQL(
     env.GRAPHQL_URL + "/graphql",
     land_query,
     {}
-  ).then((res: any) => res.ponziLandLandModels.edges.map((edge: any) => edge.node));
+  ).then((res: any) => res.ponziLandLandModels.edges.map((edge: any) => edge?.node));
   let land_info = await Promise.all(lands.map((land: any) => {
     let info = ponziLandContract.call("get_neighbors_yield", [land.location]);
     return info;
@@ -164,11 +157,11 @@ export const get_lands_str = async () => {
 }
 
 export const get_claims_str = async () => {
-  let lands = await Providers.fetchGraphQL(
+  let lands = await fetchGraphQL(
     env.GRAPHQL_URL + "/graphql",
     land_query,
     {}
-  ).then((res: any) => res.ponziLandLandModels.edges.map((edge: any) => edge.node));
+  ).then((res: any) => res.ponziLandLandModels.edges.map((edge: any) => edge?.node));
 
   let land_claims = await Promise.all(lands.map((land: any) => {
     return ponziLandContract.call("get_next_claim_info", [land.location]);
@@ -201,14 +194,14 @@ export const get_claims_str = async () => {
 }
 
 export const get_auctions_str = async () => {
-  let auctions = await Providers.fetchGraphQL(
+  let auctions = await fetchGraphQL(
     env.GRAPHQL_URL + "/graphql",
     auction_query,
     {}
-  ).then((res: any) => res.ponziLandAuctionModels.edges.map((edge: any) => edge.node));
+  ).then((res: any) => res.ponziLandAuctionModels.edges.map((edge: any) => edge?.node));
 
   let initial_prices = await Promise.all(auctions.map((auction: any) => {
-    let current_price = starknetChain.read(
+    let current_price = provider.callContract(
         {
             contractAddress: ponzilandAddress,
             entrypoint: "get_current_auction_price",
@@ -229,11 +222,11 @@ export const get_auctions_str = async () => {
 }
 
 export const get_neighbors_str = async () => {
-  let lands = await Providers.fetchGraphQL(
+  let lands = await fetchGraphQL(
     env.GRAPHQL_URL + "/graphql",
     land_query,
     {}
-  ).then((res: any) => res.ponziLandLandModels.edges.map((edge: any) => edge.node));
+  ).then((res: any) => res.ponziLandLandModels.edges.map((edge: any) => edge?.node));
   let land_info = await Promise.all(lands.map((land: any) => {
     let info = ponziLandContract.call("get_neighbors_yield", [land.location]);
     return info;
@@ -298,8 +291,7 @@ Remember that all lands can be bought for their listed sell price in their stake
 You should regulalaly monitor your lands stake and price relative to its neighbors, and keep an eye out for auctions and cheap lands.
 <contract_addresses>
   - your address: 0x07480be1854e8464b85b7310d1f9602d810674e2bc43a3d73a168c816a2bbd8a
-  - ponziland-actions: 0x1f058fe3a5a82cc12c1e38444d3f9f3fd3511ef4c95851a3d4e07ad195e0af6
-  
+  - ponziland-actions: 0x1f058fe3a5a82cc12c1e38444d3f9f3fd3511ef4c95851a3d4e07ad195e0af6  
 </contract_addresses>
 
 <state>
@@ -494,6 +486,13 @@ ALL LANDS CAN BE BOUGHT FOR THEIR LISTED SELL PRICE IN THEIR STAKED TOKEN
         The sell price and the amount to stake should be about 10 to 100, but make sure you can afford the stake.
         Make sure you approve the token for the ponziland-actions contract before bidding.
 
+        Use the following liquidity pools for the given token:
+        - eStrk: "005-01"
+        - ePaper: "1-2"
+        - eBrother: "005-01"
+        - eLords: "1-2"
+        - ePAL: "005-01"
+
       </PARAMETERS>
       <EXAMPLE>
     
@@ -543,19 +542,11 @@ ALL LANDS CAN BE BOUGHT FOR THEIR LISTED SELL PRICE IN THEIR STAKED TOKEN
 
 `;
 
-export const CONTEXT = injectTags({
+export const CONTEXT = render(PONZILAND_CONTEXT, {
   balances: balance_str,
   auctions: auction_str,
   lands: land_str,
   neighbors: neighbors_str,
   claims: claims_str,
   nukeable_lands: nukeable_lands_str
-}, PONZILAND_CONTEXT);
-
-// API DOCs etc
-export const PONZILAND_GUIDE = `
-
-<PROVIDER_GUIDE>
-
-</PROVIDER_GUIDE>
-`;
+});

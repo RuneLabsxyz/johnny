@@ -1,8 +1,8 @@
 {
   "world": {
     "class_hash": "0x7c9469d45a9cdbab775035afb48e1fa73fb35ab059fcb9dfb0a301aa973e783",
-    "address": "0x27a82b1641d3a6b4b0b049afeb6c9f0196fe6b440fcb636e87be0243b23736f",
-    "seed": "ponzi_land_private_1",
+    "address": "0x70456c032e1a867292d6661ac299984521ee0fff56664e2c311a2230b009b6f",
+    "seed": "ponzi_land-internal-3",
     "name": "Ponzi Land",
     "entrypoints": [
       "uuid",
@@ -1312,8 +1312,8 @@
   },
   "contracts": [
     {
-      "address": "0x792716cdd575f8150e7a25fbca4599210f2318cb6887e577a1e88217ae451fe",
-      "class_hash": "0x24efb4df37dac01a0859d5c8d1c49691896c8bf12544ad56bcb21cb0f5df96e",
+      "address": "0x639bb1113a6e3464dc2b0c1d62443452d6811c48ede42ba9297f59fcc825d6",
+      "class_hash": "0x3a75d431d25024c38b184c53ac5080d95fb7202812255bc264cb2ca247f13a",
       "abi": [
         {
           "type": "impl",
@@ -1378,6 +1378,112 @@
           "interface_name": "orchard::systems::johnny_actions::IJohnnyActions"
         },
         {
+          "type": "enum",
+          "name": "orchard::models::Status",
+          "variants": [
+            {
+              "name": "None",
+              "type": "()"
+            },
+            {
+              "name": "Planting",
+              "type": "()"
+            },
+            {
+              "name": "Tending",
+              "type": "()"
+            },
+            {
+              "name": "Moving",
+              "type": "core::integer::u64"
+            }
+          ]
+        },
+        {
+          "type": "struct",
+          "name": "orchard::models::Johnny",
+          "members": [
+            {
+              "name": "address",
+              "type": "core::starknet::contract_address::ContractAddress"
+            },
+            {
+              "name": "location",
+              "type": "core::integer::u64"
+            },
+            {
+              "name": "status",
+              "type": "orchard::models::Status"
+            },
+            {
+              "name": "last_action_time",
+              "type": "core::integer::u64"
+            }
+          ]
+        },
+        {
+          "type": "enum",
+          "name": "orchard::models::Stage",
+          "variants": [
+            {
+              "name": "Nursery",
+              "type": "()"
+            },
+            {
+              "name": "Young",
+              "type": "()"
+            },
+            {
+              "name": "Mature",
+              "type": "()"
+            }
+          ]
+        },
+        {
+          "type": "struct",
+          "name": "orchard::models::Orchard",
+          "members": [
+            {
+              "name": "location",
+              "type": "core::integer::u64"
+            },
+            {
+              "name": "planted_time",
+              "type": "core::integer::u64"
+            },
+            {
+              "name": "stage",
+              "type": "orchard::models::Stage"
+            },
+            {
+              "name": "health",
+              "type": "core::integer::u8"
+            },
+            {
+              "name": "last_tend_time",
+              "type": "core::integer::u64"
+            },
+            {
+              "name": "time_healthy",
+              "type": "core::integer::u64"
+            }
+          ]
+        },
+        {
+          "type": "enum",
+          "name": "core::option::Option::<orchard::models::Orchard>",
+          "variants": [
+            {
+              "name": "Some",
+              "type": "orchard::models::Orchard"
+            },
+            {
+              "name": "None",
+              "type": "()"
+            }
+          ]
+        },
+        {
           "type": "interface",
           "name": "orchard::systems::johnny_actions::IJohnnyActions",
           "items": [
@@ -1406,6 +1512,78 @@
               "inputs": [],
               "outputs": [],
               "state_mutability": "external"
+            },
+            {
+              "type": "function",
+              "name": "refresh",
+              "inputs": [],
+              "outputs": [],
+              "state_mutability": "external"
+            },
+            {
+              "type": "function",
+              "name": "get_johnny",
+              "inputs": [],
+              "outputs": [
+                {
+                  "type": "orchard::models::Johnny"
+                }
+              ],
+              "state_mutability": "view"
+            },
+            {
+              "type": "function",
+              "name": "get_johnny_location",
+              "inputs": [],
+              "outputs": [
+                {
+                  "type": "(core::integer::u64, core::integer::u64)"
+                }
+              ],
+              "state_mutability": "view"
+            },
+            {
+              "type": "function",
+              "name": "get_status",
+              "inputs": [],
+              "outputs": [
+                {
+                  "type": "(orchard::models::Johnny, core::integer::u64, core::option::Option::<orchard::models::Orchard>)"
+                }
+              ],
+              "state_mutability": "view"
+            },
+            {
+              "type": "function",
+              "name": "get_orchard",
+              "inputs": [
+                {
+                  "name": "location",
+                  "type": "core::integer::u64"
+                }
+              ],
+              "outputs": [
+                {
+                  "type": "core::option::Option::<orchard::models::Orchard>"
+                }
+              ],
+              "state_mutability": "view"
+            },
+            {
+              "type": "function",
+              "name": "get_neighbors",
+              "inputs": [
+                {
+                  "name": "location",
+                  "type": "core::integer::u64"
+                }
+              ],
+              "outputs": [
+                {
+                  "type": "core::array::Array::<(core::integer::u64, (core::integer::u64, core::integer::u64), core::option::Option::<orchard::models::Orchard>)>"
+                }
+              ],
+              "state_mutability": "view"
             }
           ]
         },
@@ -1518,19 +1696,20 @@
         }
       ],
       "init_calldata": [],
-      "tag": "orchards-johnny_actions",
-      "selector": "0x41a7bf62a1174284674ac16babfc877bd9558b70c86078d4438a8ac3e7a9669",
+      "tag": "orchards2-johnny_actions",
+      "selector": "0x7af3931f15c49042bce9ed027facecd322d774452ca2f639de7d051b7c3fdd4",
       "systems": [
         "dojo_init",
         "move",
         "plant",
         "tend",
+        "refresh",
         "upgrade"
       ]
     },
     {
-      "address": "0x7482c6c57248724616a8243a05638589ae26f61c4cca9ed8815417aa5ae0bac",
-      "class_hash": "0xbd2b7d2ffb204a55c050cf884a2735b7f384d1027c995eb72c68473f599c3c",
+      "address": "0x4f205217e9416791405524461ed0f6bbd36bae3bed2d265d4d24cb3ac3469fe",
+      "class_hash": "0x2349fc2039fc1361008cf5c40e1757d0500a2b6b2cbdfd4bd385dc9fdea988b",
       "abi": [
         {
           "type": "impl",
@@ -1591,28 +1770,6 @@
           "type": "interface",
           "name": "orchard::systems::player_actions::IPlayerActions",
           "items": [
-            {
-              "type": "function",
-              "name": "get_johnny_location",
-              "inputs": [],
-              "outputs": [
-                {
-                  "type": "(core::integer::u64, core::integer::u64)"
-                }
-              ],
-              "state_mutability": "view"
-            },
-            {
-              "type": "function",
-              "name": "get_johnny_location_index",
-              "inputs": [],
-              "outputs": [
-                {
-                  "type": "core::integer::u64"
-                }
-              ],
-              "state_mutability": "view"
-            },
             {
               "type": "function",
               "name": "claim_apples",
@@ -1755,8 +1912,8 @@
         }
       ],
       "init_calldata": [],
-      "tag": "orchards-player_actions",
-      "selector": "0x43854e96dc77b60753119b939094327403e5a68b6728d1a5d174330b28febea",
+      "tag": "orchards2-player_actions",
+      "selector": "0x58dd21e9f9a2b99cfc8b5c29218476038d79843b97b321ad6a586b5ce7fbe64",
       "systems": [
         "claim_apples",
         "tend_orchard",
@@ -1768,21 +1925,21 @@
   "models": [
     {
       "members": [],
-      "class_hash": "0x529bfe0eda68efe9388ac11b11c8368fd7ebe6d7ad14835619d82697c82748b",
-      "tag": "orchards-Johnny",
-      "selector": "0x253c7797a0afcbc374834a4e398c597cb22fa9b1974536171765b35c8934286"
+      "class_hash": "0x325982efa8d61463517e8be8eb4d2632fdc7ba73cab01474cb49eb7a3539928",
+      "tag": "orchards2-Johnny",
+      "selector": "0x6e3ee51ab1835d282a24ad25335dd1633a2e4f30d85bd9a7897a84282a79466"
     },
     {
       "members": [],
       "class_hash": "0x7e22256ec810f5c7536bcd5000be2a6828d088e7a5d0c0b0ca59d60987ce201",
-      "tag": "orchards-Land",
-      "selector": "0x5aef021f931a83f6b0c84a224ad902f2daadd07701a2296f93c5d4c1c5085c2"
+      "tag": "orchards2-Land",
+      "selector": "0x5f9b16a9c5f64633009297af4cc0cb700b24b72947db4fe8f7251063b6bb9bf"
     },
     {
       "members": [],
-      "class_hash": "0x7dcee4f2725e6b8acec79c8a6273afb20bd5a5c6604179b08e7b7d1f9e36526",
-      "tag": "orchards-Orchard",
-      "selector": "0x252e3e5fbe2239ed9d0da5b5680dee428dd2a2374cc28fb2371e5b4934fcc00"
+      "class_hash": "0x268a9091e5eaee361f2c792e069357559a8fe2507ade750c948b1c4a98d126b",
+      "tag": "orchards2-Orchard",
+      "selector": "0x60bfff7b43ccff839c2f3559731ecbab1f4e5d982cd8556946d3599dcf33586"
     }
   ],
   "events": [],

@@ -100,6 +100,33 @@ pub fn max_neighbors(index: u64) -> u64 {
     return count;
 }
 
+pub fn get_neighbors_indexs(index: u64) -> Array<u64> {
+    let mut neighbors = ArrayTrait::new();
+    if left(index).is_some() {
+        neighbors.append(left(index).unwrap());
+    }
+    if right(index).is_some() {
+        neighbors.append(right(index).unwrap());
+    }
+    if up(index).is_some() {
+        neighbors.append(up(index).unwrap());
+    }
+    if down(index).is_some() {
+        neighbors.append(down(index).unwrap());
+    }
+
+    return neighbors;
+}
+
+pub fn get_neighbors_coords(index: u64) -> Array<(u64, u64)> {
+    let neighbors = get_neighbors_indexs(index);
+    let mut coords = ArrayTrait::new();
+    for neighbor in neighbors {
+        coords.append(index_to_position(neighbor));
+    };
+    return coords;
+}
+
 #[cfg(test)]
 mod coord_test {
     use ponzi_land::consts::GRID_WIDTH;
