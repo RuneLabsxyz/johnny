@@ -1,11 +1,11 @@
 import { z } from "zod";
-import { extension, input, output } from "../../fork/daydreams/packages/core/src/utils";
-import { formatMsg } from "../../fork/daydreams/packages/core/src/formatters";
-import { ChannelType, Events, type Message } from "discord.js";
-import { DiscordClient } from "../../fork/daydreams/packages/core/src/io/discord";
-import { context } from "../../fork/daydreams/packages/core/src/context";
-import { service } from "../../fork/daydreams/packages/core/src/serviceProvider";
-import { LogLevel } from "../../fork/daydreams/packages/core/src/types";
+import { extension, input, output } from "../../fork/daydreams/packages/core/src";
+import { formatMsg } from "../../fork/daydreams/packages/core/src";
+import { Events, type Message } from "discord.js";
+import { DiscordClient } from "./io";
+import { context } from "../../fork/daydreams/packages/core/src";
+import { service } from "../../fork/daydreams/packages/core/src";
+import { LogLevel } from "../../fork/daydreams/packages/core/src";
 
 const discordService = service({
   register(container) {
@@ -28,7 +28,7 @@ const discordChannelContext = context({
   key: ({ channelId }) => channelId,
   schema: z.object({ channelId: z.string() }),
 
-  async setup(args, { container }) {
+  async setup(args, setttings, { container }) {
     const channel = await container
       .resolve<DiscordClient>("discord")
       .client.channels.fetch(args.channelId);
@@ -56,11 +56,11 @@ export const discord = extension({
         user: z.object({ id: z.string(), name: z.string() }),
         text: z.string(),
       }),
-      format: ({ user, text }) =>
+      format: (input) =>
         formatMsg({
           role: "user",
-          user: user.name,
-          content: text,
+          user: input.data.user.name,
+          content: input.data.text,
         }),
       subscribe(send, { container }) {
         function listener(message: Message) {
@@ -82,8 +82,8 @@ export const discord = extension({
                 id: message.channelId,
               },
               user: {
-                id: message.member!.id,
-                name: message.member!.displayName,
+                id: message.author.id,
+                name: message.author.displayName,
               },
               text: message.content,
             }
@@ -99,20 +99,33 @@ export const discord = extension({
       },
     }),
   },
+
   outputs: {
-    "discord:send_message": output({
+    "discord:message": output({
       schema: z.object({
         channelId: z
           .string()
           .describe("The Discord channel ID to send the message to"),
         content: z.string().describe("The content of the message to send"),
       }),
+      description: `
+      Send a message to a Discord channel
+      
+      # Rules for sending messages:
+      1. Always respond if you have been tagged in the message
+      2. Don't repeat yourself
+      3. Don't take part in conversations unless you have been mentioned or asked to join the conversation
+      4. Don't send multiple messages in a row
+      
+      `,
+      enabled({ context }) {
+        return context.type === discordChannelContext.type;
+      },
       handler: async (data, ctx, { container }) => {
         const channel = await container
           .resolve<DiscordClient>("discord")
           .client.channels.fetch(data.channelId);
-        console.log("Sending message to discord", data)
-        if (channel && channel.isSendable()) {
+        if (channel && (channel.isTextBased() || channel.isDMBased())) {
           await container.resolve<DiscordClient>("discord").sendMessage(data);
           return {
             data,
@@ -121,11 +134,11 @@ export const discord = extension({
         }
         throw new Error("Invalid channel id");
       },
-      format: ({ data }) =>
-        formatMsg({
-          role: "assistant",
-          content: data.content,
-        }),
+      // format: (res) =>
+      //   formatMsg({
+      //     role: "assistant",
+      //     content: res.data.content,
+      //   }),
     }),
   },
 });

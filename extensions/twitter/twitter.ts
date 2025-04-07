@@ -1,9 +1,9 @@
 import { z } from "zod";
-import { context } from "../../../fork/daydreams/packages/core/src/context";
-import { service } from "../../../fork/daydreams/packages/core/src/serviceProvider";
+import { context } from "../../../fork/daydreams/packages/core/src";
+import { service } from "../../../fork/daydreams/packages/core/src";
 import { TwitterClient } from "./twitter-client";
 import { extension, input, output } from "../../../fork/daydreams/packages/core/src";
-import { formatXml } from "../../../fork/daydreams/packages/core/src/xml";
+import { formatXml } from "../../../fork/daydreams/packages/core/src";
 
 // Define Twitter context
 const twitterContext = context({
@@ -45,39 +45,36 @@ export const twitter = extension({
       schema: z.object({
         userId: z.string(),
         tweetId: z.string(),
-        username: z.string(),
         text: z.string(),
       }),
-      format: (data) =>
+      format: (input) =>
         formatXml({
           tag: "tweet",
-          params: { tweetId: data.tweetId, from: data.username },
-          content: data.text,
+          params: { tweetId: input.data.tweetId },
+          children: input.data.text,
         }),
-      subscribe(send, { container }) {
-        const twitter = container.resolve<TwitterClient>("twitter");
+      subscribe(send, agent) {
+        const { container } = agent;
+
+        const twitter = container.resolve("twitter") as TwitterClient;
 
         // Check mentions every minute
         const interval = setInterval(async () => {
           const mentions = await twitter.checkMentions();
 
-
-          for await (const mention of mentions) {
+          for (const mention of mentions) {
             console.log("Mention", mention);
-            
             send(
               twitterContext,
               { tweetId: mention.metadata.tweetId || "" },
               {
                 tweetId: mention.metadata.tweetId || "",
                 userId: mention.metadata.userId || "",
-                username: mention.metadata.username || "",
                 text: mention.content,
               }
             );
           }
-
-        }, 250000);
+        }, 10000);
 
         return () => clearInterval(interval);
       },
@@ -107,25 +104,22 @@ export const twitter = extension({
           timestamp: Date.now(),
         };
       },
-      format: ({ data }) =>
-        formatXml({
-          tag: "tweet-reply",
-          params: { tweetId: data.tweetId },
-          content: data.content,
-        }),
+      // format: ({ data }) =>
+      //   formatXml({
+      //     tag: "tweet-reply",
+      //     params: { tweetId: data.tweetId },
+      //     children: data.content,
+      //   }),
     }),
 
     "twitter:tweet": output({
       schema: z.object({
-        content: z.string().max(280).describe("tweet content, keep it short"),
-        reasoning: z.string().optional()
+        content: z.string().max(280),
       }),
-      description: "Use this to post a new tweet. Remember not to include any slashes in your response, And remember tweest are outputs, not actions",
+      description: "Use this to post a new tweet",
 
       handler: async (data, ctx, { container }) => {
         const twitter = container.resolve<TwitterClient>("twitter");
-
-        console.log(data);
         await twitter.sendTweet({
           content: data.content,
         });
@@ -135,11 +129,11 @@ export const twitter = extension({
         };
       },
 
-      format: ({ data }) =>
-        formatXml({
-          tag: "tweet",
-          content: data.content,
-        }),
+      // format: ({ data }) =>
+      //   formatXml({
+      //     tag: "tweet",
+      //     children: data.content,
+      //   }),
     }),
   },
 });

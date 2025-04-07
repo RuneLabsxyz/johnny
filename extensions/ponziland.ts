@@ -1,7 +1,7 @@
 import { action, ActionCall, Agent, context, extension, formatXml, input } from "../../fork/daydreams/packages/core/src";
 import { z } from "zod";
 import { render } from "../../fork/daydreams/packages/core/src";
-import { StarknetChain } from "../../fork/daydreams/packages/core/src";
+import { StarknetChain } from "../../fork/daydreams/packages/defai/src";
 import manifest  from "../contracts/manifest_sepolia.json"
 import { Contract, Abi, Call } from "starknet";
 import { execute_transaction } from "../actions/execute-transaction";
@@ -69,15 +69,20 @@ export const ponziland_check = (chain: StarknetChain) => input({
   schema: z.object({
     text: z.string(),
   }),
-  format: (data) =>
+  format: (input) =>
     formatXml({
       tag: "status check",
-      content: data.text,
+      children: [
+        {
+          tag: "content",
+          children: input.data.text,
+        },
+      ],
     }),
   subscribe(send, { container }) {
     // Check mentions every minute
     let index = 0;
-    let timeout: NodeJS.Timeout;
+    let timeout: ReturnType<typeof setTimeout>;
 
     // Function to schedule the next thought with random timing
     const scheduleNextThought = async () => {
