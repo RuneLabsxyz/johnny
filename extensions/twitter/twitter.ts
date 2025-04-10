@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { context } from "../../../fork/daydreams/packages/core/src";
+import { action, context } from "../../../fork/daydreams/packages/core/src";
 import { service } from "../../../fork/daydreams/packages/core/src";
 import { TwitterClient } from "./twitter-client";
 import { extension, input, output } from "../../../fork/daydreams/packages/core/src";
@@ -74,15 +74,16 @@ export const twitter = extension({
               }
             );
           }
-        }, 10000);
+        }, 1000000);
 
         return () => clearInterval(interval);
       },
     }),
   },
 
-  outputs: {
-    "twitter:reply": output({
+  actions: [
+    action({
+      name: "twitter:reply",
       schema: z.object({
         content: z.string().max(280),
         inReplyTo: z.string(),
@@ -112,14 +113,16 @@ export const twitter = extension({
       //   }),
     }),
 
-    "twitter:tweet": output({
+    action({
+      name: "twitter:tweet",
       schema: z.object({
         content: z.string().max(280),
       }),
-      description: "Use this to post a new tweet",
+      description: "Use this to post a new tweet. Remember that tweets are outputs, not actions",
 
       handler: async (data, ctx, { container }) => {
         const twitter = container.resolve<TwitterClient>("twitter");
+        console.log('sending tweet', data.content)
         await twitter.sendTweet({
           content: data.content,
         });
@@ -135,5 +138,5 @@ export const twitter = extension({
       //     children: data.content,
       //   }),
     }),
-  },
+  ],
 });

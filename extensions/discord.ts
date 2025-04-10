@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { extension, input, output } from "../../fork/daydreams/packages/core/src";
+import { action, extension, input, output } from "../../fork/daydreams/packages/core/src";
 import { formatMsg } from "../../fork/daydreams/packages/core/src";
 import { Events, type Message } from "discord.js";
 import { DiscordClient } from "./io";
@@ -100,8 +100,9 @@ export const discord = extension({
     }),
   },
 
-  outputs: {
-    "discord:message": output({
+  actions: [
+    action({
+      name: "discord:message",
       schema: z.object({
         channelId: z
           .string()
@@ -140,5 +141,5 @@ export const discord = extension({
       //     content: res.data.content,
       //   }),
     }),
-  },
+  ],
 });

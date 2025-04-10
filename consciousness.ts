@@ -20,21 +20,21 @@ export const consciousness = (prompt: string) => input({
     schema: z.object({
       text: z.string(),
     }),
-    format: (data) =>
+    format: (input) =>
       formatXml({
         tag: "consciousness",
-        content: data.text,
+        children: input.data.text,
       }),
     subscribe(send, { container }) {
       // Check mentions every minute
       let index = 0;
-      let timeout: NodeJS.Timeout;
+      let timeout: ReturnType<typeof setTimeout>;
 
       // Function to schedule the next thought with random timing
       const scheduleNextThought = async () => {
         // Random delay between 3 and 10 minutes (180000-600000 ms)
-        const minDelay = 180000; // 3 minutes
-        const maxDelay = 3000000; // 10 minutes
+        const minDelay = 18000; // 3 minutes
+        const maxDelay = 300000; // 10 minutes
         const randomDelay = Math.floor(Math.random() * (maxDelay - minDelay + 1)) + minDelay;
         
         console.log(`Scheduling next thought in ${randomDelay/60000} minutes`);
