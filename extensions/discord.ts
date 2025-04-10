@@ -102,7 +102,7 @@ export const discord = extension({
 
   actions: [
     action({
-      name: "discord:message",
+      name: "discord:send_message",
       schema: z.object({
         channelId: z
           .string()
@@ -119,9 +119,6 @@ export const discord = extension({
       4. Don't send multiple messages in a row
       
       `,
-      enabled({ context }) {
-        return context.type === discordChannelContext.type;
-      },
       handler: async (data, ctx, { container }) => {
         const channel = await container
           .resolve<DiscordClient>("discord")

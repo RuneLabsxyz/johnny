@@ -25,7 +25,7 @@ const chain = new StarknetChain({rpcUrl: process.env.STARKNET_RPC_URL ?? "",
 let c = consciousness("Give me a random thought you want to share on social media considering the following character information: " + character + `don't make the post itself, just say something like "I want to tweet about x")`)
 
 const agent = createDreams({
-  logger: LogLevel.TRACE,
+  logger: LogLevel.DEBUG,
   model: openrouter("google/gemini-2.0-flash-001"),
   extensions: [discord, twitter],
   memory: {
