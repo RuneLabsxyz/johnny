@@ -10,9 +10,9 @@ let openrouter = createOpenRouter({
 
 const consciousnessContext = context({
   type: "consciousness",
-  key: ({ userId }) => userId.toString(),
+  key: ({ thoughtId }) => thoughtId.toString(),
   schema: z.object({
-    userId: z.string(),
+    thoughtId: z.string(),
   }),
 });
 
@@ -20,11 +20,6 @@ export const consciousness = (prompt: string) => input({
     schema: z.object({
       text: z.string(),
     }),
-    format: (input) =>
-      formatXml({
-        tag: "consciousness",
-        children: input.data.text,
-      }),
     subscribe(send, { container }) {
       // Check mentions every minute
       let index = 0;
@@ -47,7 +42,7 @@ export const consciousness = (prompt: string) => input({
           });
     
           console.log('new thought: ' + res.text);
-          send(consciousnessContext, { userId: "thought: " + index }, { text: res.text });
+          send(consciousnessContext, { thoughtId: "thought: " + index }, { text: res.text });
           index += 1;
           
           // Schedule the next thought

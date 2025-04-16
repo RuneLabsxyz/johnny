@@ -287,11 +287,12 @@ Remember that all token values should be in wei, so x10^18.
 If your lands are low on stake you can use the increase stake function to add more stake to the land, making sure to approve the token for the ponziland-actions contract.
 The price of your land should be higher than the amount you paid for it, keeping in mind conversion rate between estark and the token it is listed for.
 Remember that all lands can be bought for their listed sell price in their staked token
+Remember that you need to approve your tokens for the ponziland-actions contract before you can use them.
 
 You should regulalaly monitor your lands stake and price relative to its neighbors, and keep an eye out for auctions and cheap lands.
 <contract_addresses>
-  - your address: 0x07480be1854e8464b85b7310d1f9602d810674e2bc43a3d73a168c816a2bbd8a
-  - ponziland-actions: 0x1f058fe3a5a82cc12c1e38444d3f9f3fd3511ef4c95851a3d4e07ad195e0af6  
+  - your address: 0x0274b3248dfc7324fa59d59dc21b69b705e3e5e3174f3fb39ee421f5e818dbf4
+  - ponziland-actions: 0x5c6b6b4e62de83b1c76e61719e31eeb2bfcf8e41b928c8e4f070e5c0b9f70d4  
 </contract_addresses>
 
 <state>

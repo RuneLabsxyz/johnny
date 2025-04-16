@@ -1,10 +1,10 @@
 import { action } from "../../fork/daydreams/packages/core/src"
-import { StarknetChain } from "../../fork/daydreams/packages/core/src"
+import { StarknetChain } from "../../fork/daydreams/packages/defai/src"
 import { ActionCall } from "../../fork/daydreams/packages/core/src"
 import { Agent } from "../../fork/daydreams/packages/core/src"
 import { z } from "zod"
 import { getBalances } from "../contexts/ponziland-context"
-
+import { CallData } from "starknet";
 export const execute_transaction = (chain: StarknetChain) => action({
     name: "execute_transaction",
     description: "Execute a transaction on starknet",
@@ -28,17 +28,16 @@ export const execute_transaction = (chain: StarknetChain) => action({
         ),
     ).describe("Array of all calls to execute in transaction. Include all transactions here, instead of using this multiple times"),
     }),
-    handler(call, ctx, agent) {
-        console.log(call);
+    handler(data, ctx, agent) {
+        console.log('call', data);
 
         let i = 0;
-        //TODO use multicall
-        while (i < call.data.calls.length) {    
-            chain.write(call.data.calls[i])
+        let calldata = CallData.compile(data.calls);
 
-            i+=1;
+        for (let call of data.calls) {
+            chain.write(call);
         }
-        
-        return call;
+
+        return data.calls;
     }
 })

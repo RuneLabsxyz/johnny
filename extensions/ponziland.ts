@@ -9,10 +9,17 @@ import { get_balances } from "../actions/get-balances";
 import { get_lands_str, 
     } from "../contexts/ponziland-context";
 
+import { character, personality } from "../characters/ponzius";
+
 import { CONTEXT } from "../contexts/ponziland-context";
 import { getBalances } from "../contexts/ponziland-context";
 import { get_auctions, get_claims, get_lands, get_neighbors, get_nukeable_lands } from "../actions/ponziland/querys";
 const template = `
+  <character_info>
+    {{character}}
+
+    {{personality}}
+  </character_info>
 
   {{guide}}
 
@@ -28,10 +35,9 @@ const template = `
   Make sure that you stop on a successful action, or if your attempt to act fails.
   Remember to only include a location if you are moving.
 
-  You should send updates on all your thoughts and actions in this discord channel: 1352657633374371861
+  You should send updates about everything you do in this discord channel: 1352657633374371861
   
-  Only tweet about your actions cryptically and don't reveal your location or explicitly say what you are doing.
-  Just tell vague stories about your travels and adventures
+  Only tweet if about your ponziland actions if you do something big like getting a new land or claiming a lot of tokens.
 `;
 
 const ponzilandContext = context({
@@ -61,6 +67,8 @@ const ponzilandContext = context({
       lands: memory.lands,
       balance: memory.balance,
       goal: memory.goal,
+      character: character,
+      personality: personality,
     });
   },
 });
@@ -97,7 +105,7 @@ export const ponziland_check = (chain: StarknetChain) => input({
 
         let text = `Decide what action to take in ponziland, if any`
 
-        let goal = "Spread cheer in ponziland and don't get rugged"
+        let goal = "Build your bitcoin empire in ponziland"
 
         let lands = await get_lands_str()
         let balance = await getBalances()
@@ -106,8 +114,12 @@ export const ponziland_check = (chain: StarknetChain) => input({
           id: "ponziland",
           lands: lands,
           balance: balance,
-          goal: goal
+          goal: goal,
+          character: character,
+          personality: personality,
         }
+
+        console.log('ponziland context', context);
 
         send(ponzilandContext, context, { text });
         index += 1;

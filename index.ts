@@ -2,7 +2,7 @@ import { Action, createDreams, createMemoryStore, LogLevel, memory, action, Acti
 import { createOpenRouter } from "@openrouter/ai-sdk-provider";
 import { createChromaVectorStore } from "../fork/daydreams/packages/chroma/src";
 import { createGroq } from "@ai-sdk/groq";
-import { character } from "./characters/johnny";
+import { personality } from "./characters/ponzius";
 import { z } from "zod";
 import { generateText } from "ai";
 import { consciousness } from "./consciousness";
@@ -22,12 +22,14 @@ const chain = new StarknetChain({rpcUrl: process.env.STARKNET_RPC_URL ?? "",
                                   privateKey: process.env.STARKNET_PRIVATE_KEY ?? "" 
 })
 
-let c = consciousness("Give me a random thought you want to share on social media considering the following character information: " + character + `don't make the post itself, just say something like "I want to tweet about x")`)
+let c = consciousness("Give me a random thought you want to share on social media considering the following character information: " + personality + `don't make the post itself, just give the general topic or idea. You are giving the instruction for someone else to write the tweet itself.`)
 
 const agent = createDreams({
   logger: LogLevel.DEBUG,
   model: openrouter("google/gemini-2.0-flash-001"),
-  extensions: [discord, twitter],
+  extensions: [discord, twitter, 
+    ponziland(chain)
+    ],
   memory: {
     store: createMemoryStore(),
     vector: createChromaVectorStore("agent", "http://localhost:8000"),
