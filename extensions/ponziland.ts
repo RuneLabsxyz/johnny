@@ -13,7 +13,7 @@ import { character, personality } from "../characters/ponzius";
 
 import { CONTEXT } from "../contexts/ponziland-context";
 import { getBalances } from "../contexts/ponziland-context";
-import { get_auctions, get_claims, get_lands, get_neighbors, get_nukeable_lands } from "../actions/ponziland/querys";
+import { get_auctions, get_claims, get_lands, get_neighbors } from "../actions/ponziland/querys";
 const template = `
   <character_info>
     {{character}}
@@ -38,6 +38,11 @@ const template = `
   You should send updates about everything you do in this discord channel: 1352657633374371861
   
   Only tweet if about your ponziland actions if you do something big like getting a new land or claiming a lot of tokens.
+  Remember if you have no lands you will have no claims or neighbors. 
+
+  Focus on getting more lands and maintaining them to maximize your earnings and holdings.
+
+  Always wait until the result of your transaction is confirmed before posting about it, making sure not to make anything up.
 `;
 
 const ponzilandContext = context({
@@ -77,16 +82,6 @@ export const ponziland_check = (chain: StarknetChain) => input({
   schema: z.object({
     text: z.string(),
   }),
-  format: (input) =>
-    formatXml({
-      tag: "status check",
-      children: [
-        {
-          tag: "content",
-          children: input.data.text,
-        },
-      ],
-    }),
   subscribe(send, { container }) {
     // Check mentions every minute
     let index = 0;
@@ -150,7 +145,6 @@ export const ponziland = (chain: StarknetChain) => {
     execute_transaction(chain),
     get_lands(chain),
     get_auctions(chain),
-    get_nukeable_lands(chain),
     get_claims(chain),
     get_neighbors(chain),
   ],

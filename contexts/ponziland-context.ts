@@ -2,10 +2,11 @@ import { render } from "../../fork/daydreams/packages/core/src";
 import { env } from "../env";
 import { fetchGraphQL } from "../../fork/daydreams/packages/core/src";
 import manifest from "../manifest.json";
-import { Contract, RpcProvider, type Abi } from "starknet";
+import { BigNumberish, Contract, RpcProvider, type Abi } from "starknet";
 import { balance_query, auction_query, land_query } from "../querys";
 import { estimateNukeTime } from "../querys";
 import { nuke_query } from "../querys";
+
 
 let provider = new RpcProvider({ nodeUrl: process.env.STARKNET_RPC_URL });
 let abi = manifest.contracts[0].abi;
@@ -16,7 +17,7 @@ const ponzilandAddress = '0x1f058fe3a5a82cc12c1e38444d3f9f3fd3511ef4c95851a3d4e0
 const estarkAddress = '0x71de745c1ae996cfd39fb292b4342b7c086622e3ecf3a5692bd623060ff3fa0';
 const ebrotherAddress = '0x7031b4db035ffe8872034a97c60abd4e212528416f97462b1742e1f6cf82afe';
 const elordsAddress = '0x4230d6e1203e0d26080eb1cf24d1a3708b8fc085a7e0a4b403f8cc4ec5f7b7b';
-const epaperAddress = '0x335e87d03baaea788b8735ea0eac49406684081bb669535bb7074f9d3f66825'
+const epaperAddress = '0x335e87d03baaea788b8735ea0eac49406684081bb669535bb7074f9d3f66825' 
 
 // read abi of Test contract
 const { abi: estarkAbi } = await provider.getClassAt(estarkAddress);
@@ -76,7 +77,7 @@ export const getBalances = async () => {
         name: token.name,
         balance: BigInt(balance.toString()) / BigInt(10 ** 18),
         approved: BigInt(approved.toString()) / BigInt(10 ** 18),
-        address: address,
+        address: token.address,
       };
     })
   );
@@ -110,49 +111,23 @@ export const get_lands_str = async () => {
     land_query,
     {}
   ).then((res: any) => res.ponziLandLandModels.edges.map((edge: any) => edge?.node));
-  let land_info = await Promise.all(lands.map((land: any) => {
-    let info = ponziLandContract.call("get_neighbors_yield", [land.location]);
+  let nuke_time = await Promise.all(lands.map((land: any) => {
+    let info = ponziLandContract.call("get_time_to_nuke", [land.location]);
     return info;
   }));
-  let land_claims = await Promise.all(lands.map((land: any) => {
-    return ponziLandContract.call("get_next_claim_info", [land.location]);
-  }));
   
-  lands.forEach((land: any, index: number) => {
-    land.neighbors_info = land_info.map((land_info: any) => {
-      return land_info.yield_info.map((info: any) => {
-        return `
-          location: ${info.location}
-          token: ${info.token}
-          sell_price: ${info.sell_price}
-          per hour: ${info.per_hour}
-          nukeable: ${info.nukeable}
-        `;
-      }).join("\n");
-    });
-    land.neighbor_number = land_claims[index].length;
-    land.claims = land_claims[index].map((claim: any) => {
-      let claims: any[] = [];
-      for (let contract of contracts) {
-        if (claim.token === contract.address) {
-          land.claims += `${contract.name} (${claim.token}): ${claim.amount}\n`;
-        }
-      }
-      return claims;
-    });
-    land.remaining_stake_time = estimateNukeTime(land.sell_price, land.stake_amount, land.neighbor_number);
-    console.log('land.remaining_stake_time', land.remaining_stake_time)
-  }); 
 
-  let land_str = lands.map((land: any) => 
+  let land_str = lands.map((land: any, index: number) => 
     `location: ${BigInt(land.location).toString()} - 
     Remaining Stake
     Amount: ${BigInt(land.stake_amount).toString()}
     Token: ${getTokenName(land.token_used)}
-    Time: ${land.remaining_stake_time/60} minutes
+    Time: ${nuke_time[index]/60} minutes
   
     Listed Price: ${BigInt(land.sell_price).toString()}
   `).join("\n");
+
+  console.log('land_str', land_str)
   return land_str;
 }
 
@@ -292,7 +267,7 @@ Remember that you need to approve your tokens for the ponziland-actions contract
 You should regulalaly monitor your lands stake and price relative to its neighbors, and keep an eye out for auctions and cheap lands.
 <contract_addresses>
   - your address: 0x0274b3248dfc7324fa59d59dc21b69b705e3e5e3174f3fb39ee421f5e818dbf4
-  - ponziland-actions: 0x5c6b6b4e62de83b1c76e61719e31eeb2bfcf8e41b928c8e4f070e5c0b9f70d4  
+  - ponziland-actions: 0x5007534c6c59e8e01bc5d1163b646bb9b19e7e1fe566fcbedafad454616f5e6
 </contract_addresses>
 
 <state>
@@ -487,13 +462,16 @@ ALL LANDS CAN BE BOUGHT FOR THEIR LISTED SELL PRICE IN THEIR STAKED TOKEN
         The sell price and the amount to stake should be about 10 to 100, but make sure you can afford the stake.
         Make sure you approve the token for the ponziland-actions contract before bidding.
 
-        Use the following liquidity pools for the given token:
+        Use the following liquidity pool key for the given token:
         - eStrk: "005-01"
         - ePaper: "1-2"
         - eBrother: "005-01"
         - eLords: "1-2"
         - ePAL: "005-01"
 
+        Here are the token addresses:
+        - eLords: 0x04230d6e1203e0d26080eb1cf24d1a3708b8fc085a7e0a4b403f8cc4ec5f7b7b
+        - eStrk: 0x71de745c1ae996cfd39fb292b4342b7c086622e3ecf3a5692bd623060ff3fa0
       </PARAMETERS>
       <EXAMPLE>
     
@@ -507,7 +485,7 @@ ALL LANDS CAN BE BOUGHT FOR THEIR LISTED SELL PRICE IN THEIR STAKED TOKEN
               0,
               <amount_to_stake>,
               0,
-              <liquidity_pool>
+              <liquidity_pool_key>
             ]
           }
 

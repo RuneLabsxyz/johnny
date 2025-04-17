@@ -16,6 +16,8 @@ export const get_auctions = (chain: StarknetChain) => action({
        //todo
        let auctions = await get_auctions_str()
 
+       console.log('auctions', auctions)
+
        return auctions
 
     }
@@ -35,20 +37,6 @@ export const get_lands = (chain: StarknetChain) => action({
        }
 
        return lands
-
-    }
-});
-
-export const get_nukeable_lands = (chain: StarknetChain) => action({
-    name: "get-nukeable-lands",
-    description: "Get the lands in ponziland that can be nuked",
-    schema: z.object({}),
-    async handler(data: {}, ctx: any, agent: Agent) {
-        
-       //todo
-       let nukable_lands = await get_nukeable_lands_str()
-
-       return nukable_lands
 
     }
 });
@@ -76,7 +64,9 @@ export const get_neighbors = (chain: StarknetChain) => action({
        //todo
        let neighbors = await get_neighbors_str();
 
-       console.log("neighbors", neighbors);
+       if (neighbors == "") {
+        return "You do not have any neighbors, do you own any lands?"
+       }
 
        return neighbors
 
