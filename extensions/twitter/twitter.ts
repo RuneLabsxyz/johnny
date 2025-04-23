@@ -1,17 +1,35 @@
 import { z } from "zod";
-import { action, context } from "../../../fork/daydreams/packages/core/src";
+import { action, context, render } from "../../../fork/daydreams/packages/core/src";
 import { service } from "../../../fork/daydreams/packages/core/src";
 import { TwitterClient } from "./twitter-client";
 import { extension, input, output } from "../../../fork/daydreams/packages/core/src";
 import { formatXml } from "../../../fork/daydreams/packages/core/src";
+import { personality } from "../../characters/ponzius";
+
+const template = `
+
+  Make sure to tweet in character, and to base all tweets off the given input tweet or thought.
+
+  
+  <personality>
+    {{personality}}
+  </personality>
+`;
 
 // Define Twitter context
 const twitterContext = context({
   type: "twitter:thread",
   key: ({ tweetId }) => tweetId.toString(),
   schema: z.object({
+    personality: z.string(),
     tweetId: z.string(),
   }),
+
+  render({ memory }) {
+    return render(template, {
+      personality: personality
+    });
+  },
 });
 
 // Twitter service setup
@@ -47,12 +65,6 @@ export const twitter = extension({
         tweetId: z.string(),
         text: z.string(),
       }),
-      format: (input) =>
-        formatXml({
-          tag: "tweet",
-          params: { tweetId: input.data.tweetId },
-          children: input.data.text,
-        }),
       subscribe(send, agent) {
         const { container } = agent;
 
@@ -66,7 +78,7 @@ export const twitter = extension({
             console.log("Mention", mention);
             send(
               twitterContext,
-              { tweetId: mention.metadata.tweetId || "" },
+              { tweetId: mention.metadata.tweetId || "", personality: personality },
               {
                 tweetId: mention.metadata.tweetId || "",
                 userId: mention.metadata.userId || "",
@@ -74,7 +86,7 @@ export const twitter = extension({
               }
             );
           }
-        }, 1000000);
+        }, 100000);
 
         return () => clearInterval(interval);
       },
@@ -92,6 +104,8 @@ export const twitter = extension({
 
       handler: async (data, ctx, { container }) => {
         const twitter = container.resolve<TwitterClient>("twitter");
+
+        console.log('sending reply', data.content, data.inReplyTo)
         const { tweetId } = await twitter.sendTweet({
           content: data.content,
           inReplyTo: data.inReplyTo,

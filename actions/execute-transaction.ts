@@ -5,7 +5,7 @@ import { Agent } from "../../fork/daydreams/packages/core/src"
 import { z } from "zod"
 import { getBalances } from "../contexts/ponziland-context"
 import { CallData } from "starknet";
-import { getLiquidityPoolFromToken } from "../utils/liquidity_pools"
+import { getLiquidityPoolFromAPI } from "../utils/ponziland_api"
 export const execute_transaction = (chain: StarknetChain) => action({
     name: "execute_transaction",
     description: "Execute a transaction on starknet",
@@ -34,19 +34,20 @@ export const execute_transaction = (chain: StarknetChain) => action({
 
         let res = [];
         for (let call of data.calls) {
-            console.log('call', call);
 
             if (call.entrypoint == "bid" || call.entrypoint == "buy") {
-                let pool = getLiquidityPoolFromToken(call.calldata[1] as string, call.calldata[6] as string);
-                let key = call.calldata.pop();
-                console.log('key', key);
+                let pool = await getLiquidityPoolFromAPI(call.calldata[1] as string);
                 console.log('pool', pool);
-                call.calldata.push(pool.token0);
-                call.calldata.push(pool.token1);
-                call.calldata.push(pool.fee as string);
-                call.calldata.push(pool.tick_spacing as string);
-                call.calldata.push(pool.extension);
+                if (pool) {
+                    call.calldata.push(pool.token0);
+                    call.calldata.push(pool.token1);
+                    call.calldata.push(pool.fee.toString());
+                    call.calldata.push(pool.tick_spacing.toString());
+                    call.calldata.push(pool.extension);
+                }
             }
+            console.log('call', call);
+
             let r = await chain.write(call);
             console.log('r', r);
             res.push(r);

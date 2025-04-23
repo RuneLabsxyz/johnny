@@ -43,6 +43,13 @@ const template = `
   Focus on getting more lands and maintaining them to maximize your earnings and holdings.
 
   Always wait until the result of your transaction is confirmed before posting about it, making sure not to make anything up.
+
+  If a transaction fails, do not retry, just send an update with the error in discord. DO NOT tweet about failed transactions.
+
+  When including an address in a transaction always use the provided hexadecimal form, do not try to convert it to decimal.
+
+
+  {{context}}
 `;
 
 const ponzilandContext = context({
@@ -52,6 +59,7 @@ const ponzilandContext = context({
     lands: z.string(),
     goal: z.string(),
     balance: z.string(),
+    context: z.string(),
   }),
 
   key({ id }) {
@@ -74,6 +82,7 @@ const ponzilandContext = context({
       goal: memory.goal,
       character: character,
       personality: personality,
+      context: CONTEXT,
     });
   },
 });
@@ -90,8 +99,8 @@ export const ponziland_check = (chain: StarknetChain) => input({
     // Function to schedule the next thought with random timing
     const scheduleNextThought = async () => {
       // Random delay between 3 and 10 minutes (180000-600000 ms)
-      const minDelay = 180000; // 3 minutes
-      const maxDelay = 300000; // 10 minutes
+      const minDelay = 100000; // 3 minutes
+      const maxDelay = 150000; // 10 minutes
       const randomDelay = Math.floor(Math.random() * (maxDelay - minDelay + 1)) + minDelay;
       
       console.log(`Scheduling next ponziland check in ${randomDelay/60000} minutes`);
@@ -112,6 +121,7 @@ export const ponziland_check = (chain: StarknetChain) => input({
           goal: goal,
           character: character,
           personality: personality,
+          context: CONTEXT,
         }
 
         console.log('ponziland context', context);

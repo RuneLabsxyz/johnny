@@ -122,7 +122,7 @@ export const get_lands_str = async () => {
     Remaining Stake
     Amount: ${BigInt(land.stake_amount).toString()}
     Token: ${getTokenName(land.token_used)}
-    Time: ${nuke_time[index]/60} minutes
+    Time: ${nuke_time[index]/BigInt(60)} minutes
   
     Listed Price: ${BigInt(land.sell_price).toString()}
   `).join("\n");
@@ -321,6 +321,9 @@ ALL LANDS CAN BE BOUGHT FOR THEIR LISTED SELL PRICE IN THEIR STAKED TOKEN
         This should be called for both estark when bidding and any erc20 used for staking
         If staking with estark make sure to include the amount of estark you are using for the stake in the amount.
 
+        Make sure you approve for both the sale and the stake, and that the amount is correct. So when you bid you should approve estark for the bid and the token you are going to stake with.
+        Also remember that the amount is in wei, so to stake 10 tokens you would need to approve 10 * 10^18.
+
       </PARAMETERS>
       <EXAMPLE>
     
@@ -347,8 +350,6 @@ ALL LANDS CAN BE BOUGHT FOR THEIR LISTED SELL PRICE IN THEIR STAKED TOKEN
         Sell Price and Amount to Stake are u256, which in cairo means they have a high and low value and you must pass in a 0 as the low value.
         Make sure the land location is correct based on the graphql query.
         The sell price and the amount to stake should be about 10 to 100, but make sure you can afford the stake.
-        Make sure you approve the token for the ponziland-actions contract before bidding.
-
       </PARAMETERS>
       <EXAMPLE>
     
@@ -427,6 +428,14 @@ ALL LANDS CAN BE BOUGHT FOR THEIR LISTED SELL PRICE IN THEIR STAKED TOKEN
         Make sure you approve the token for the ponziland-actions contract before bidding.
         Remember that you must approve the token that the land is listed for, which is not always estark.
 
+        When you attempt a buy transaction, the liquidity pool info will be added to the calldata after automatically, so don't attempt to add it.
+        Use the exact calldata given in the example and ingore the liquidity pool info, if you get an error about it just send and update and stop.
+
+
+        Here are the token addresses:
+        - eLords: 0x4230d6e1203e0d26080eb1cf24d1a3708b8fc085a7e0a4b403f8cc4ec5f7b7b
+        - eStrk: 0x71de745c1ae996cfd39fb292b4342b7c086622e3ecf3a5692bd623060ff3fa0
+
       </PARAMETERS>
       <EXAMPLE>
     
@@ -439,8 +448,7 @@ ALL LANDS CAN BE BOUGHT FOR THEIR LISTED SELL PRICE IN THEIR STAKED TOKEN
               <sell_price>,
               0,
               <amount_to_stake>,
-              0,
-              <liquidity_pool>
+              0
             ]
           }
 
@@ -461,17 +469,13 @@ ALL LANDS CAN BE BOUGHT FOR THEIR LISTED SELL PRICE IN THEIR STAKED TOKEN
         Make sure the land location is correct based on the graphql query.
         The sell price and the amount to stake should be about 10 to 100, but make sure you can afford the stake.
         Make sure you approve the token for the ponziland-actions contract before bidding.
+        When you attempt a bid transaction, the liquidity pool info will be added to the calldata after automatically, so don't attempt to add it.
+        Use the exact calldata given in the example and ingore the liquidity pool info, if you get an error about it just send and update and stop.
 
-        Use the following liquidity pool key for the given token:
-        - eStrk: "005-01"
-        - ePaper: "1-2"
-        - eBrother: "005-01"
-        - eLords: "1-2"
-        - ePAL: "005-01"
-
-        Here are the token addresses:
-        - eLords: 0x04230d6e1203e0d26080eb1cf24d1a3708b8fc085a7e0a4b403f8cc4ec5f7b7b
+        Here are the token addresses, you will usually use eStrk:
+        - eLords: 0x4230d6e1203e0d26080eb1cf24d1a3708b8fc085a7e0a4b403f8cc4ec5f7b7b
         - eStrk: 0x71de745c1ae996cfd39fb292b4342b7c086622e3ecf3a5692bd623060ff3fa0
+
       </PARAMETERS>
       <EXAMPLE>
     
@@ -484,8 +488,7 @@ ALL LANDS CAN BE BOUGHT FOR THEIR LISTED SELL PRICE IN THEIR STAKED TOKEN
               <sell_price>,
               0,
               <amount_to_stake>,
-              0,
-              <liquidity_pool_key>
+              0
             ]
           }
 

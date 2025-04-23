@@ -14,6 +14,7 @@ const consciousnessContext = context({
   schema: z.object({
     thoughtId: z.string(),
   }),
+  
 });
 
 export const consciousness = (prompt: string) => input({
@@ -38,7 +39,7 @@ export const consciousness = (prompt: string) => input({
           let res = await generateText({ 
             model: openrouter("google/gemini-2.0-flash-001"),
             prompt,
-            temperature: 0.5,
+            temperature: 0.7,
           });
     
           console.log('new thought: ' + res.text);
