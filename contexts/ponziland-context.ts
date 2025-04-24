@@ -277,11 +277,12 @@ The price of your land should be higher than the amount you paid for it, keeping
 Remember that all lands can be bought for their listed sell price in their staked token
 Remember that you need to approve your tokens for the ponziland-actions contract before you can use them.
 
-You should regulalaly monitor your lands stake and price relative to its neighbors, and keep an eye out for auctions and cheap lands.
-<contract_addresses>
-  - your address: 0x0274b3248dfc7324fa59d59dc21b69b705e3e5e3174f3fb39ee421f5e818dbf4
-  - ponziland-actions: 0x5007534c6c59e8e01bc5d1163b646bb9b19e7e1fe566fcbedafad454616f5e6
-</contract_addresses>
+Remember that you want to build a bitcoin empire, so you should be staking lands with bitcoin and targeting
+any neighboring lands to bitcoin lands so you can collect the taxes. You should only ever stake lands
+with <10 BTC, and you should keep the sell price at 1 BTC.
+
+DO NOT continue to retry transactions that fail due to gas errors, just send an update with the error in discord.
+
 
 <state>
 

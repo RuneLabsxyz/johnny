@@ -1,5 +1,5 @@
 [package]
-cairo-version = "=2.9.2"
+cairo-version = "=2.9.4"
 name = "orchard"
 version = "1.1.0"
 edition = "2024_07"
@@ -19,7 +19,7 @@ dojo = { git = "https://github.com/dojoengine/dojo", tag = "v1.4.2" }
 build-external-contracts = ["dojo::world::world_contract::world"]
 
 [dev-dependencies]
-cairo_test = "=2.9.2"
+cairo_test = "=2.9.4"
 dojo_cairo_test = { git = "https://github.com/dojoengine/dojo", tag = "v1.4.2" }
 
 [profile.sepolia]

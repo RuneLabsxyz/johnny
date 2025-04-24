@@ -6,16 +6,14 @@
 
 use orchard::ponziland::consts::{GRID_WIDTH};
 
-use ponzi_land::consts::{GRID_WIDTH};
-
-fn position_to_index(row: u16, col: u16) -> u16 {
+pub fn position_to_index(row: u16, col: u16) -> u16 {
     assert!(row < GRID_WIDTH, "out of bounds");
     assert!(col < GRID_WIDTH, "out of bounds");
 
     return row * GRID_WIDTH + col;
 }
 
-fn index_to_position(index: u16) -> (u16, u16) {
+pub fn index_to_position(index: u16) -> (u16, u16) {
     assert!(index < GRID_WIDTH * GRID_WIDTH, "out of bounds");
 
     let row = index / GRID_WIDTH;
@@ -104,32 +102,32 @@ fn is_valid_position(index: u16) -> bool {
     index < GRID_WIDTH * GRID_WIDTH
 }
 
-fn get_all_neighbors(index: u16) -> Array<u16> {
-    let mut neighbors = Array::new();
+pub fn get_all_neighbors(index: u16) -> Array<u16> {
+    let mut neighbors = ArrayTrait::new();
     if left(index).is_some() {
-        neighbors.push(left(index).unwrap());
+        neighbors.append(left(index).unwrap());
     }
     if right(index).is_some() {
-        neighbors.push(right(index).unwrap());
+        neighbors.append(right(index).unwrap());
     }
     if up(index).is_some() {
-        neighbors.push(up(index).unwrap());
+        neighbors.append(up(index).unwrap());
     }
     if down(index).is_some() {
-        neighbors.push(down(index).unwrap());
+        neighbors.append(down(index).unwrap());
     }
 
     if up_left(index).is_some() {
-        neighbors.push(up_left(index).unwrap());
+        neighbors.append(up_left(index).unwrap());
     }
     if up_right(index).is_some() {
-        neighbors.push(up_right(index).unwrap());
+        neighbors.append(up_right(index).unwrap());
     }
     if down_left(index).is_some() {
-        neighbors.push(down_left(index).unwrap());
+        neighbors.append(down_left(index).unwrap());
     }
     if down_right(index).is_some() {
-        neighbors.push(down_right(index).unwrap());
+        neighbors.append(down_right(index).unwrap());
     }
     
     neighbors

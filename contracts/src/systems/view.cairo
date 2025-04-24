@@ -1,8 +1,8 @@
 // define the interface
-import orchard::ponziland::models::{Land, Auction};
+use orchard::ponziland::models::{Land, Auction, LandOrAuction};
 #[starknet::interface]
 pub trait IPlayerActions<T> {
-    fn get_neighbors(ref self: T, location: u64) -> Array<LandOrAuction>;
+    fn get_neighbors(self: @T, location: u16) -> Array<LandOrAuction>;
 
 }
 
@@ -14,38 +14,41 @@ pub mod player_actions {
     use orchard::ponziland::coords::{position_to_index, index_to_position};
     use orchard::models::{Johnny, Orchard, OrchardTrait};
     use orchard::ponziland::consts::{PONZILAND_WORLD_ADDRESS, JOHNNY_ADDRESS};
+
+    use orchard::ponziland::coords::{get_all_neighbors};
+    use orchard::ponziland::models::{LandOrAuction, Land, Auction};
     
     use dojo::model::{ModelStorage};
     use dojo::event::EventStorage;
-    use orchard::ponziland::coords::{get_all_neighbors};
+
 
     #[abi(embed_v0)]
     impl PlayerActionsImpl of IPlayerActions<ContractState> {
 
-        fn get_neighbors(ref self: ContractState, location: u64) -> Array<LandOrAuction> {
+        fn get_neighbors(self: @ContractState, location: u16) -> Array<LandOrAuction> {
             let mut world = self.world(namespace());
-            let ponziland = self.world(@"ponziLand");
+            let ponziland = self.world(@"ponzi_land");
 
             let neighbors = get_all_neighbors(location);
 
-            let mut neighbors_array = Array::new();
+            let mut neighbors_array = ArrayTrait::new();
 
             for neighbor in neighbors {
                 let maybe_auction: Auction = ponziland.read_model(neighbor);
                 let maybe_land: Land = ponziland.read_model(neighbor);
 
-                if maybe_auction.floor_price != 0 {
-                    neighbors_array.push(LandOrAuction::Auction(maybe_auction));
+                if maybe_auction.floor_price != 0 && maybe_auction.is_finished == false {
+                    neighbors_array.append(LandOrAuction::Auction(maybe_auction));
                 } 
                 else if maybe_land.sell_price != 0 {
-                    neighbors_array.push(LandOrAuction::Land(maybe_land));
+                    neighbors_array.append(LandOrAuction::Land(maybe_land));
                 }
                 else {
-                    neighbors_array.push(LandOrAuction::None);
+                    neighbors_array.append(LandOrAuction::None);
                 }
-            }
+            };
 
-            neighbors
+            neighbors_array
         }
 
 

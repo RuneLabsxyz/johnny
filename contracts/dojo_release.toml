@@ -1,10 +1,10 @@
 [world]
-name = "Dojo starter"
+name = "Ponzi Land"
 description = "The official Dojo Starter guide, the quickest and most streamlined way to get your Dojo Autonomous World up and running. This guide will assist you with the initial setup, from cloning the repository to deploying your world."
 cover_uri = "file://assets/cover.png"
 icon_uri = "file://assets/icon.png"
 website = "https://github.com/dojoengine/dojo-starter"
-seed = "dojo_starter"
+seed = "tourney-for-real"
 
 [world.socials]
 x = "https://x.com/ohayo_dojo"
@@ -13,14 +13,11 @@ github = "https://github.com/dojoengine/dojo-starter"
 telegram = "https://t.me/dojoengine"
 
 [namespace]
-default = "dojo_starter"
+default = "view"
+
 
 [env]
-rpc_url = "http://localhost:5050/"
+rpc_url = "https://api.cartridge.gg/x/starknet/mainnet"
 # Default account for katana with seed = 0
-account_address = "0x127fd5f1fe78a71f8bcd1fec63e3fe2f0486b6ecd5c86a0466c3a21fa5cfcec"
-private_key = "0xc5b2fcab997346f3ea1c00b002ecf6f382c5f9c9659a3894eb783c5320f912"
-#world_address = "0x06171ed98331e849d6084bf2b3e3186a7ddf35574dd68cab4691053ee8ab69d7" # Uncomment and update this line with your world address.
-
-[writers]
-"dojo_starter" = ["dojo_starter-actions"]
+account_address = "0x0576CC90c1BD97011CC9c6351ACe3A372f13290ad2f114Eee05f0Cc5ee78d8e7"
+world_address = "0x628b6af861259ce9ce22e8df6ebd5fbf4fde9a7d4e6eba086aa8dd32325f3b0"

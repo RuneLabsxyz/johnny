@@ -3,7 +3,7 @@ use starknet::ContractAddress;
 pub const PONZILAND_WORLD_ADDRESS: felt252 = 0x0000000000000000000000000000000000000000000000000000000000000000;
 pub const JOHNNY_ADDRESS: felt252 = 0x0274b3248dfc7324fa59d59dc21b69b705e3e5e3174f3fb39ee421f5e818dbf4;
 
-pub const GRID_WIDTH: u64 = 64;
+pub const GRID_WIDTH: u16 = 64;
 //this % is for tests now
 pub const TAX_RATE: u64 = 2;
 pub const BASE_TIME: u64 = 3600;
