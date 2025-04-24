@@ -13,6 +13,11 @@ interface TokenPrice {
   } | null;
 }
 
+export async function getAllTokens(): Promise<TokenPrice[]> {
+  const response = await fetch('https://api.ponzi.land/price');
+  return await response.json();
+}
+
 export async function getLiquidityPoolFromAPI(tokenAddress: string): Promise<PoolKey | null> {
   try {
     const response = await fetch('https://api.ponzi.land/price');
@@ -28,9 +33,6 @@ export async function getLiquidityPoolFromAPI(tokenAddress: string): Promise<Poo
     });
 
     console.log('token', token);
-
-  
-
 
     if (!token || !token.best_pool) {
       return {

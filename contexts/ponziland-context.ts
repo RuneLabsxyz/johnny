@@ -139,27 +139,37 @@ export const get_claims_str = async () => {
   ).then((res: any) => res.ponziLandLandModels.edges.map((edge: any) => edge?.node));
 
   let land_claims = await Promise.all(lands.map((land: any) => {
-    return ponziLandContract.call("get_next_claim_info", [land.location]);
+    return ponziLandContract.call("get_claimable_taxes_for_land", [land.location, address]);
   }));
 
   console.log('land_claims', land_claims)
 
   // Flatten the claims data and format it
   let claims = lands.map((land: any, index: number) => {
-    let landClaims = land_claims[index]
+    console.log('land_claims', land_claims[index])
+    let landClaims = land_claims
       .map((claim: any) => {
         // Find matching contract for the token
         for (let contract of contracts) {
-          if (BigInt(claim.token_address) === BigInt(contract.address)) {
-            return `    ${contract.name}: ${BigInt(claim.amount)}`;
+          let claim_amount = BigInt(0);
+          for (let pending of claim[0]){
+            if (BigInt(pending.token_address) === BigInt(contract.address)) {
+              claim_amount += BigInt(pending.amount);
+            }
           }
+        
+          for (let claimable of claim[1]){
+            if (BigInt(claimable.token_address) === BigInt(contract.address)) {
+              claim_amount += BigInt(claimable.amount);
+            }
+          }
+        
+          return `    ${contract.name}: ${formatTokenAmount(claim_amount)}`;
         }
-        return '';
       })
-      .filter((claim: any) => claim !== '')
       .join('\n');
 
-    return `Land ${BigInt(land.location).toString()}:\n${landClaims}`;
+    return `Land ${BigInt(land.location).toString()}:\n${landClaims} \n ----------------------`;
   }).join('\n\n');
 
 

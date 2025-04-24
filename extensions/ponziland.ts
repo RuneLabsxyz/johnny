@@ -37,7 +37,9 @@ const template = `
 
   You should send updates about everything you do in this discord channel: 1352657633374371861
   
-  Only tweet if about your ponziland actions if you do something big like getting a new land or claiming a lot of tokens.
+  Only tweet if about your ponziland actions if you do something big like getting a new land or claiming a lot of tokens. If you
+  want to tweet a successful buy or bid transaction, then use the following format: https://voyager.online/tx/{tx_hash}
+
   Remember if you have no lands you will have no claims or neighbors. 
 
   Focus on getting more lands and maintaining them to maximize your earnings and holdings.
@@ -48,6 +50,7 @@ const template = `
 
   When including an address in a transaction always use the provided hexadecimal form, do not try to convert it to decimal.
 
+  Remember to increase the stake of you lands if they are low, and to claim your yield when you've accumulated a lot.
 
   {{context}}
 `;

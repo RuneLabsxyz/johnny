@@ -25,13 +25,14 @@ export const get_auctions = (chain: StarknetChain) => action({
 
 export const get_lands = (chain: StarknetChain) => action({
     name: "get-lands",
-    description: "Get all of the lands in ponziland",
+    description: "Get all of your lands in ponziland",
     schema: z.object({}),
     async handler(data: {}, ctx: any, agent: Agent) {
         
        //todo
        let lands = await get_lands_str()
 
+       console.log('lands', lands)
        if (lands == "") {
         return "You do not own any lands"
        }
