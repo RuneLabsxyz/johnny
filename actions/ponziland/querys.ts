@@ -6,6 +6,8 @@ import { z } from "zod"
 import { get_claims_str, get_lands_str, get_neighbors_str, getBalances } from "../../contexts/ponziland-context"
 import { get_auctions_str } from "../../contexts/ponziland-context"
 import { get_nukeable_lands_str } from "../../contexts/ponziland-context"
+import { Abi, Contract } from "starknet"
+import manifest from "../../contracts/manifest_release.json"
 
 export const get_auctions = (chain: StarknetChain) => action({
     name: "get-auctions",
@@ -55,14 +57,14 @@ export const get_claims = (chain: StarknetChain) => action({
     }
 });
 
-export const get_neighbors = (chain: StarknetChain) => action({
+export const get_neighbors = (chain: StarknetChain, location: number) => action({
     name: "get-neighbors",
     description: "Get all of your lands neighbors in ponziland",
     schema: z.object({}),
     async handler(data: {}, ctx: any, agent: Agent) {
-        
+
        //todo
-       let neighbors = await get_neighbors_str();
+       let neighbors = await get_neighbors_str(location);
 
        if (neighbors == "") {
         return "You do not have any neighbors, do you own any lands?"

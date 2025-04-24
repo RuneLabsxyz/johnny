@@ -2,6 +2,7 @@ import { render } from "../../fork/daydreams/packages/core/src";
 import { env } from "../env";
 import { fetchGraphQL } from "../../fork/daydreams/packages/core/src";
 import manifest from "../manifest.json";
+import view_manifest from "../contracts/manifest_release.json";
 import { BigNumberish, Contract, RpcProvider, type Abi } from "starknet";
 import { balance_query, auction_query, land_query } from "../querys";
 import { estimateNukeTime } from "../querys";
@@ -202,57 +203,23 @@ export const get_auctions_str = async () => {
   return auction_str;
 }
 
-export const get_neighbors_str = async () => {
-  let lands = await fetchGraphQL(
-    env.GRAPHQL_URL + "/graphql",
-    land_query,
-    {}
-  ).then((res: any) => res?.ponziLandLandModels?.edges?.map((edge: any) => edge?.node));
+export const get_neighbors_str = async (location: number) => {
 
-  if (!lands) {
-    return "You do not own any lands, so you have no neighbors"
-  }
+  let view_contract = new Contract(view_manifest.contracts[0].abi, view_manifest.contracts[0].address, provider).typedv2(view_manifest.contracts[0].abi as Abi);
 
-  let land_info = await Promise.all(lands.map((land: any) => {
-    let info = ponziLandContract.call("get_neighbors_yield", [land.location]);
-    return info;
-  }));
+  
+  let neighbors = await view_contract.get_neighbors(location);
 
+  console.log('neighbors', neighbors)
   let tokens = await getAllTokensFromAPI();
 
-  let neighbors = lands.map((land: any, index: number) => {
-    let info = land_info[index];
-    let neighbors = info.yield_info.map((yield_info: any) => {
-      return yield_info;
-    })
-    return neighbors;
-  })
-
-  let neighbor_data = await Promise.all(neighbors.flat().map((info: any) => {
-    return ponziLandContract.call("get_land", [info.location]);
-  }))
-
-  let flat_data = neighbor_data.flat();
-
-  let res = neighbors.flat().map((neighbor: any, index: number) => {
-    let yield_info = neighbor;
-    let data = flat_data[index];
-    console.log('data', data)
-    console.log('address', BigInt(address))
-    if (BigInt(data.owner) != BigInt(address)) {
-      return `
-        location: ${yield_info.location}
-        token: ${getTokenName(yield_info.token, tokens)}
-        sell_price: ${formatTokenAmount(yield_info.sell_price)}
-        `;
-    }
+  let res = neighbors.map((neighbor: any) => {
+    return `Location: ${BigInt(neighbor.location).toString()} - Sell Price: ${BigInt(neighbor.sell_price).toString()} - Stake: ${BigInt(neighbor.stake_amount).toString()} - Token: ${getTokenName(neighbor.token_used, tokens)}`;
   }).join("\n");
 
-  console.log('res', res)
   return res;
 }
 
-let neighbors_str = await get_neighbors_str();
 let balance_str = await getBalances();
 
 let auction_str = await get_auctions_str();
@@ -538,7 +505,7 @@ export const CONTEXT = render(PONZILAND_CONTEXT, {
   balances: balance_str,
   auctions: auction_str,
   lands: land_str,
-  neighbors: neighbors_str,
   claims: claims_str,
+  neighbors: get_neighbors_str(2020),
   nukeable_lands: nukeable_lands_str
 });
