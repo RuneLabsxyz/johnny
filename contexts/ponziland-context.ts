@@ -90,7 +90,12 @@ export const get_nukeable_lands_str = async () => {
     env.GRAPHQL_URL + "/graphql",
     nuke_query,
     {}
-  ).then((res: any) => res.ponziLandLandModels.edges.map((edge: any) => edge?.node));
+  ).then((res: any) => res?.ponziLandLandModels?.edges?.map((edge: any) => edge?.node));
+
+  if (!lands) {
+    return "there are no nukeable lands"
+  }
+
   console.log('lands', lands)
   return lands;
 }
@@ -100,7 +105,12 @@ export const get_lands_str = async () => {
     env.GRAPHQL_URL + "/graphql",
     land_query,
     {}
-  ).then((res: any) => res.ponziLandLandModels.edges.map((edge: any) => edge?.node));
+  ).then((res: any) => res?.ponziLandLandModels?.edges?.map((edge: any) => edge?.node));
+
+  if (!lands) {
+    return "You do not own any lands"
+  }
+
   let nuke_time = await Promise.all(lands.map((land: any) => {
     let info = ponziLandContract.call("get_time_to_nuke", [land.location]);
     return info;
@@ -128,7 +138,11 @@ export const get_claims_str = async () => {
     env.GRAPHQL_URL + "/graphql",
     land_query,
     {}
-  ).then((res: any) => res.ponziLandLandModels.edges.map((edge: any) => edge?.node));
+  ).then((res: any) => res?.ponziLandLandModels?.edges?.map((edge: any) => edge?.node));
+
+  if (!lands) {
+    return "You do not own any lands, so you have no claims"
+  }
 
   let land_claims = await Promise.all(lands.map((land: any) => {
     return ponziLandContract.call("get_next_claim_info", [land.location]);
@@ -193,7 +207,12 @@ export const get_neighbors_str = async () => {
     env.GRAPHQL_URL + "/graphql",
     land_query,
     {}
-  ).then((res: any) => res.ponziLandLandModels.edges.map((edge: any) => edge?.node));
+  ).then((res: any) => res?.ponziLandLandModels?.edges?.map((edge: any) => edge?.node));
+
+  if (!lands) {
+    return "You do not own any lands, so you have no neighbors"
+  }
+
   let land_info = await Promise.all(lands.map((land: any) => {
     let info = ponziLandContract.call("get_neighbors_yield", [land.location]);
     return info;

@@ -48,6 +48,7 @@ const template = `
 
   When including an address in a transaction always use the provided hexadecimal form, do not try to convert it to decimal.
 
+  DO NOT EVER tweet about failed transactions or unsuccessful ponziland actions. 
 
   {{context}}
 `;

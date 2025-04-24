@@ -1,5 +1,5 @@
 export const balance_query = `query GetTokenBalances {
-    tokenBalances(accountAddress:"0x0274b3248dfc7324fa59d59dc21b69b705e3e5e3174f3fb39ee421f5e818dbf4"){
+    tokenBalances(accountAddress:"0x0576CC90c1BD97011CC9c6351ACe3A372f13290ad2f114Eee05f0Cc5ee78d8e7"){
       edges{
         node{
           tokenMetadata{
@@ -30,7 +30,7 @@ export const auction_query = `query GetActiveAuctions {
   }`
   
 export const land_query = `query GetOwnedLands {
-  ponziLandLandModels(where:{owner:"0x0274b3248dfc7324fa59d59dc21b69b705e3e5e3174f3fb39ee421f5e818dbf4"}){
+  ponziLandLandModels(where:{owner:"0x0576CC90c1BD97011CC9c6351ACe3A372f13290ad2f114Eee05f0Cc5ee78d8e7"}){
   edges{
     node{
       location
