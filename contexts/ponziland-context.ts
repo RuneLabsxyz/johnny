@@ -6,50 +6,35 @@ import { BigNumberish, Contract, RpcProvider, type Abi } from "starknet";
 import { balance_query, auction_query, land_query } from "../querys";
 import { estimateNukeTime } from "../querys";
 import { nuke_query } from "../querys";
+import { getAllTokensFromAPI } from "../utils/ponziland_api";
 
+interface TokenPrice {
+  symbol: string;
+  address: string;
+  ratio: number | null;
+  best_pool: {
+    token0: string;
+    token1: string;
+    fee: string;
+    tick_spacing: number;
+    extension: string;
+  } | null;
+}
 
 let provider = new RpcProvider({ nodeUrl: process.env.STARKNET_RPC_URL });
 let abi = manifest.contracts[0].abi;
 
 const address = process.env.STARKNET_ADDRESS!;
 
-const ponzilandAddress = '0x1f058fe3a5a82cc12c1e38444d3f9f3fd3511ef4c95851a3d4e07ad195e0af6';
-const estarkAddress = '0x71de745c1ae996cfd39fb292b4342b7c086622e3ecf3a5692bd623060ff3fa0';
-const ebrotherAddress = '0x7031b4db035ffe8872034a97c60abd4e212528416f97462b1742e1f6cf82afe';
-const elordsAddress = '0x4230d6e1203e0d26080eb1cf24d1a3708b8fc085a7e0a4b403f8cc4ec5f7b7b';
-const epaperAddress = '0x335e87d03baaea788b8735ea0eac49406684081bb669535bb7074f9d3f66825' 
-
-// read abi of Test contract
-const { abi: estarkAbi } = await provider.getClassAt(estarkAddress);
-const { abi: ebrotherAbi } = await provider.getClassAt(ebrotherAddress);
-const { abi: elordsAbi } = await provider.getClassAt(elordsAddress);
-const { abi: epaperAbi } = await provider.getClassAt(epaperAddress);
-
-const estarkContract = new Contract(estarkAbi, estarkAddress, provider);
-const ebrotherContract = new Contract(ebrotherAbi, ebrotherAddress, provider);
-const elordsContract = new Contract(elordsAbi, elordsAddress, provider);
-const epaperContract = new Contract(epaperAbi, epaperAddress, provider);
 let ponziLandContract = (new Contract(abi, manifest.contracts[0].address, provider)).typedv2(abi as Abi);
 
-
-let contracts = [
-  {name: "estark", contract: estarkContract, address: estarkAddress},
-  {name: "ebrother", contract: ebrotherContract, address: ebrotherAddress},
-  {name: "elords", contract: elordsContract, address: elordsAddress},
-  {name: "epaper", contract: epaperContract, address: epaperAddress},
-]
-
-if (estarkAbi === undefined) {
-  throw new Error('no abi.');
-}
-
+let ponzilandAddress = manifest.contracts[0].address;
 let block_time = (await provider.getBlock()).timestamp;
 
-// After the contracts array declaration, add a helper function to map a token address to its name:
-const getTokenName = (tokenAddr: string | number): string => {
-  for (const token of contracts) {
+const getTokenName = (tokenAddr: string | number, tokens: TokenPrice[]): string => {
+  for (const token of tokens) {
     if (BigInt(token.address) === BigInt(tokenAddr)) {
-      return token.name;
+      return token.symbol;
     }
   }
   return tokenAddr.toString();
@@ -69,12 +54,17 @@ const formatTokenAmount = (amount: bigint): string => {
 
 export const getBalances = async () => {
   // Retrieve balance and allowance info for each token via the contracts array.
+
+  let tokens = await getAllTokensFromAPI();
+  console.log('tokens', tokens)
   const balancesData = await Promise.all(
-    contracts.map(async (token) => {
-      const balance = await token.contract.call("balanceOf", [address]);
-      const approved = await token.contract.call("allowance", [address, ponzilandAddress]);
+    tokens.map(async (token) => {
+      let abi = await provider.getClassAt(token.address);
+      let contract = new Contract(abi.abi, token.address, provider);
+      const balance = await contract.call("balanceOf", [address]);
+      const approved = await contract.call("allowance", [address, ponzilandAddress]);
       return {
-        name: token.name,
+        name: token.symbol,
         balance: BigInt(balance.toString()) / BigInt(10 ** 18),
         approved: BigInt(approved.toString()) / BigInt(10 ** 18),
         address: token.address,
@@ -115,13 +105,15 @@ export const get_lands_str = async () => {
     let info = ponziLandContract.call("get_time_to_nuke", [land.location]);
     return info;
   }));
+
+  let tokens = await getAllTokensFromAPI();
   
 
   let land_str = lands.map((land: any, index: number) => 
     `location: ${BigInt(land.location).toString()} - 
     Remaining Stake
     Amount: ${BigInt(land.stake_amount).toString()}
-    Token: ${getTokenName(land.token_used)}
+    Token: ${getTokenName(land.token_used, tokens)}
     Time: ${nuke_time[index]/BigInt(60)} minutes
   
     Listed Price: ${BigInt(land.sell_price).toString()}
@@ -207,6 +199,8 @@ export const get_neighbors_str = async () => {
     return info;
   }));
 
+  let tokens = await getAllTokensFromAPI();
+
   let neighbors = lands.map((land: any, index: number) => {
     let info = land_info[index];
     let neighbors = info.yield_info.map((yield_info: any) => {
@@ -229,7 +223,7 @@ export const get_neighbors_str = async () => {
     if (BigInt(data.owner) != BigInt(address)) {
       return `
         location: ${yield_info.location}
-        token: ${getTokenName(yield_info.token)}
+        token: ${getTokenName(yield_info.token, tokens)}
         sell_price: ${formatTokenAmount(yield_info.sell_price)}
         `;
     }
@@ -471,10 +465,6 @@ ALL LANDS CAN BE BOUGHT FOR THEIR LISTED SELL PRICE IN THEIR STAKED TOKEN
         Make sure you approve the token for the ponziland-actions contract before bidding.
         When you attempt a bid transaction, the liquidity pool info will be added to the calldata after automatically, so don't attempt to add it.
         Use the exact calldata given in the example and ingore the liquidity pool info, if you get an error about it just send and update and stop.
-
-        Here are the token addresses, you will usually use eStrk:
-        - eLords: 0x4230d6e1203e0d26080eb1cf24d1a3708b8fc085a7e0a4b403f8cc4ec5f7b7b
-        - eStrk: 0x71de745c1ae996cfd39fb292b4342b7c086622e3ecf3a5692bd623060ff3fa0
 
       </PARAMETERS>
       <EXAMPLE>
