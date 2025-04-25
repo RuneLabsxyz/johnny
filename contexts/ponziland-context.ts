@@ -3,7 +3,7 @@ import { env } from "../env";
 import { fetchGraphQL } from "../../fork/daydreams/packages/core/src";
 import manifest from "../manifest.json";
 import view_manifest from "../contracts/manifest_release.json";
-import { BigNumberish, Contract, RpcProvider, type Abi } from "starknet";
+import { BigNumberish, CairoCustomEnum, Contract, RpcProvider, type Abi } from "starknet";
 import { balance_query, auction_query, land_query } from "../querys";
 import { estimateNukeTime } from "../querys";
 import { nuke_query } from "../querys";
@@ -108,6 +108,7 @@ export const get_lands_str = async () => {
     {}
   ).then((res: any) => res?.ponziLandLandModels?.edges?.map((edge: any) => edge?.node));
 
+  console.log('lands', lands)
   if (!lands) {
     return "You do not own any lands"
   }
@@ -207,14 +208,22 @@ export const get_neighbors_str = async (location: number) => {
 
   let view_contract = new Contract(view_manifest.contracts[0].abi, view_manifest.contracts[0].address, provider).typedv2(view_manifest.contracts[0].abi as Abi);
 
-  
-  let neighbors = await view_contract.get_neighbors(location);
 
-  console.log('neighbors', neighbors)
+  let neighbors: Array<CairoCustomEnum> = await view_contract.get_neighbors(location);
+
   let tokens = await getAllTokensFromAPI();
 
-  let res = neighbors.map((neighbor: any) => {
-    return `Location: ${BigInt(neighbor.location).toString()} - Sell Price: ${BigInt(neighbor.sell_price).toString()} - Stake: ${BigInt(neighbor.stake_amount).toString()} - Token: ${getTokenName(neighbor.token_used, tokens)}`;
+  let res = neighbors.map((temp: CairoCustomEnum) => {
+    if (temp.activeVariant() == "Land"){
+      let neighbor = temp.unwrap();
+      return `Location: ${BigInt(neighbor.location).toString()} - Sell Price: ${BigInt(neighbor.sell_price).toString()} - Token: ${getTokenName(neighbor.token_used, tokens)}`;
+    } else if (temp.activeVariant() == "Auction") {
+      let neighbor = temp.unwrap();
+      return `Location: ${BigInt(neighbor.land_location).toString()} - Auction`;
+    }
+    else {
+      return ``
+    }
   }).join("\n");
 
   return res;
@@ -249,6 +258,11 @@ any neighboring lands to bitcoin lands so you can collect the taxes. You should 
 with <10 BTC, and you should keep the sell price at 1 BTC.
 
 DO NOT continue to retry transactions that fail due to gas errors, just send an update with the error in discord.
+DO NOT EVER TWEET ABOUT FAILED TRANSACTIONS OR HAVING GAS PROBLEMS.
+
+NEVER TWEET ABOUT TRANSACTIONS APPROVING TOKENS, ONLY TWEET ABOUT BIDDING AND BUYING LANDS.
+
+PONZILAND_ACTIONS_ADDRESS: 0x77eeeef469121d1761bb25efbfce7650f5c7fbf00d63cb1b778b774783b2c6
 
 
 <state>
@@ -412,11 +426,9 @@ ALL LANDS CAN BE BOUGHT FOR THEIR LISTED SELL PRICE IN THEIR STAKED TOKEN
         When you attempt a buy transaction, the liquidity pool info will be added to the calldata after automatically, so don't attempt to add it.
         Use the exact calldata given in the example and ingore the liquidity pool info, if you get an error about it just send and update and stop.
 
+        BTC address: 0x04c090a1a34a3ba423e63a498ce23de7c7a4f0f1a8128fa768a09738606cbb9e
 
-        Here are the token addresses:
-        - eLords: 0x4230d6e1203e0d26080eb1cf24d1a3708b8fc085a7e0a4b403f8cc4ec5f7b7b
-        - eStrk: 0x71de745c1ae996cfd39fb292b4342b7c086622e3ecf3a5692bd623060ff3fa0
-
+        You will usually use BTC as the stake token
       </PARAMETERS>
       <EXAMPLE>
     
@@ -453,6 +465,9 @@ ALL LANDS CAN BE BOUGHT FOR THEIR LISTED SELL PRICE IN THEIR STAKED TOKEN
         When you attempt a bid transaction, the liquidity pool info will be added to the calldata after automatically, so don't attempt to add it.
         Use the exact calldata given in the example and ingore the liquidity pool info, if you get an error about it just send and update and stop.
 
+        BTC address: 0x04c090a1a34a3ba423e63a498ce23de7c7a4f0f1a8128fa768a09738606cbb9e
+
+        You will usually use BTC as the stake token
       </PARAMETERS>
       <EXAMPLE>
     

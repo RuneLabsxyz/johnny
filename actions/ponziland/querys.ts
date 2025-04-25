@@ -27,12 +27,14 @@ export const get_auctions = (chain: StarknetChain) => action({
 
 export const get_lands = (chain: StarknetChain) => action({
     name: "get-lands",
-    description: "Get all of the lands in ponziland",
+    description: "Get all of your lands in ponziland",
     schema: z.object({}),
     async handler(data: {}, ctx: any, agent: Agent) {
         
        //todo
        let lands = await get_lands_str()
+
+       console.log('lands', lands)
 
        if (lands == "") {
         return "You do not own any lands"
@@ -57,17 +59,17 @@ export const get_claims = (chain: StarknetChain) => action({
     }
 });
 
-export const get_neighbors = (chain: StarknetChain, location: number) => action({
+export const get_neighbors = (chain: StarknetChain) => action({
     name: "get-neighbors",
     description: "Get all of your lands neighbors in ponziland",
-    schema: z.object({}),
-    async handler(data: {}, ctx: any, agent: Agent) {
+    schema: z.object({location: z.number()}),
+    async handler(data: {location: number}, ctx: any, agent: Agent) {
 
        //todo
-       let neighbors = await get_neighbors_str(location);
+       let neighbors = await get_neighbors_str(data.location);
 
        if (neighbors == "") {
-        return "You do not have any neighbors, do you own any lands?"
+        return "Failed to get neighbors for location " + location + ". land may not exist."
        }
 
        return neighbors

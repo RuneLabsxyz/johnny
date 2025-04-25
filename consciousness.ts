@@ -29,8 +29,8 @@ export const consciousness = (prompt: string) => input({
       // Function to schedule the next thought with random timing
       const scheduleNextThought = async () => {
         // Random delay between 3 and 10 minutes (180000-600000 ms)
-        const minDelay = 300000; // 3 minutes
-        const maxDelay = 1000000; // 10 minutes
+        const minDelay = 100000; // 3 minutes
+        const maxDelay = 4000000; // 10 minutes
         const randomDelay = Math.floor(Math.random() * (maxDelay - minDelay + 1)) + minDelay;
         
         console.log(`Scheduling next thought in ${randomDelay/60000} minutes`);
@@ -39,7 +39,7 @@ export const consciousness = (prompt: string) => input({
           let res = await generateText({ 
             model: openrouter("google/gemini-2.0-flash-001"),
             prompt,
-            temperature: 0.6,
+            temperature: 0.8,
           });
     
           console.log('new thought: ' + res.text);

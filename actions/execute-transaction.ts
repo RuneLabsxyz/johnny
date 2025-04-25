@@ -34,18 +34,6 @@ export const execute_transaction = (chain: StarknetChain) => action({
 
         let res = [];
         for (let call of data.calls) {
-
-            if (call.entrypoint == "bid" || call.entrypoint == "buy") {
-                let pool = await getLiquidityPoolFromAPI(call.calldata[1] as string);
-                console.log('pool', pool);
-                if (pool) {
-                    call.calldata.push(pool.token0);
-                    call.calldata.push(pool.token1);
-                    call.calldata.push(pool.fee.toString());
-                    call.calldata.push(pool.tick_spacing.toString());
-                    call.calldata.push(pool.extension);
-                }
-            }
             console.log('call', call);
 
             let r = await chain.write(call);
