@@ -6,14 +6,13 @@ import manifest  from "../contracts/manifest_sepolia.json"
 import { Contract, Abi, Call } from "starknet";
 import { execute_transaction } from "../actions/execute-transaction";
 import { get_balances } from "../actions/get-balances";
-import { get_lands_str, 
-    } from "../contexts/ponziland-context";
+import { get_lands_str } from "../contexts/ponziland-context";
 
 import { character, personality } from "../characters/ponzius";
 
 import { CONTEXT } from "../contexts/ponziland-context";
 import { getBalances } from "../contexts/ponziland-context";
-import { get_auctions, get_claims, get_lands, get_neighbors } from "../actions/ponziland/querys";
+import { get_auctions, get_claims, get_lands, get_neighbors, get_all_lands, get_owned_lands } from "../actions/ponziland/querys";
 const template = `
   <character_info>
     {{character}}
@@ -58,7 +57,13 @@ const template = `
   If there are no suitable auctions or neighbors, just send an update saying so and do not bid or buy anything.
   Remember you don't want to waste all your resources. 
 
+  Be aggressive in targeting the neighbors of your lands. If you can afford to buy one you should.
+  Only worry about conserving resources when you are almost out (< 100)
+  You also should use the get_neighbors and get_all_lands actions to identify possible purchases.
+  If there is an afforadable land that is not a neighbor, you should still buy it and stake it with btc.
 
+  When you claim your yield, you should tweet about how much you just claimed, but only claim when
+  its a significant amount.
   {{context}}
 `;
 
@@ -109,8 +114,8 @@ export const ponziland_check = (chain: StarknetChain) => input({
     // Function to schedule the next thought with random timing
     const scheduleNextThought = async () => {
       // Random delay between 3 and 10 minutes (180000-600000 ms)
-      const minDelay = 100000; // 3 minutes
-      const maxDelay = 150000; // 10 minutes
+      const minDelay = 300000; // 3 minutes
+      const maxDelay = 400000; // 10 minutes
       const randomDelay = Math.floor(Math.random() * (maxDelay - minDelay + 1)) + minDelay;
       
       console.log(`Scheduling next ponziland check in ${randomDelay/60000} minutes`);
@@ -163,10 +168,11 @@ export const ponziland = (chain: StarknetChain) => {
   },
   actions: [
     execute_transaction(chain),
-    get_lands(chain),
+    get_owned_lands(chain),
     get_auctions(chain),
     get_claims(chain),
-    get_neighbors(chain, location),
+    get_neighbors(chain),
+    get_all_lands(chain),
   ],
 
   });

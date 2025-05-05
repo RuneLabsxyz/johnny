@@ -30,7 +30,7 @@ export const auction_query = `query GetActiveAuctions {
   }`
   
 export const land_query = `query GetOwnedLands {
-  ponziLandLandModels(where:{owner:"0x576CC90c1BD97011CC9c6351ACe3A372f13290ad2f114Eee05f0Cc5ee78d8e7"}){
+ponziLandLandModels(where:{owner:"0x576cc90c1bd97011cc9c6351ace3a372f13290ad2f114eee05f0cc5ee78d8e7"}){
   edges{
     node{
       location
@@ -39,6 +39,7 @@ export const land_query = `query GetOwnedLands {
     }
   }
   }
+
   }`
 
   export const nuke_query = `query GetNukeableLands {

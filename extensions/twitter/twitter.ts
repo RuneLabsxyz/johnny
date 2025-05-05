@@ -69,9 +69,10 @@ export const twitter = extension({
         const { container } = agent;
 
         const twitter = container.resolve("twitter") as TwitterClient;
-
         // Check mentions every minute
         const interval = setInterval(async () => {
+
+          console.log('checking mentions')
           const mentions = await twitter.checkMentions();
 
           for (const mention of mentions) {
@@ -86,7 +87,7 @@ export const twitter = extension({
               }
             );
           }
-        }, 100000);
+        }, 600000);
 
         return () => clearInterval(interval);
       },
@@ -104,10 +105,13 @@ export const twitter = extension({
 
       handler: async (data, ctx, { container }) => {
         const twitter = container.resolve<TwitterClient>("twitter");
-
-        console.log('sending reply', data.content, data.inReplyTo)
+        
+        // Remove hashtags at the end of the tweet
+        const cleanedContent = data.content.replace(/\s+#\w+\s*$/g, '').trim();
+        
+        console.log('sending reply', cleanedContent, data.inReplyTo)
         const { tweetId } = await twitter.sendTweet({
-          content: data.content,
+          content: cleanedContent,
           inReplyTo: data.inReplyTo,
         });
 
@@ -136,9 +140,14 @@ export const twitter = extension({
 
       handler: async (data, ctx, { container }) => {
         const twitter = container.resolve<TwitterClient>("twitter");
-        console.log('sending tweet', data.content)
+        
+        // Remove hashtags at the end of the tweet
+        const cleanedContent = data.content.replace(/\s+#\w+\s*$/g, '').trim();
+        
+        console.log('sending tweet', cleanedContent)
+        
         await twitter.sendTweet({
-          content: data.content,
+          content: cleanedContent,
         });
         return {
           data,

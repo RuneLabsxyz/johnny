@@ -6,6 +6,8 @@ import { z } from "zod"
 import { getBalances } from "../contexts/ponziland-context"
 import { CallData } from "starknet";
 import { getLiquidityPoolFromAPI } from "../utils/ponziland_api"
+import { decodeTokenTransferEvents } from "../utils/utils";
+
 export const execute_transaction = (chain: StarknetChain) => action({
     name: "execute_transaction",
     description: "Execute a transaction on starknet",
@@ -36,7 +38,17 @@ export const execute_transaction = (chain: StarknetChain) => action({
         for (let call of data.calls) {
             console.log('call', call);
 
+            if (call.entrypoint == "approve") {
+                if (BigInt(call.calldata[1]) < BigInt(10**18)) {
+                    call.calldata[1] = (BigInt(call.calldata[1]) * BigInt(10**18)).toString();   
+                }
+            }
+
             let r = await chain.write(call);
+
+         //   let events = await decodeTokenTransferEvents(r);
+
+        //    console.log('events', events)
             console.log('r', r);
             res.push(r);
         }

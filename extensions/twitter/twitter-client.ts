@@ -94,9 +94,11 @@ export class TwitterClient {
 
       const mentions = await this.scraper.fetchSearchTweets(
         `@${this.credentials.username}`,
-        20,
+        50,
         SearchMode.Latest
       );
+
+      console.log('mentions', mentions)
 
       // Convert AsyncGenerator to array and process
       const mentionsArray: Tweet[] = [];

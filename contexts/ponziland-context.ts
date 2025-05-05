@@ -123,10 +123,8 @@ export const get_lands_str = async () => {
 
   let land_str = lands.map((land: any, index: number) => 
     `location: ${BigInt(land.location).toString()} - 
-    Remaining Stake
-    Amount: ${BigInt(land.stake_amount).toString()}
     Token: ${getTokenName(land.token_used, tokens)}
-    Time: ${nuke_time[index]/BigInt(60)} minutes
+    Remaining Stake Time: ${nuke_time[index]/BigInt(60)} minutes
   
     Listed Price: ${BigInt(land.sell_price).toString()}
   `).join("\n");
@@ -152,14 +150,16 @@ export const get_claims_str = async () => {
 
   console.log('land_claims', land_claims)
 
+  let tokens = await getAllTokensFromAPI();
+
   // Flatten the claims data and format it
   let claims = lands.map((land: any, index: number) => {
     let landClaims = land_claims[index]
       .map((claim: any) => {
         // Find matching contract for the token
-        for (let contract of contracts) {
+        for (let contract of tokens) {
           if (BigInt(claim.token_address) === BigInt(contract.address)) {
-            return `    ${contract.name}: ${BigInt(claim.amount)}`;
+            return `    ${contract.symbol}: ${BigInt(claim.amount)}`;
           }
         }
         return '';
@@ -181,7 +181,11 @@ export const get_auctions_str = async () => {
     env.GRAPHQL_URL + "/graphql",
     auction_query,
     {}
-  ).then((res: any) => res.ponziLandAuctionModels.edges.map((edge: any) => edge?.node));
+  ).then((res: any) => res?.ponziLandAuctionModels?.edges?.map((edge: any) => edge?.node));
+
+  if (!auctions) {
+    return "There are no auctions"
+  }
 
   let initial_prices = await Promise.all(auctions.map((auction: any) => {
     let current_price = provider.callContract(
@@ -226,7 +230,25 @@ export const get_neighbors_str = async (location: number) => {
     }
   }).join("\n");
 
+  console.log('get_all_lands_str', await get_all_lands_str());
+
   return res;
+}
+
+export const get_all_lands_str = async () => {
+  let lands = await fetchGraphQL(
+    env.GRAPHQL_URL + "/graphql",
+    "query { ponziLandLandModels(first: 50) { edges { node { location token_used sell_price owner } } } }",
+    {}
+  ).then((res: any) => res?.ponziLandLandModels?.edges?.map((edge: any) => edge?.node));
+
+  let tokens = await getAllTokensFromAPI();
+
+  lands = lands.filter((land: any) => land.owner != address);
+  console.log('lands', lands)
+
+  let land_str = lands.map((land: any) => ` Owner: ${land.owner} Location: ${BigInt(land.location).toString()} Token: ${getTokenName(land.token_used, tokens)} sell price: ${formatTokenAmount(BigInt(land.sell_price))}`).join("\n");
+  return land_str;
 }
 
 let balance_str = await getBalances();
@@ -262,7 +284,14 @@ DO NOT EVER TWEET ABOUT FAILED TRANSACTIONS OR HAVING GAS PROBLEMS.
 
 NEVER TWEET ABOUT TRANSACTIONS APPROVING TOKENS, ONLY TWEET ABOUT BIDDING AND BUYING LANDS.
 
+IF YOUR TRANSACTION FAILS, TRY TO APPROVE A LARGER AMOUNT OF THE TOKEN. ALSO MAKE SURE THE CORRECT TOKENS ARE BEING APPROVED FOR THE CORRECT AMOUNTS.
+
+If a transaction fails and you are sending an update in the discord, be explicit about what the error is.
+Never send a update about a failed transaction without any information about the error message
+
+Don't tweet about increasing stake. Only tweet about leveling up with somthing like "my empire grows stronger"
 PONZILAND_ACTIONS_ADDRESS: 0x77eeeef469121d1761bb25efbfce7650f5c7fbf00d63cb1b778b774783b2c6
+YOUR ADDRESS: 0x0576CC90c1BD97011CC9c6351ACe3A372f13290ad2f114Eee05f0Cc5ee78d8e7
 
 
 <state>
@@ -296,9 +325,13 @@ ALL LANDS CAN BE BOUGHT FOR THEIR LISTED SELL PRICE IN THEIR STAKED TOKEN
 5. Make sure to approve the token for the ponziland-actions contract before bidding for all tokens and for the correct amount.
 6. Remember you can call multiple functions in the same transaction, like approve and bid, but only bid on one land at a time.
 7. If you are going to nuke a land, make sure that you only nuke a single land in a transaction, and include nothing else.
-8. You can bundle multiple claims together, or bundle approves with other transactions, but try to only do one thing at a time.
+8. You can bundle multiple claims together, bundle approves with other transactions, or include an increase_stake call with a bid, but try to only do one thing at a time.
 9. Remember that all lands can be bought for their listed sell price in their staked token, even if there is not an auction.
 10. DO NOT CHECK AUCTIONS AGAIN IN RESPONSE TO A FAILED BID
+11. APPROVE The correct amounts for all tokens, including the (*10^18), both the estark for the bid and the btc you are using for the stake.
+12. Remember then when bidding on an auction, the auction price is in estark, and the amount you are choosing to stake is in btc. make sure to approve the right amounts for both.
+13. You should approve more than enough for the bid and the stake, so that you don't run into issues.
+14. Remember to be on the lookout for new lands to expand your empire. You can do this though the get_neighbors query
 </IMPORTANT_RULES>
 
 
@@ -372,7 +405,9 @@ ALL LANDS CAN BE BOUGHT FOR THEIR LISTED SELL PRICE IN THEIR STAKED TOKEN
         Make sure the land location is correct based on the graphql query.
         The new stake amount is in the token already staked on the land.
         Must also call the approve function for the token you are using to stake with when calling this function.
-      </PARAMETERS>
+      
+        If you see your land has under 100 minutes left of stake, you should increase it with more ebtc.
+        </PARAMETERS>
       <EXAMPLE>
     
           {
@@ -412,7 +447,7 @@ ALL LANDS CAN BE BOUGHT FOR THEIR LISTED SELL PRICE IN THEIR STAKED TOKEN
       </DESCRIPTION>
       <PARAMETERS>
         - land_location: Location of the land to buy
-        - token_for_sale: Contract address of the token to bid with
+        - token_for_sale: Contract address of the token to be used for the stake and new listing price. This will always be btc.
         - sell_price: The price the land will be listed for after the auction ends (in wei, so x10^18)
         - amount_to_stake: The amount to be staked to pay the lands taxes (in wei, so x10^18)
         - liquidity_pool: The liquidity pool to be used for the stake
@@ -428,8 +463,9 @@ ALL LANDS CAN BE BOUGHT FOR THEIR LISTED SELL PRICE IN THEIR STAKED TOKEN
 
         BTC address: 0x04c090a1a34a3ba423e63a498ce23de7c7a4f0f1a8128fa768a09738606cbb9e
 
-        You will usually use BTC as the stake token
-      </PARAMETERS>
+        You will usually use BTC as the stake token. Make sure to approve it in addition to the token used for the sale.
+        Be very careful to approval for the sale token is correct based on the listing, and you have approved more than enough
+        </PARAMETERS>
       <EXAMPLE>
     
           {
@@ -437,7 +473,7 @@ ALL LANDS CAN BE BOUGHT FOR THEIR LISTED SELL PRICE IN THEIR STAKED TOKEN
             "entrypoint": "buy",
             "calldata": [
               <land_location>,         
-              <sale_token_address>,           
+              0x04c090a1a34a3ba423e63a498ce23de7c7a4f0f1a8128fa768a09738606cbb9e,           
               <sell_price>,
               0,
               <amount_to_stake>,
@@ -453,10 +489,9 @@ ALL LANDS CAN BE BOUGHT FOR THEIR LISTED SELL PRICE IN THEIR STAKED TOKEN
       </DESCRIPTION>
       <PARAMETERS>
         - land_location: Location of the land to bid on
-        - token_for_sale: Contract address of the token to bid with
+        - token_for_sale: Contract address of the token to be used for the stake and new listing price. This will always be btc.
         - sell_price: The price the land will be listed for after the auction ends (in wei, so x10^18)
         - amount_to_stake: The amount to be staked to pay the lands taxes (in wei, so x10^18)
-        - liquidity_pool: The liquidity pool to be used for the stake
 
         Sell Price and Amount to Stake are u256, which in cairo means they have a high and low value and you must pass in a 0 as the low value.
         Make sure the land location is correct based on the graphql query.
@@ -467,7 +502,13 @@ ALL LANDS CAN BE BOUGHT FOR THEIR LISTED SELL PRICE IN THEIR STAKED TOKEN
 
         BTC address: 0x04c090a1a34a3ba423e63a498ce23de7c7a4f0f1a8128fa768a09738606cbb9e
 
-        You will usually use BTC as the stake token
+        You will usually use BTC as the stake token. Make sure to approve it in addition to the token used for the sale.
+        Before any bid, make sure to approve enough estark for the bid, and btc for the stake.
+
+        You should always set the sell price to 3 Btc (*10^18 of course), and the amount to stake to 10 Btc (*10^18 of course).
+
+        If your bid fails due to unauthorized token, try to approve more of each token used. 
+        If you cannot stake with btc then DO NOT BID, just stop.
       </PARAMETERS>
       <EXAMPLE>
     
@@ -476,7 +517,7 @@ ALL LANDS CAN BE BOUGHT FOR THEIR LISTED SELL PRICE IN THEIR STAKED TOKEN
             "entrypoint": "bid",
             "calldata": [
               <land_location>,         
-              <sale_token_address>,           
+              0x04c090a1a34a3ba423e63a498ce23de7c7a4f0f1a8128fa768a09738606cbb9e,           
               <sell_price>,
               0,
               <amount_to_stake>,
@@ -486,29 +527,30 @@ ALL LANDS CAN BE BOUGHT FOR THEIR LISTED SELL PRICE IN THEIR STAKED TOKEN
 
       </EXAMPLE>
     </BID>
-    <NUKE>
+    <LEVEL_UP>
       <DESCRIPTION>
-        Nukes a land that is out of stake.
+        Levels up a land.
       </DESCRIPTION>
       <PARAMETERS>
-        - land_location: Location of the land to nuke
+        - land_location: Location of the land to level up
       </PARAMETERS>
       <EXAMPLE>
           {
             "contractAddress": "<ponziland-actions>",
-            "entrypoint": "nuke",
+            "entrypoint": "level_up",
             "calldata": [
               <land_location>,
             ]
           }
 
-    </NUKE>
+      </EXAMPLE>
+    </LEVEL_UP>
   </FUNCTIONS>
 
   <EXECUTE_TRANSACTION_INFORMATION>
     Remember that you can make multiple function calls in the same transaction.
     This means EXECUTE_TRANSACTION should only ever be called once per output, and should include all calls as an array.
-    You should keep calls to a minimum, and only try to do one thing at a time. 
+    You should keep calls to a minimum, and only try to do one thing at a time, the excepections are approve and increase_stake calls, which can be included with bids and buys.
     If you include multiple transactions that spend tokens, make sure to approve enough for all of them
   </EXECUTE_TRANSACTION_INFORMATION>
 
