@@ -9,32 +9,28 @@ let openrouter = createOpenRouter({
   });
 
 const consciousnessContext = context({
-  type: "consciousness",
-  key: ({ userId }) => userId.toString(),
+  type: "twitter-consciousnesss",
+  key: ({ thoughtId }) => thoughtId.toString(),
   schema: z.object({
-    userId: z.string(),
+    thoughtId: z.string(),
   }),
+  
 });
 
 export const consciousness = (prompt: string) => input({
     schema: z.object({
       text: z.string(),
     }),
-    format: (data) =>
-      formatXml({
-        tag: "consciousness",
-        content: data.text,
-      }),
     subscribe(send, { container }) {
       // Check mentions every minute
       let index = 0;
-      let timeout: NodeJS.Timeout;
+      let timeout: ReturnType<typeof setTimeout>;
 
       // Function to schedule the next thought with random timing
       const scheduleNextThought = async () => {
         // Random delay between 3 and 10 minutes (180000-600000 ms)
-        const minDelay = 180000; // 3 minutes
-        const maxDelay = 3000000; // 10 minutes
+        const minDelay = 1000000; // 3 minutes
+        const maxDelay = 2400000; // 10 minutes
         const randomDelay = Math.floor(Math.random() * (maxDelay - minDelay + 1)) + minDelay;
         
         console.log(`Scheduling next thought in ${randomDelay/60000} minutes`);
@@ -43,11 +39,11 @@ export const consciousness = (prompt: string) => input({
           let res = await generateText({ 
             model: openrouter("google/gemini-2.0-flash-001"),
             prompt,
-            temperature: 0.5,
+            temperature: 0.7,
           });
     
           console.log('new thought: ' + res.text);
-          send(consciousnessContext, { userId: "thought: " + index }, { text: res.text });
+          send(consciousnessContext, { thoughtId: "twitter-thought: " + index }, { text: "Twitter " + res.text });
           index += 1;
           
           // Schedule the next thought

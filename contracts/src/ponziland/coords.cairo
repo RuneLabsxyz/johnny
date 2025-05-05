@@ -6,14 +6,14 @@
 
 use orchard::ponziland::consts::{GRID_WIDTH};
 
-pub fn position_to_index(row: u64, col: u64) -> u64 {
+pub fn position_to_index(row: u16, col: u16) -> u16 {
     assert!(row < GRID_WIDTH, "out of bounds");
     assert!(col < GRID_WIDTH, "out of bounds");
 
     return row * GRID_WIDTH + col;
 }
 
-pub fn index_to_position(index: u64) -> (u64, u64) {
+pub fn index_to_position(index: u16) -> (u16, u16) {
     assert!(index < GRID_WIDTH * GRID_WIDTH, "out of bounds");
 
     let row = index / GRID_WIDTH;
@@ -22,7 +22,7 @@ pub fn index_to_position(index: u64) -> (u64, u64) {
     return (row, col);
 }
 
-pub fn left(index: u64) -> Option<u64> {
+fn left(index: u16) -> Option<u16> {
     let (row, col) = index_to_position(index);
     if col == 0 {
         // return index;
@@ -32,7 +32,7 @@ pub fn left(index: u64) -> Option<u64> {
     }
 }
 
-pub fn right(index: u64) -> Option<u64> {
+fn right(index: u16) -> Option<u16> {
     let (row, col) = index_to_position(index);
     if col == GRID_WIDTH - 1 {
         //return index
@@ -42,7 +42,7 @@ pub fn right(index: u64) -> Option<u64> {
     }
 }
 
-pub fn up(index: u64) -> Option<u64> {
+fn up(index: u16) -> Option<u16> {
     let (row, col) = index_to_position(index);
     if row == 0 {
         //return index
@@ -52,7 +52,7 @@ pub fn up(index: u64) -> Option<u64> {
     }
 }
 
-pub fn down(index: u64) -> Option<u64> {
+fn down(index: u16) -> Option<u16> {
     let (row, col) = index_to_position(index);
     if row == GRID_WIDTH - 1 {
         //return index
@@ -62,11 +62,78 @@ pub fn down(index: u64) -> Option<u64> {
     }
 }
 
-fn is_valid_position(index: u64) -> bool {
+fn up_left(index: u16) -> Option<u16> {
+    let (row, col) = index_to_position(index);
+    if row == 0 || col == 0 {
+        Option::None
+    } else {
+        Option::Some(position_to_index(row - 1, col - 1))
+    }
+}
+
+fn up_right(index: u16) -> Option<u16> {
+    let (row, col) = index_to_position(index);
+    if row == 0 || col == GRID_WIDTH - 1 {
+        Option::None
+    } else {
+        Option::Some(position_to_index(row - 1, col + 1))
+    }
+}
+
+fn down_left(index: u16) -> Option<u16> {
+    let (row, col) = index_to_position(index);
+    if row == GRID_WIDTH - 1 || col == 0 {
+        Option::None
+    } else {
+        Option::Some(position_to_index(row + 1, col - 1))
+    }
+}
+
+fn down_right(index: u16) -> Option<u16> {
+    let (row, col) = index_to_position(index);
+    if row == GRID_WIDTH - 1 || col == GRID_WIDTH - 1 {
+        Option::None
+    } else {
+        Option::Some(position_to_index(row + 1, col + 1))
+    }
+}
+
+fn is_valid_position(index: u16) -> bool {
     index < GRID_WIDTH * GRID_WIDTH
 }
 
-pub fn max_neighbors(index: u64) -> u64 {
+pub fn get_all_neighbors(index: u16) -> Array<u16> {
+    let mut neighbors = ArrayTrait::new();
+    if left(index).is_some() {
+        neighbors.append(left(index).unwrap());
+    }
+    if right(index).is_some() {
+        neighbors.append(right(index).unwrap());
+    }
+    if up(index).is_some() {
+        neighbors.append(up(index).unwrap());
+    }
+    if down(index).is_some() {
+        neighbors.append(down(index).unwrap());
+    }
+
+    if up_left(index).is_some() {
+        neighbors.append(up_left(index).unwrap());
+    }
+    if up_right(index).is_some() {
+        neighbors.append(up_right(index).unwrap());
+    }
+    if down_left(index).is_some() {
+        neighbors.append(down_left(index).unwrap());
+    }
+    if down_right(index).is_some() {
+        neighbors.append(down_right(index).unwrap());
+    }
+    
+    neighbors
+}
+
+fn max_neighbors(index: u16) -> u8 {
     let mut count = 0;
 
     // Orthogonal neighbors
@@ -84,47 +151,20 @@ pub fn max_neighbors(index: u64) -> u64 {
     }
 
     // Diagonal neighbors
-    if up(index).is_some() && right(index).is_some() {
+    if up_left(index).is_some() {
         count += 1;
     }
-    if up(index).is_some() && left(index).is_some() {
+    if up_right(index).is_some() {
         count += 1;
     }
-    if down(index).is_some() && right(index).is_some() {
+    if down_left(index).is_some() {
         count += 1;
     }
-    if down(index).is_some() && left(index).is_some() {
+    if down_right(index).is_some() {
         count += 1;
     }
 
     return count;
-}
-
-pub fn get_neighbors_indexs(index: u64) -> Array<u64> {
-    let mut neighbors = ArrayTrait::new();
-    if left(index).is_some() {
-        neighbors.append(left(index).unwrap());
-    }
-    if right(index).is_some() {
-        neighbors.append(right(index).unwrap());
-    }
-    if up(index).is_some() {
-        neighbors.append(up(index).unwrap());
-    }
-    if down(index).is_some() {
-        neighbors.append(down(index).unwrap());
-    }
-
-    return neighbors;
-}
-
-pub fn get_neighbors_coords(index: u64) -> Array<(u64, u64)> {
-    let neighbors = get_neighbors_indexs(index);
-    let mut coords = ArrayTrait::new();
-    for neighbor in neighbors {
-        coords.append(index_to_position(neighbor));
-    };
-    return coords;
 }
 
 #[cfg(test)]
@@ -184,7 +224,7 @@ mod coord_test {
         assert(is_valid_position(10), 'has to be true');
         assert(is_valid_position(4095), 'has to be true');
         assert(!is_valid_position(4096), 'has to be false');
-        assert(!is_valid_position(100000), 'has to be false');
+        assert(!is_valid_position(10000), 'has to be false');
     }
 
     #[test]
@@ -192,26 +232,26 @@ mod coord_test {
         // Corner positions
         assert_eq!(max_neighbors(position_to_index(0, 0)), 3); // Top-left: right, down, down-right
         assert_eq!(
-            max_neighbors(position_to_index(0, GRID_WIDTH - 1)), 3
+            max_neighbors(position_to_index(0, GRID_WIDTH - 1)), 3,
         ); // Top-right: left, down, down-left
         assert_eq!(
-            max_neighbors(position_to_index(GRID_WIDTH - 1, 0)), 3
+            max_neighbors(position_to_index(GRID_WIDTH - 1, 0)), 3,
         ); // Bottom-left: up, right, up-right
         assert_eq!(
-            max_neighbors(position_to_index(GRID_WIDTH - 1, GRID_WIDTH - 1)), 3
+            max_neighbors(position_to_index(GRID_WIDTH - 1, GRID_WIDTH - 1)), 3,
         ); // Bottom-right: up, left, up-left
 
         // Edge positions
         assert_eq!(
-            max_neighbors(position_to_index(0, 1)), 5
+            max_neighbors(position_to_index(0, 1)), 5,
         ); // Top edge: left, right, down, down-left, down-right
         assert_eq!(
-            max_neighbors(position_to_index(1, 0)), 5
+            max_neighbors(position_to_index(1, 0)), 5,
         ); // Left edge: up, down, right, up-right, down-right
 
         // Interior position
         assert_eq!(
-            max_neighbors(position_to_index(1, 1)), 8
+            max_neighbors(position_to_index(1, 1)), 8,
         ); // All directions: up, down, left, right, and all diagonals
     }
 }

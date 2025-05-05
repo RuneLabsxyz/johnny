@@ -1,9 +1,12 @@
 import { action } from "../../fork/daydreams/packages/core/src"
-import { StarknetChain } from "../../fork/daydreams/packages/core/src"
+import { StarknetChain } from "../../fork/daydreams/packages/defai/src"
 import { ActionCall } from "../../fork/daydreams/packages/core/src"
 import { Agent } from "../../fork/daydreams/packages/core/src"
 import { z } from "zod"
 import { getBalances } from "../contexts/ponziland-context"
+import { CallData } from "starknet";
+import { getLiquidityPoolFromAPI } from "../utils/ponziland_api"
+import { decodeTokenTransferEvents } from "../utils/utils";
 
 export const execute_transaction = (chain: StarknetChain) => action({
     name: "execute_transaction",
@@ -28,17 +31,28 @@ export const execute_transaction = (chain: StarknetChain) => action({
         ),
     ).describe("Array of all calls to execute in transaction. Include all transactions here, instead of using this multiple times"),
     }),
-    handler(call, ctx, agent) {
-        console.log(call);
+    async handler(data, ctx, agent) {
+        console.log('data', data);
 
-        let i = 0;
-        //TODO use multicall
-        while (i < call.data.calls.length) {    
-            chain.write(call.data.calls[i])
+        let res = [];
+        for (let call of data.calls) {
+            console.log('call', call);
 
-            i+=1;
+            if (call.entrypoint == "approve") {
+                if (BigInt(call.calldata[1]) < BigInt(10**18)) {
+                    call.calldata[1] = (BigInt(call.calldata[1]) * BigInt(10**18)).toString();   
+                }
+            }
+
+            let r = await chain.write(call);
+
+         //   let events = await decodeTokenTransferEvents(r);
+
+        //    console.log('events', events)
+            console.log('r', r);
+            res.push(r);
         }
-        
-        return call;
+
+        return res;
     }
 })

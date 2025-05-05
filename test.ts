@@ -6,10 +6,11 @@ import { character } from "./characters/johnny";
 import { z } from "zod";
 import { generateText } from "ai";
 import { consciousness } from "./consciousness";
-import { twitter } from "./twitter/twitter";
+import { twitter } from "./extensions/twitter/twitter";
 import { get_balances } from "./actions/get-balances";
 import { StarknetChain } from "../fork/daydreams/packages/core/src";
 import { ponziland } from "./extensions/ponziland";
+import { orchard } from "./extensions/orchard";
 
 let openrouter = createOpenRouter({
   apiKey: process.env.OPENROUTER_API_KEY!,
@@ -25,7 +26,7 @@ let c = consciousness("Give me a random thought you want to share on social medi
 const agent = createDreams({
   logger: LogLevel.TRACE,
   model: openrouter("google/gemini-2.0-flash-001"),
-  extensions: [discord, ponziland(chain)],
+  extensions: [discord, orchard(chain)],
   character: character,
   memory: {
     store: createMemoryStore(),

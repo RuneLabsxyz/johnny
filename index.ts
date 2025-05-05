@@ -1,14 +1,14 @@
 import { Action, createDreams, createMemoryStore, LogLevel, memory, action, ActionCall, input, formatXml } from "../fork/daydreams/packages/core/src";
 import { createOpenRouter } from "@openrouter/ai-sdk-provider";
-import { createChromaVectorStore } from "../fork/daydreams/packages/core/src/extensions";
+import { createChromaVectorStore } from "../fork/daydreams/packages/chroma/src";
 import { createGroq } from "@ai-sdk/groq";
-import { character } from "./characters/johnny";
+import { personality } from "./characters/ponzius";
 import { z } from "zod";
 import { generateText } from "ai";
 import { consciousness } from "./consciousness";
-import { twitter } from "./twitter/twitter";
+import { twitter } from "./extensions/twitter/twitter";
 import { get_balances } from "./actions/get-balances";
-import { StarknetChain } from "../fork/daydreams/packages/core/src";
+import { StarknetChain } from "../fork/daydreams/packages/defai/src";
 import { orchard } from "./extensions/orchard";
 import { ponziland } from "./extensions/ponziland";
 import { discord } from "./extensions/discord";
@@ -22,17 +22,21 @@ const chain = new StarknetChain({rpcUrl: process.env.STARKNET_RPC_URL ?? "",
                                   privateKey: process.env.STARKNET_PRIVATE_KEY ?? "" 
 })
 
-let c = consciousness("Give me a random thought you want to share on social media considering the following character information: " + character + `don't make the post itself, just say something like "I want to tweet about x")`)
+let c = consciousness("Give me a brief thought you want to share on social media considering the following character information: " + personality + `don't make the post itself, just give the general topic or idea. You are giving the instruction for someone else to write the tweet itself. Only give 1 and make it conscise and coherent about a single thing. DO NOT INCLUDE HASHTAGS EVER `)
 
 const agent = createDreams({
-  logger: LogLevel.TRACE,
+  logger: LogLevel.ERROR,
   model: openrouter("google/gemini-2.0-flash-001"),
-  extensions: [discord, ponziland(chain)],
-  character: character,
+  extensions: [discord, twitter, 
+    ponziland(chain)
+    ],
   memory: {
     store: createMemoryStore(),
     vector: createChromaVectorStore("agent", "http://localhost:8000"),
     vectorModel: openrouter("google/gemini-2.0-flash-001"),
+  },
+  inputs: {
+    consciousness: c,
   },
 }); 
 

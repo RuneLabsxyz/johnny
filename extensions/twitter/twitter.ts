@@ -1,17 +1,35 @@
 import { z } from "zod";
-import { context } from "../../../fork/daydreams/packages/core/src/context";
-import { service } from "../../../fork/daydreams/packages/core/src/serviceProvider";
+import { action, context, render } from "../../../fork/daydreams/packages/core/src";
+import { service } from "../../../fork/daydreams/packages/core/src";
 import { TwitterClient } from "./twitter-client";
 import { extension, input, output } from "../../../fork/daydreams/packages/core/src";
-import { formatXml } from "../../../fork/daydreams/packages/core/src/xml";
+import { formatXml } from "../../../fork/daydreams/packages/core/src";
+import { personality } from "../../characters/ponzius";
+
+const template = `
+
+  Make sure to tweet in character, and to base all tweets off the given input tweet or thought.
+
+  
+  <personality>
+    {{personality}}
+  </personality>
+`;
 
 // Define Twitter context
 const twitterContext = context({
   type: "twitter:thread",
   key: ({ tweetId }) => tweetId.toString(),
   schema: z.object({
+    personality: z.string(),
     tweetId: z.string(),
   }),
+
+  render({ memory }) {
+    return render(template, {
+      personality: personality
+    });
+  },
 });
 
 // Twitter service setup
@@ -45,47 +63,40 @@ export const twitter = extension({
       schema: z.object({
         userId: z.string(),
         tweetId: z.string(),
-        username: z.string(),
         text: z.string(),
       }),
-      format: (data) =>
-        formatXml({
-          tag: "tweet",
-          params: { tweetId: data.tweetId, from: data.username },
-          content: data.text,
-        }),
-      subscribe(send, { container }) {
-        const twitter = container.resolve<TwitterClient>("twitter");
+      subscribe(send, agent) {
+        const { container } = agent;
 
+        const twitter = container.resolve("twitter") as TwitterClient;
         // Check mentions every minute
         const interval = setInterval(async () => {
+
+          console.log('checking mentions')
           const mentions = await twitter.checkMentions();
 
-
-          for await (const mention of mentions) {
+          for (const mention of mentions) {
             console.log("Mention", mention);
-            
             send(
               twitterContext,
-              { tweetId: mention.metadata.tweetId || "" },
+              { tweetId: mention.metadata.tweetId || "", personality: personality },
               {
                 tweetId: mention.metadata.tweetId || "",
                 userId: mention.metadata.userId || "",
-                username: mention.metadata.username || "",
                 text: mention.content,
               }
             );
           }
-
-        }, 250000);
+        }, 600000);
 
         return () => clearInterval(interval);
       },
     }),
   },
 
-  outputs: {
-    "twitter:reply": output({
+  actions: [
+    action({
+      name: "twitter:reply",
       schema: z.object({
         content: z.string().max(280),
         inReplyTo: z.string(),
@@ -94,8 +105,13 @@ export const twitter = extension({
 
       handler: async (data, ctx, { container }) => {
         const twitter = container.resolve<TwitterClient>("twitter");
+        
+        // Remove hashtags at the end of the tweet
+        const cleanedContent = data.content.replace(/\s+#\w+\s*$/g, '').trim();
+        
+        console.log('sending reply', cleanedContent, data.inReplyTo)
         const { tweetId } = await twitter.sendTweet({
-          content: data.content,
+          content: cleanedContent,
           inReplyTo: data.inReplyTo,
         });
 
@@ -107,27 +123,31 @@ export const twitter = extension({
           timestamp: Date.now(),
         };
       },
-      format: ({ data }) =>
-        formatXml({
-          tag: "tweet-reply",
-          params: { tweetId: data.tweetId },
-          content: data.content,
-        }),
+      // format: ({ data }) =>
+      //   formatXml({
+      //     tag: "tweet-reply",
+      //     params: { tweetId: data.tweetId },
+      //     children: data.content,
+      //   }),
     }),
 
-    "twitter:tweet": output({
+    action({
+      name: "twitter:tweet",
       schema: z.object({
-        content: z.string().max(280).describe("tweet content, keep it short"),
-        reasoning: z.string().optional()
+        content: z.string().max(280),
       }),
-      description: "Use this to post a new tweet. Remember not to include any slashes in your response, And remember tweest are outputs, not actions",
+      description: "Use this to post a new tweet. Remember that tweets are outputs, not actions",
 
       handler: async (data, ctx, { container }) => {
         const twitter = container.resolve<TwitterClient>("twitter");
-
-        console.log(data);
+        
+        // Remove hashtags at the end of the tweet
+        const cleanedContent = data.content.replace(/\s+#\w+\s*$/g, '').trim();
+        
+        console.log('sending tweet', cleanedContent)
+        
         await twitter.sendTweet({
-          content: data.content,
+          content: cleanedContent,
         });
         return {
           data,
@@ -135,11 +155,11 @@ export const twitter = extension({
         };
       },
 
-      format: ({ data }) =>
-        formatXml({
-          tag: "tweet",
-          content: data.content,
-        }),
+      // format: ({ data }) =>
+      //   formatXml({
+      //     tag: "tweet",
+      //     children: data.content,
+      //   }),
     }),
-  },
+  ],
 });

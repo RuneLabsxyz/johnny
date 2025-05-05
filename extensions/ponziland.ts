@@ -1,18 +1,24 @@
 import { action, ActionCall, Agent, context, extension, formatXml, input } from "../../fork/daydreams/packages/core/src";
 import { z } from "zod";
 import { render } from "../../fork/daydreams/packages/core/src";
-import { StarknetChain } from "../../fork/daydreams/packages/core/src";
+import { StarknetChain } from "../../fork/daydreams/packages/defai/src";
 import manifest  from "../contracts/manifest_sepolia.json"
 import { Contract, Abi, Call } from "starknet";
 import { execute_transaction } from "../actions/execute-transaction";
 import { get_balances } from "../actions/get-balances";
-import { get_lands_str, 
-    } from "../contexts/ponziland-context";
+import { get_lands_str } from "../contexts/ponziland-context";
+
+import { character, personality } from "../characters/ponzius";
 
 import { CONTEXT } from "../contexts/ponziland-context";
 import { getBalances } from "../contexts/ponziland-context";
-import { get_auctions, get_claims, get_lands, get_neighbors, get_nukeable_lands } from "../actions/ponziland/querys";
+import { get_auctions, get_claims, get_lands, get_neighbors, get_all_lands, get_owned_lands } from "../actions/ponziland/querys";
 const template = `
+  <character_info>
+    {{character}}
+
+    {{personality}}
+  </character_info>
 
   {{guide}}
 
@@ -28,10 +34,37 @@ const template = `
   Make sure that you stop on a successful action, or if your attempt to act fails.
   Remember to only include a location if you are moving.
 
-  You should send updates on all your thoughts and actions in this discord channel: 1352657633374371861
+  You should send updates about everything you do in this discord channel: 1352657633374371861
   
-  Only tweet about your actions cryptically and don't reveal your location or explicitly say what you are doing.
-  Just tell vague stories about your travels and adventures
+  Only tweet if about your ponziland actions if you do something big like getting a new land or claiming a lot of tokens.
+  Remember if you have no lands you will have no claims or neighbors. 
+
+  Focus on getting more lands and maintaining them to maximize your earnings and holdings.
+
+  Always wait until the result of your transaction is confirmed before posting about it, making sure not to make anything up.
+
+  If a transaction fails, do not retry, just send an update with the error in discord. DO NOT tweet about failed transactions.
+
+  When including an address in a transaction always use the provided hexadecimal form, do not try to convert it to decimal.
+
+  DO NOT EVER tweet about failed transactions or unsuccessful ponziland actions. 
+  DO NOT EVER TWEET ABOUT FAILED TRANSACTIONS OR HAVING GAS PROBLEMS.
+
+  Only bid on auctions that are neighboring one of your btc lands. Also, if you see a neighboring land
+  is listed for sale in a token you have enough of, you should buy it to expand your empire. You can
+  check the neighbors of a land with the get_neighbors action, and use that to identify possible purchases.
+
+  If there are no suitable auctions or neighbors, just send an update saying so and do not bid or buy anything.
+  Remember you don't want to waste all your resources. 
+
+  Be aggressive in targeting the neighbors of your lands. If you can afford to buy one you should.
+  Only worry about conserving resources when you are almost out (< 100)
+  You also should use the get_neighbors and get_all_lands actions to identify possible purchases.
+  If there is an afforadable land that is not a neighbor, you should still buy it and stake it with btc.
+
+  When you claim your yield, you should tweet about how much you just claimed, but only claim when
+  its a significant amount.
+  {{context}}
 `;
 
 const ponzilandContext = context({
@@ -41,6 +74,7 @@ const ponzilandContext = context({
     lands: z.string(),
     goal: z.string(),
     balance: z.string(),
+    context: z.string(),
   }),
 
   key({ id }) {
@@ -61,6 +95,9 @@ const ponzilandContext = context({
       lands: memory.lands,
       balance: memory.balance,
       goal: memory.goal,
+      character: character,
+      personality: personality,
+      context: CONTEXT,
     });
   },
 });
@@ -69,21 +106,16 @@ export const ponziland_check = (chain: StarknetChain) => input({
   schema: z.object({
     text: z.string(),
   }),
-  format: (data) =>
-    formatXml({
-      tag: "status check",
-      content: data.text,
-    }),
   subscribe(send, { container }) {
     // Check mentions every minute
     let index = 0;
-    let timeout: NodeJS.Timeout;
+    let timeout: ReturnType<typeof setTimeout>;
 
     // Function to schedule the next thought with random timing
     const scheduleNextThought = async () => {
       // Random delay between 3 and 10 minutes (180000-600000 ms)
-      const minDelay = 180000; // 3 minutes
-      const maxDelay = 300000; // 10 minutes
+      const minDelay = 300000; // 3 minutes
+      const maxDelay = 400000; // 10 minutes
       const randomDelay = Math.floor(Math.random() * (maxDelay - minDelay + 1)) + minDelay;
       
       console.log(`Scheduling next ponziland check in ${randomDelay/60000} minutes`);
@@ -92,7 +124,7 @@ export const ponziland_check = (chain: StarknetChain) => input({
 
         let text = `Decide what action to take in ponziland, if any`
 
-        let goal = "Spread cheer in ponziland and don't get rugged"
+        let goal = "Build your bitcoin empire in ponziland"
 
         let lands = await get_lands_str()
         let balance = await getBalances()
@@ -101,8 +133,13 @@ export const ponziland_check = (chain: StarknetChain) => input({
           id: "ponziland",
           lands: lands,
           balance: balance,
-          goal: goal
+          goal: goal,
+          character: character,
+          personality: personality,
+          context: CONTEXT,
         }
+
+        console.log('ponziland context', context);
 
         send(ponzilandContext, context, { text });
         index += 1;
@@ -131,11 +168,11 @@ export const ponziland = (chain: StarknetChain) => {
   },
   actions: [
     execute_transaction(chain),
-    get_lands(chain),
+    get_owned_lands(chain),
     get_auctions(chain),
-    get_nukeable_lands(chain),
     get_claims(chain),
     get_neighbors(chain),
+    get_all_lands(chain),
   ],
 
   });

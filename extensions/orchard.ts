@@ -1,7 +1,7 @@
 import { action, ActionCall, Agent, context, extension, formatXml, input } from "../../fork/daydreams/packages/core/src";
 import { z } from "zod";
 import { render } from "../../fork/daydreams/packages/core/src";
-import { StarknetChain } from "../../fork/daydreams/packages/core/src";
+import { StarknetChain } from "../../fork/daydreams/packages/defai/src";
 import manifest  from "../contracts/manifest_sepolia.json"
 import { Contract, Abi, Call } from "starknet";
 
@@ -66,20 +66,17 @@ export const orchard_action = (chain: StarknetChain, orchard_contract: Contract)
         action: z.enum(["move", "plant", "tend"]).describe(`must be "move", "plant", or "tend" `),
         location: z.number().optional().describe(`location to move to choosing to move`)
     }),
-    async handler(call: ActionCall<{
-        action: 
-            | "move"
-            | "plant"
-            | "tend"
-        location?: number | undefined
-    }>, ctx: any, agent: Agent) {
+    async handler(args: { 
+        action: "move" | "plant" | "tend";
+        location?: number | undefined;
+    }, ctx: any, agent: Agent) {
 
-      let choice = call.data.action;
+      let choice = args.action;
 
       let orchard_call: Call = {
         contractAddress: orchard_contract.address,
         entrypoint: choice,
-        calldata: call.data.location ? [call.data.location] : []
+        calldata: args.location ? [args.location] : []
       }
 
       let tx = await chain.write(orchard_call)
@@ -96,15 +93,20 @@ export const check_status = (orchard_contract: Contract) => input({
   schema: z.object({
     text: z.string(),
   }),
-  format: (data) =>
+  format: (input) =>
     formatXml({
       tag: "status check",
-      content: data.text,
+      children: [
+        {
+          tag: "content",
+          children: input.data.text,
+        },
+      ],
     }),
   subscribe(send, { container }) {
     // Check mentions every minute
     let index = 0;
-    let timeout: NodeJS.Timeout;
+    let timeout: ReturnType<typeof setTimeout>;
 
     // Function to schedule the next thought with random timing
     const scheduleNextThought = async () => {
@@ -126,7 +128,7 @@ export const check_status = (orchard_contract: Contract) => input({
         let neighbors = await orchard_contract.get_neighbors(status[0].location.toString())
 
         //todo: format orchard data for neighbors 
-        let neighbors_str = neighbors.map((neighbor) => `
+        let neighbors_str = neighbors.map((neighbor: any) => `
           location: ${neighbor[0]}
           coords: ${neighbor[1][0].toString()},${neighbor[1][1].toString()}
           orchard: ${neighbor[2].isSome()}
