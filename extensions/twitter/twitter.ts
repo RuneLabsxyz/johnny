@@ -5,7 +5,7 @@ import { TwitterClient } from "./twitter-client";
 import { extension, input, output } from "../../../fork/daydreams/packages/core/src";
 import { formatXml } from "../../../fork/daydreams/packages/core/src";
 import { personality } from "../../characters/ponzius";
-
+import { Tweet } from "agent-twitter-client";
 const template = `
 
   Make sure to tweet in character, and to base all tweets off the given input tweet or thought.
@@ -72,8 +72,7 @@ export const twitter = extension({
         // Check mentions every minute
         const interval = setInterval(async () => {
 
-          console.log('checking mentions')
-          const mentions = await twitter.checkMentions();
+          const mentions = await twitter.checkMentions(); 
 
           for (const mention of mentions) {
             console.log("Mention", mention);

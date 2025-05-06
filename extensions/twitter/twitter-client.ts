@@ -124,11 +124,9 @@ export class TwitterClient {
           }
         }
       }
-      console.log(mentionsArray)
       // Filter and format mentions
 
       let res = mentionsArray.map(this.formatTweetData)
-      console.log('res', res)
       // Only return if we have new mentions
       return res.length > 0 ? res : [];
     } catch (error) {
@@ -202,12 +200,13 @@ export class TwitterClient {
     return false;
   }
 
-  private formatTweetData(mention: Tweet) {
+  private async formatTweetData(mention: Tweet) {
     let tweet = mention;
-    console.log(tweet)
+    let content = await formatTweetText(tweet, this.scraper);
+    console.log('content', content)
     let res =  {
       type: "tweet",
-      content: tweet.text ?? "",
+      content: content,
       metadata: {
         tweetId: tweet.id,
         userId: tweet.userId,
@@ -249,3 +248,13 @@ core.registerInput(twitter.createTimelineInput("elonmusk"));
 core.registerOutput(twitter.createTweetOutput());
 */
 
+
+const formatTweetText = async (tweet: Tweet, scraper: Scraper): Promise<string> => {
+  if (!tweet.inReplyToStatus) {
+    return `From: @${tweet.username} - ${tweet.text} \n`;
+  }
+  else {
+    let inReplyTo = await scraper.getTweet(tweet.inReplyToStatusId!);
+    return formatTweetText(inReplyTo!, scraper) + ` \n From: @${tweet.username} - ${tweet.text}`;
+  }
+}

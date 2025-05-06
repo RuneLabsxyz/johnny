@@ -5,7 +5,6 @@ import manifest from "../manifest.json";
 import view_manifest from "../contracts/manifest_release.json";
 import { BigNumberish, CairoCustomEnum, Contract, RpcProvider, type Abi } from "starknet";
 import { balance_query, auction_query, land_query } from "../querys";
-import { estimateNukeTime } from "../querys";
 import { nuke_query } from "../querys";
 import { getAllTokensFromAPI } from "../utils/ponziland_api";
 

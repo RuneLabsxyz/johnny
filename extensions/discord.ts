@@ -1,7 +1,7 @@
 import { z } from "zod";
-import { action, extension, input, output } from "../../fork/daydreams/packages/core/src";
+import { action, extension, input, output, render } from "../../fork/daydreams/packages/core/src";
 import { formatMsg } from "../../fork/daydreams/packages/core/src";
-import { Events, type Message } from "discord.js";
+import { Events, type Message, Snowflake } from "discord.js";
 import { DiscordClient } from "./io";
 import { context } from "../../fork/daydreams/packages/core/src";
 import { service } from "../../fork/daydreams/packages/core/src";
@@ -41,6 +41,9 @@ const discordChannelContext = context({
   description({ options: { channel } }) {
     return `Channel ID: ${channel.id}`;
   },
+  render({ options: { channel } }) {
+    return `Channel ID: ${channel.id}`;
+  },
 });
 
 export const discord = extension({
@@ -52,7 +55,7 @@ export const discord = extension({
   inputs: {
     "discord:message": input({
       schema: z.object({
-        chat: z.object({ id: z.string() }),
+        chat: z.object({ id: z.string(), context: z.string() }),
         user: z.object({ id: z.string(), name: z.string() }),
         text: z.string(),
       }),
@@ -62,8 +65,8 @@ export const discord = extension({
           user: input.data.user.name,
           content: input.data.text,
         }),
-      subscribe(send, { container }) {
-        function listener(message: Message) {
+      async subscribe(send, { container }) {
+        async function listener(message: Message) {
           if (
             message.author.displayName ==
             container.resolve<DiscordClient>("discord").credentials
@@ -74,12 +77,36 @@ export const discord = extension({
             );
             return;
           }
+
+          let channel = await client.channels.fetch(message.channelId);
+
+          if (!channel || !channel.isTextBased()) {
+            return;
+          }
+
+          let messages = await channel.messages.fetch({ limit: 15 });
+
+          let sortedMessages = messages.sort((a, b) => a.createdTimestamp - b.createdTimestamp);
+
+          let context = "";
+          let i = 0;
+
+          for (const message of sortedMessages) {
+            if (i == sortedMessages.size - 1){
+              context += `*NEW*`;
+            }
+            context += `From: @${message[1].author.displayName} (timestamp: ${message[1].createdTimestamp}) - ${message[1].content} \n`;            
+          }
+
+          console.log(context);
+
           send(
             discord.contexts!.discordChannel,
             { channelId: message.channelId },
             {
               chat: {
                 id: message.channelId,
+                context: context,
               },
               user: {
                 id: message.author.id,
