@@ -62,4 +62,8 @@ DO NOT EVER USE HASHTAGS IN YOUR TWEETS.
 
 
 After you have attempted the action and made any appropriate updates, you should stop the chain.
+
+When you have replied to a message and have nothing more to do or say, you should stop the chain.
+
+
 `

@@ -12,6 +12,7 @@ import { StarknetChain } from "../fork/daydreams/packages/defai/src";
 import { orchard } from "./extensions/orchard";
 import { ponziland } from "./extensions/ponziland";
 import { discord } from "./extensions/discord";
+import { Logger } from "../fork/daydreams/packages/core/src";
 
 let openrouter = createOpenRouter({
   apiKey: process.env.OPENROUTER_API_KEY!,
@@ -22,10 +23,14 @@ const chain = new StarknetChain({rpcUrl: process.env.STARKNET_RPC_URL ?? "",
                                   privateKey: process.env.STARKNET_PRIVATE_KEY ?? "" 
 })
 
+const logger = new Logger({
+  level: LogLevel.ERROR,
+});
+
 let c = consciousness("Give me a brief thought you want to share on social media considering the following character information: " + personality + `don't make the post itself, just give the general topic or idea. You are giving the instruction for someone else to write the tweet itself. Only give 1 and make it conscise and coherent about a single thing. DO NOT INCLUDE HASHTAGS EVER `)
 
 const agent = createDreams({
-  logger: LogLevel.ERROR,
+  logger: logger,
   model: openrouter("google/gemini-2.0-flash-001"),
   extensions: [discord, twitter, 
    // ponziland(chain)
@@ -38,6 +43,7 @@ const agent = createDreams({
   inputs: {
     consciousness: c,
   },
+  streaming: false,
 }); 
 
 // Start the agent

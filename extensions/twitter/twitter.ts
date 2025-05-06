@@ -76,13 +76,14 @@ export const twitter = extension({
 
           for (const mention of mentions) {
             console.log("Mention", mention);
+            let mentionv = await mention;
             send(
               twitterContext,
-              { tweetId: mention.metadata.tweetId || "", personality: personality },
+              { tweetId: mentionv.metadata.tweetId || "", personality: personality },
               {
-                tweetId: mention.metadata.tweetId || "",
-                userId: mention.metadata.userId || "",
-                text: mention.content,
+                tweetId: mentionv.metadata.tweetId || "",
+                userId: mentionv.metadata.userId || "",
+                text: mentionv.content,
               }
             );
           }

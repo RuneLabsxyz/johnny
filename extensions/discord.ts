@@ -26,7 +26,7 @@ const discordService = service({
 const discordChannelContext = context({
   type: "discord:channel",
   key: ({ channelId }) => channelId,
-  schema: z.object({ channelId: z.string() }),
+  schema: { channelId: z.string(), context: z.string() },
 
   async setup(args, setttings, { container }) {
     const channel = await container
@@ -37,12 +37,19 @@ const discordChannelContext = context({
 
     return { channel };
   },
+  create(state) {
+    return {
+      channelId: state.channelId,
+      context: state.context,
+    };
+  },
 
   description({ options: { channel } }) {
-    return `Channel ID: ${channel.id}`;
+    return `Make sure to only reply to messages once, and to stop when you have nothing more to say`;
   },
-  render({ options: { channel } }) {
-    return `Channel ID: ${channel.id}`;
+  render({args}) {
+    console.log(args);
+    return `Channel ID: ${args.channelId}, recent messages: ${args.context}`;
   },
 });
 
@@ -54,11 +61,11 @@ export const discord = extension({
   },
   inputs: {
     "discord:message": input({
-      schema: z.object({
-        chat: z.object({ id: z.string(), context: z.string() }),
-        user: z.object({ id: z.string(), name: z.string() }),
+      schema: {
+        chat: { id: z.string(), context: z.string() },
+        user: { id: z.string(), name: z.string() },
         text: z.string(),
-      }),
+      },
       format: (input) =>
         formatMsg({
           role: "user",
@@ -98,11 +105,11 @@ export const discord = extension({
             context += `From: @${message[1].author.displayName} (timestamp: ${message[1].createdTimestamp}) - ${message[1].content} \n`;            
           }
 
-          console.log(context);
+         // console.log(context);
 
           send(
             discord.contexts!.discordChannel,
-            { channelId: message.channelId },
+            { channelId: message.channelId, context: context },
             {
               chat: {
                 id: message.channelId,
@@ -130,12 +137,12 @@ export const discord = extension({
   actions: [
     action({
       name: "discord:send_message",
-      schema: z.object({
+      schema: {
         channelId: z
           .string()
           .describe("The Discord channel ID to send the message to"),
         content: z.string().describe("The content of the message to send"),
-      }),
+      },
       description: `
       Send a message to a Discord channel
       
