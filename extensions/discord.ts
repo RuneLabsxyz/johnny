@@ -5,7 +5,8 @@ import { Events, type Message, Snowflake } from "discord.js";
 import { DiscordClient } from "./io";
 import { context } from "../../fork/daydreams/packages/core/src";
 import { service } from "../../fork/daydreams/packages/core/src";
-import { LogLevel } from "../../fork/daydreams/packages/core/src";
+import { LogLevel } from "../../fork/daydreams/packages/core/src"
+import { personality } from "../characters/ponzius";
 
 const discordService = service({
   register(container) {
@@ -26,30 +27,21 @@ const discordService = service({
 const discordChannelContext = context({
   type: "discord:channel",
   key: ({ channelId }) => channelId,
-  schema: { channelId: z.string(), context: z.string() },
-
-  async setup(args, setttings, { container }) {
-    const channel = await container
-      .resolve<DiscordClient>("discord")
-      .client.channels.fetch(args.channelId);
-
-    if (!channel) throw new Error("Invalid channel");
-
-    return { channel };
-  },
+  schema: { channelId: z.string(), context: z.string(), personality: z.string() },
   create(state) {
     return {
       channelId: state.channelId,
       context: state.context,
+      personality: personality,
     };
   },
 
-  description({ options: { channel } }) {
+  description() {
     return `Make sure to only reply to messages once, and to stop when you have nothing more to say`;
   },
   render({args}) {
     console.log(args);
-    return `Channel ID: ${args.channelId}, recent messages: ${args.context}`;
+    return `Personality: ${args.personality}, Channel ID: ${args.channelId}, recent messages: ${args.context}`;
   },
 });
 
@@ -61,17 +53,13 @@ export const discord = extension({
   },
   inputs: {
     "discord:message": input({
-      schema: {
-        chat: { id: z.string(), context: z.string() },
-        user: { id: z.string(), name: z.string() },
+      schema: z.object({
+        channelId: z.string(),
+        context: z.string(),
+        userId: z.string(),
+        userName: z.string(),
         text: z.string(),
-      },
-      format: (input) =>
-        formatMsg({
-          role: "user",
-          user: input.data.user.name,
-          content: input.data.text,
-        }),
+      }),
       async subscribe(send, { container }) {
         async function listener(message: Message) {
           if (
@@ -109,18 +97,15 @@ export const discord = extension({
 
           send(
             discord.contexts!.discordChannel,
-            { channelId: message.channelId, context: context },
+            { channelId: message.channelId, context: context, personality: personality },
             {
-              chat: {
-                id: message.channelId,
-                context: context,
-              },
-              user: {
-                id: message.author.id,
-                name: message.author.displayName,
-              },
+              channelId: message.channelId,
+              context: context,
+              personality: personality,
+              userId: message.author.id,
+              userName: message.author.displayName,
               text: message.content,
-            }
+            },
           );
         }
 
@@ -151,6 +136,7 @@ export const discord = extension({
       2. Don't repeat yourself
       3. Don't take part in conversations unless you have been mentioned or asked to join the conversation
       4. Don't send multiple messages in a row
+      5. When you @ someone, use the syntax <@userId>
       
       `,
       handler: async (data, ctx, { container }) => {

@@ -98,15 +98,13 @@ export class TwitterClient {
         SearchMode.Latest
       );
 
-      console.log('mentions', mentions)
-
       // Convert AsyncGenerator to array and process
       const mentionsArray: Tweet[] = [];
       for await (const mention of mentions.tweets) {
         if (mention) {
           let hasReplied = await this.checkHasRepliedToTweet(mention.conversationId!, mention.id!);
 
-
+          console.log("Has replied", hasReplied);
           if (hasReplied) {
             continue;
           }
@@ -126,7 +124,14 @@ export class TwitterClient {
       }
       // Filter and format mentions
 
-      let res = mentionsArray.map(this.formatTweetData)
+      let res = mentionsArray.map((mention) => this.formatTweetData(mention));
+
+      if (res.length > 0) {
+        console.log("New mentions: ", res);
+      }
+      else {
+        console.log("No new mentions");
+      }
       // Only return if we have new mentions
       return res.length > 0 ? res : [];
     } catch (error) {
@@ -200,10 +205,9 @@ export class TwitterClient {
     return false;
   }
 
-  private async formatTweetData(mention: Tweet) {
+  async formatTweetData(mention: Tweet) {
     let tweet = mention;
-    let content = await formatTweetText(tweet, this.scraper);
-    console.log('content', content)
+    let content = await this.formatTweetText(tweet);
     let res =  {
       type: "tweet",
       content: content,
@@ -228,6 +232,20 @@ export class TwitterClient {
 
     return res
   }
+
+
+  async formatTweetText(tweet: Tweet): Promise<string> {
+    console.log("Tweet", tweet);
+    if (!tweet.inReplyToStatusId) {
+      return `From: @${tweet.username} - ${tweet.text} \n`;
+    }
+      else {
+        console.log(this.scraper)
+        let inReplyTo = await this.scraper.getTweet(tweet.inReplyToStatusId!);
+        console.log("In reply to", inReplyTo);
+        return (await this.formatTweetText(inReplyTo!)) + ` \n From: @${tweet.username} - ${tweet.text}`;
+      }
+    }
 }
 
 
@@ -249,12 +267,3 @@ core.registerOutput(twitter.createTweetOutput());
 */
 
 
-const formatTweetText = async (tweet: Tweet, scraper: Scraper): Promise<string> => {
-  if (!tweet.inReplyToStatus) {
-    return `From: @${tweet.username} - ${tweet.text} \n`;
-  }
-  else {
-    let inReplyTo = await scraper.getTweet(tweet.inReplyToStatusId!);
-    return formatTweetText(inReplyTo!, scraper) + ` \n From: @${tweet.username} - ${tweet.text}`;
-  }
-}

@@ -25,7 +25,7 @@ const twitterContext = context({
     tweetId: z.string(),
   }),
 
-  render({ memory }) {
+  async render({ memory }) {
     return render(template, {
       personality: personality
     });
@@ -75,8 +75,9 @@ export const twitter = extension({
           const mentions = await twitter.checkMentions(); 
 
           for (const mention of mentions) {
-            console.log("Mention", mention);
             let mentionv = await mention;
+            console.log("Mention", mentionv.content);
+
             send(
               twitterContext,
               { tweetId: mentionv.metadata.tweetId || "", personality: personality },
@@ -87,7 +88,7 @@ export const twitter = extension({
               }
             );
           }
-        }, 600000);
+        }, 60000);
 
         return () => clearInterval(interval);
       },
