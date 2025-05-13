@@ -13,8 +13,11 @@ const consciousnessContext = context({
   key: ({ thoughtId }) => thoughtId.toString(),
   schema: z.object({
     thoughtId: z.string(),
+    thought: z.string(),
   }),
-  
+  render: ({ thoughtId, thought }) => {
+    return `Thought ${thoughtId}: ${thought}`;
+  }
 });
 
 export const consciousness = (prompt: string) => input({
@@ -43,7 +46,7 @@ export const consciousness = (prompt: string) => input({
           });
     
           console.log('new thought: ' + res.text);
-          send(consciousnessContext, { thoughtId: "twitter-thought: " + index }, { text: "Twitter " + res.text });
+          send(consciousnessContext, { thoughtId: "twitter-thought: " + index , thought: res.text }, { text: "Twitter " + res.text });
           index += 1;
           
           // Schedule the next thought

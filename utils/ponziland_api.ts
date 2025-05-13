@@ -14,13 +14,13 @@ interface TokenPrice {
 }
 
 export async function getAllTokensFromAPI(): Promise<TokenPrice[]> {
-  const response = await fetch('https://api.ponzi.land/price');
+  const response = await fetch('https://api-sepolia.ponzi.land/price');
   return response.json();
 }
 
 export async function getLiquidityPoolFromAPI(tokenAddress: string): Promise<PoolKey | null> {
   try {
-    const response = await fetch('https://api.ponzi.land/price');
+    const response = await fetch('https://api-sepolia.ponzi.land/price');
     const tokens: TokenPrice[] = await response.json();
     
     const token = tokens.find(t => {

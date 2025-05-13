@@ -1,6 +1,6 @@
 {
   "world": {
-    "class_hash": "0x7c9469d45a9cdbab775035afb48e1fa73fb35ab059fcb9dfb0a301aa973e783",
+    "class_hash": "0x75fc75bcd1a7f8b4bf64b74978b0f89c8cee44bb755c1dae6f82284756451ec",
     "address": "0x70456c032e1a867292d6661ac299984521ee0fff56664e2c311a2230b009b6f",
     "seed": "ponzi_land-internal-3",
     "name": "Ponzi Land",
@@ -1312,404 +1312,8 @@
   },
   "contracts": [
     {
-      "address": "0x639bb1113a6e3464dc2b0c1d62443452d6811c48ede42ba9297f59fcc825d6",
-      "class_hash": "0x3a75d431d25024c38b184c53ac5080d95fb7202812255bc264cb2ca247f13a",
-      "abi": [
-        {
-          "type": "impl",
-          "name": "johnny_actions__ContractImpl",
-          "interface_name": "dojo::contract::interface::IContract"
-        },
-        {
-          "type": "interface",
-          "name": "dojo::contract::interface::IContract",
-          "items": []
-        },
-        {
-          "type": "impl",
-          "name": "johnny_actions__DeployedContractImpl",
-          "interface_name": "dojo::meta::interface::IDeployedResource"
-        },
-        {
-          "type": "struct",
-          "name": "core::byte_array::ByteArray",
-          "members": [
-            {
-              "name": "data",
-              "type": "core::array::Array::<core::bytes_31::bytes31>"
-            },
-            {
-              "name": "pending_word",
-              "type": "core::felt252"
-            },
-            {
-              "name": "pending_word_len",
-              "type": "core::integer::u32"
-            }
-          ]
-        },
-        {
-          "type": "interface",
-          "name": "dojo::meta::interface::IDeployedResource",
-          "items": [
-            {
-              "type": "function",
-              "name": "dojo_name",
-              "inputs": [],
-              "outputs": [
-                {
-                  "type": "core::byte_array::ByteArray"
-                }
-              ],
-              "state_mutability": "view"
-            }
-          ]
-        },
-        {
-          "type": "function",
-          "name": "dojo_init",
-          "inputs": [],
-          "outputs": [],
-          "state_mutability": "external"
-        },
-        {
-          "type": "impl",
-          "name": "JohnnyActionsImpl",
-          "interface_name": "orchard::systems::johnny_actions::IJohnnyActions"
-        },
-        {
-          "type": "enum",
-          "name": "orchard::models::Status",
-          "variants": [
-            {
-              "name": "None",
-              "type": "()"
-            },
-            {
-              "name": "Planting",
-              "type": "()"
-            },
-            {
-              "name": "Tending",
-              "type": "()"
-            },
-            {
-              "name": "Moving",
-              "type": "core::integer::u64"
-            }
-          ]
-        },
-        {
-          "type": "struct",
-          "name": "orchard::models::Johnny",
-          "members": [
-            {
-              "name": "address",
-              "type": "core::starknet::contract_address::ContractAddress"
-            },
-            {
-              "name": "location",
-              "type": "core::integer::u64"
-            },
-            {
-              "name": "status",
-              "type": "orchard::models::Status"
-            },
-            {
-              "name": "last_action_time",
-              "type": "core::integer::u64"
-            }
-          ]
-        },
-        {
-          "type": "enum",
-          "name": "orchard::models::Stage",
-          "variants": [
-            {
-              "name": "Nursery",
-              "type": "()"
-            },
-            {
-              "name": "Young",
-              "type": "()"
-            },
-            {
-              "name": "Mature",
-              "type": "()"
-            }
-          ]
-        },
-        {
-          "type": "struct",
-          "name": "orchard::models::Orchard",
-          "members": [
-            {
-              "name": "location",
-              "type": "core::integer::u64"
-            },
-            {
-              "name": "planted_time",
-              "type": "core::integer::u64"
-            },
-            {
-              "name": "stage",
-              "type": "orchard::models::Stage"
-            },
-            {
-              "name": "health",
-              "type": "core::integer::u8"
-            },
-            {
-              "name": "last_tend_time",
-              "type": "core::integer::u64"
-            },
-            {
-              "name": "time_healthy",
-              "type": "core::integer::u64"
-            }
-          ]
-        },
-        {
-          "type": "enum",
-          "name": "core::option::Option::<orchard::models::Orchard>",
-          "variants": [
-            {
-              "name": "Some",
-              "type": "orchard::models::Orchard"
-            },
-            {
-              "name": "None",
-              "type": "()"
-            }
-          ]
-        },
-        {
-          "type": "interface",
-          "name": "orchard::systems::johnny_actions::IJohnnyActions",
-          "items": [
-            {
-              "type": "function",
-              "name": "move",
-              "inputs": [
-                {
-                  "name": "location",
-                  "type": "core::integer::u64"
-                }
-              ],
-              "outputs": [],
-              "state_mutability": "external"
-            },
-            {
-              "type": "function",
-              "name": "plant",
-              "inputs": [],
-              "outputs": [],
-              "state_mutability": "external"
-            },
-            {
-              "type": "function",
-              "name": "tend",
-              "inputs": [],
-              "outputs": [],
-              "state_mutability": "external"
-            },
-            {
-              "type": "function",
-              "name": "refresh",
-              "inputs": [],
-              "outputs": [],
-              "state_mutability": "external"
-            },
-            {
-              "type": "function",
-              "name": "get_johnny",
-              "inputs": [],
-              "outputs": [
-                {
-                  "type": "orchard::models::Johnny"
-                }
-              ],
-              "state_mutability": "view"
-            },
-            {
-              "type": "function",
-              "name": "get_johnny_location",
-              "inputs": [],
-              "outputs": [
-                {
-                  "type": "(core::integer::u64, core::integer::u64)"
-                }
-              ],
-              "state_mutability": "view"
-            },
-            {
-              "type": "function",
-              "name": "get_status",
-              "inputs": [],
-              "outputs": [
-                {
-                  "type": "(orchard::models::Johnny, core::integer::u64, core::option::Option::<orchard::models::Orchard>)"
-                }
-              ],
-              "state_mutability": "view"
-            },
-            {
-              "type": "function",
-              "name": "get_orchard",
-              "inputs": [
-                {
-                  "name": "location",
-                  "type": "core::integer::u64"
-                }
-              ],
-              "outputs": [
-                {
-                  "type": "core::option::Option::<orchard::models::Orchard>"
-                }
-              ],
-              "state_mutability": "view"
-            },
-            {
-              "type": "function",
-              "name": "get_neighbors",
-              "inputs": [
-                {
-                  "name": "location",
-                  "type": "core::integer::u64"
-                }
-              ],
-              "outputs": [
-                {
-                  "type": "core::array::Array::<(core::integer::u64, (core::integer::u64, core::integer::u64), core::option::Option::<orchard::models::Orchard>)>"
-                }
-              ],
-              "state_mutability": "view"
-            }
-          ]
-        },
-        {
-          "type": "impl",
-          "name": "WorldProviderImpl",
-          "interface_name": "dojo::contract::components::world_provider::IWorldProvider"
-        },
-        {
-          "type": "struct",
-          "name": "dojo::world::iworld::IWorldDispatcher",
-          "members": [
-            {
-              "name": "contract_address",
-              "type": "core::starknet::contract_address::ContractAddress"
-            }
-          ]
-        },
-        {
-          "type": "interface",
-          "name": "dojo::contract::components::world_provider::IWorldProvider",
-          "items": [
-            {
-              "type": "function",
-              "name": "world_dispatcher",
-              "inputs": [],
-              "outputs": [
-                {
-                  "type": "dojo::world::iworld::IWorldDispatcher"
-                }
-              ],
-              "state_mutability": "view"
-            }
-          ]
-        },
-        {
-          "type": "impl",
-          "name": "UpgradeableImpl",
-          "interface_name": "dojo::contract::components::upgradeable::IUpgradeable"
-        },
-        {
-          "type": "interface",
-          "name": "dojo::contract::components::upgradeable::IUpgradeable",
-          "items": [
-            {
-              "type": "function",
-              "name": "upgrade",
-              "inputs": [
-                {
-                  "name": "new_class_hash",
-                  "type": "core::starknet::class_hash::ClassHash"
-                }
-              ],
-              "outputs": [],
-              "state_mutability": "external"
-            }
-          ]
-        },
-        {
-          "type": "constructor",
-          "name": "constructor",
-          "inputs": []
-        },
-        {
-          "type": "event",
-          "name": "dojo::contract::components::upgradeable::upgradeable_cpt::Upgraded",
-          "kind": "struct",
-          "members": [
-            {
-              "name": "class_hash",
-              "type": "core::starknet::class_hash::ClassHash",
-              "kind": "data"
-            }
-          ]
-        },
-        {
-          "type": "event",
-          "name": "dojo::contract::components::upgradeable::upgradeable_cpt::Event",
-          "kind": "enum",
-          "variants": [
-            {
-              "name": "Upgraded",
-              "type": "dojo::contract::components::upgradeable::upgradeable_cpt::Upgraded",
-              "kind": "nested"
-            }
-          ]
-        },
-        {
-          "type": "event",
-          "name": "dojo::contract::components::world_provider::world_provider_cpt::Event",
-          "kind": "enum",
-          "variants": []
-        },
-        {
-          "type": "event",
-          "name": "orchard::systems::johnny_actions::johnny_actions::Event",
-          "kind": "enum",
-          "variants": [
-            {
-              "name": "UpgradeableEvent",
-              "type": "dojo::contract::components::upgradeable::upgradeable_cpt::Event",
-              "kind": "nested"
-            },
-            {
-              "name": "WorldProviderEvent",
-              "type": "dojo::contract::components::world_provider::world_provider_cpt::Event",
-              "kind": "nested"
-            }
-          ]
-        }
-      ],
-      "init_calldata": [],
-      "tag": "orchards2-johnny_actions",
-      "selector": "0x7af3931f15c49042bce9ed027facecd322d774452ca2f639de7d051b7c3fdd4",
-      "systems": [
-        "dojo_init",
-        "move",
-        "plant",
-        "tend",
-        "refresh",
-        "upgrade"
-      ]
-    },
-    {
-      "address": "0x4f205217e9416791405524461ed0f6bbd36bae3bed2d265d4d24cb3ac3469fe",
-      "class_hash": "0x2349fc2039fc1361008cf5c40e1757d0500a2b6b2cbdfd4bd385dc9fdea988b",
+      "address": "0x4f70dce9f949a8fb02296b496d9422f9004de0308142926d0f5d3046d8e2309",
+      "class_hash": "0x7dc96084ac03c2fd59652dfb287ad5d668e48ede68aef2704e3ba578ba543d9",
       "abi": [
         {
           "type": "impl",
@@ -1764,35 +1368,169 @@
         {
           "type": "impl",
           "name": "PlayerActionsImpl",
-          "interface_name": "orchard::systems::player_actions::IPlayerActions"
+          "interface_name": "orchard::systems::view::IPlayerActions"
+        },
+        {
+          "type": "struct",
+          "name": "core::integer::u256",
+          "members": [
+            {
+              "name": "low",
+              "type": "core::integer::u128"
+            },
+            {
+              "name": "high",
+              "type": "core::integer::u128"
+            }
+          ]
+        },
+        {
+          "type": "enum",
+          "name": "orchard::ponziland::models::Level",
+          "variants": [
+            {
+              "name": "Zero",
+              "type": "()"
+            },
+            {
+              "name": "First",
+              "type": "()"
+            },
+            {
+              "name": "Second",
+              "type": "()"
+            }
+          ]
+        },
+        {
+          "type": "struct",
+          "name": "orchard::ponziland::models::Land",
+          "members": [
+            {
+              "name": "location",
+              "type": "core::integer::u16"
+            },
+            {
+              "name": "block_date_bought",
+              "type": "core::integer::u64"
+            },
+            {
+              "name": "owner",
+              "type": "core::starknet::contract_address::ContractAddress"
+            },
+            {
+              "name": "sell_price",
+              "type": "core::integer::u256"
+            },
+            {
+              "name": "token_used",
+              "type": "core::starknet::contract_address::ContractAddress"
+            },
+            {
+              "name": "level",
+              "type": "orchard::ponziland::models::Level"
+            }
+          ]
+        },
+        {
+          "type": "enum",
+          "name": "core::bool",
+          "variants": [
+            {
+              "name": "False",
+              "type": "()"
+            },
+            {
+              "name": "True",
+              "type": "()"
+            }
+          ]
+        },
+        {
+          "type": "enum",
+          "name": "core::option::Option::<core::integer::u256>",
+          "variants": [
+            {
+              "name": "Some",
+              "type": "core::integer::u256"
+            },
+            {
+              "name": "None",
+              "type": "()"
+            }
+          ]
+        },
+        {
+          "type": "struct",
+          "name": "orchard::ponziland::models::Auction",
+          "members": [
+            {
+              "name": "land_location",
+              "type": "core::integer::u16"
+            },
+            {
+              "name": "start_time",
+              "type": "core::integer::u64"
+            },
+            {
+              "name": "start_price",
+              "type": "core::integer::u256"
+            },
+            {
+              "name": "floor_price",
+              "type": "core::integer::u256"
+            },
+            {
+              "name": "is_finished",
+              "type": "core::bool"
+            },
+            {
+              "name": "decay_rate",
+              "type": "core::integer::u16"
+            },
+            {
+              "name": "sold_at_price",
+              "type": "core::option::Option::<core::integer::u256>"
+            }
+          ]
+        },
+        {
+          "type": "enum",
+          "name": "orchard::ponziland::models::LandOrAuction",
+          "variants": [
+            {
+              "name": "None",
+              "type": "()"
+            },
+            {
+              "name": "Land",
+              "type": "orchard::ponziland::models::Land"
+            },
+            {
+              "name": "Auction",
+              "type": "orchard::ponziland::models::Auction"
+            }
+          ]
         },
         {
           "type": "interface",
-          "name": "orchard::systems::player_actions::IPlayerActions",
+          "name": "orchard::systems::view::IPlayerActions",
           "items": [
             {
               "type": "function",
-              "name": "claim_apples",
+              "name": "get_neighbors",
               "inputs": [
                 {
                   "name": "location",
-                  "type": "core::integer::u64"
+                  "type": "core::integer::u16"
                 }
               ],
-              "outputs": [],
-              "state_mutability": "external"
-            },
-            {
-              "type": "function",
-              "name": "tend_orchard",
-              "inputs": [
+              "outputs": [
                 {
-                  "name": "location",
-                  "type": "core::integer::u64"
+                  "type": "core::array::Array::<orchard::ponziland::models::LandOrAuction>"
                 }
               ],
-              "outputs": [],
-              "state_mutability": "external"
+              "state_mutability": "view"
             }
           ]
         },
@@ -1895,7 +1633,7 @@
         },
         {
           "type": "event",
-          "name": "orchard::systems::player_actions::player_actions::Event",
+          "name": "orchard::systems::view::player_actions::Event",
           "kind": "enum",
           "variants": [
             {
@@ -1912,11 +1650,9 @@
         }
       ],
       "init_calldata": [],
-      "tag": "orchards2-player_actions",
-      "selector": "0x58dd21e9f9a2b99cfc8b5c29218476038d79843b97b321ad6a586b5ce7fbe64",
+      "tag": "orchards3-player_actions",
+      "selector": "0x4414fa4aed997b646fb104f53c09ba3d49d9c573eb713abe6a58cec053cc6ee",
       "systems": [
-        "claim_apples",
-        "tend_orchard",
         "upgrade"
       ]
     }
@@ -1925,21 +1661,27 @@
   "models": [
     {
       "members": [],
-      "class_hash": "0x325982efa8d61463517e8be8eb4d2632fdc7ba73cab01474cb49eb7a3539928",
-      "tag": "orchards2-Johnny",
-      "selector": "0x6e3ee51ab1835d282a24ad25335dd1633a2e4f30d85bd9a7897a84282a79466"
+      "class_hash": "0x488a0f6ecf67bdef74b5e167cb552dbbccb24cbc53ea1b58dbf095270e68b61",
+      "tag": "orchards3-Auction",
+      "selector": "0x12a52a3ce2b72c3bd52c360a4a6e0b107915cc854e3106138e5bc51efe85a34"
     },
     {
       "members": [],
-      "class_hash": "0x7e22256ec810f5c7536bcd5000be2a6828d088e7a5d0c0b0ca59d60987ce201",
-      "tag": "orchards2-Land",
-      "selector": "0x5f9b16a9c5f64633009297af4cc0cb700b24b72947db4fe8f7251063b6bb9bf"
+      "class_hash": "0x79736ee738b0d6f7846949f09ad2713e9f58cfe1570edc99fc55a35fb263997",
+      "tag": "orchards3-Johnny",
+      "selector": "0x5ca8082dc27629f70dcce7f9653f05d2eb36db11315867c8e6c9afae1026f2b"
     },
     {
       "members": [],
-      "class_hash": "0x268a9091e5eaee361f2c792e069357559a8fe2507ade750c948b1c4a98d126b",
-      "tag": "orchards2-Orchard",
-      "selector": "0x60bfff7b43ccff839c2f3559731ecbab1f4e5d982cd8556946d3599dcf33586"
+      "class_hash": "0x1220d03a7bb36466f76355be99b30f5e7917592a44be2869a961224cf4f5a22",
+      "tag": "orchards3-Land",
+      "selector": "0x29ab88cd7626999d68e9ccd9f7dfe5d2e8731d7dd2bbf0783e3831dc0029966"
+    },
+    {
+      "members": [],
+      "class_hash": "0x750e833cd9402e691577a56d6f183ac30af6ca9c43c7ab4a02b434472c341b4",
+      "tag": "orchards3-Orchard",
+      "selector": "0x404f918d7b164327993168930c9c71d0548c3f26650b0d6f071d2b1246fc171"
     }
   ],
   "events": [],

@@ -13,7 +13,7 @@ github = "https://github.com/dojoengine/dojo-starter"
 telegram = "https://t.me/dojoengine"
 
 [namespace]
-default = "orchards2"
+default = "orchards3"
 
 [env]
 rpc_url = "https://api.cartridge.gg/x/starknet/sepolia"
@@ -23,4 +23,3 @@ private_key = "0x05926973192c63871f15948f3793cd8f47bd9e47131c34cf05ea98d9618576c
 world_address = "0x70456c032e1a867292d6661ac299984521ee0fff56664e2c311a2230b009b6f"
 
 [writers]
-"orchards2" = ["orchards2-johnny_actions", "orchards2-player_actions"]

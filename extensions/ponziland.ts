@@ -12,7 +12,7 @@ import { character, personality } from "../characters/ponzius";
 
 import { CONTEXT } from "../contexts/ponziland-context";
 import { getBalances } from "../contexts/ponziland-context";
-import { get_auctions, get_claims, get_lands, get_neighbors, get_all_lands, get_owned_lands } from "../actions/ponziland/querys";
+import { get_auctions, get_claims, get_neighbors, get_all_lands, get_owned_lands, get_context } from "../actions/ponziland/querys";
 const template = `
   <character_info>
     {{character}}
@@ -64,6 +64,9 @@ const template = `
 
   When you claim your yield, you should tweet about how much you just claimed, but only claim when
   its a significant amount.
+
+  PONZILAND_ACTIONS ADDRESS: 0x19b9cef5b903e9838d649f40a8bfc34fbaf644c71f8b8768ece6a6ca1c46dc0
+
   {{context}}
 `;
 
@@ -164,7 +167,7 @@ export const ponziland = (chain: StarknetChain) => {
     ponziland: ponzilandContext,
   },
   inputs: {
-    "ponziland_check": ponziland_check(chain),
+ //   "ponziland_check": ponziland_check(chain),
   },
   actions: [
     execute_transaction(chain),
@@ -173,6 +176,8 @@ export const ponziland = (chain: StarknetChain) => {
     get_claims(chain),
     get_neighbors(chain),
     get_all_lands(chain),
+    get_context(chain),
+    get_balances(chain),
   ],
 
   });

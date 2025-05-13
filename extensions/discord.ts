@@ -1,11 +1,12 @@
 import { z } from "zod";
-import { action, extension, input, output } from "../../fork/daydreams/packages/core/src";
+import { action, extension, input, output, render } from "../../fork/daydreams/packages/core/src";
 import { formatMsg } from "../../fork/daydreams/packages/core/src";
-import { Events, type Message } from "discord.js";
+import { Events, type Message, Snowflake } from "discord.js";
 import { DiscordClient } from "./io";
 import { context } from "../../fork/daydreams/packages/core/src";
 import { service } from "../../fork/daydreams/packages/core/src";
-import { LogLevel } from "../../fork/daydreams/packages/core/src";
+import { LogLevel } from "../../fork/daydreams/packages/core/src"
+import { personality } from "../characters/ponzius";
 
 const discordService = service({
   register(container) {
@@ -21,25 +22,30 @@ const discordService = service({
         )
     );
   },
+  destroy(container) {
+    container.resolve<DiscordClient>("discord").client.destroy();
+  },
 });
 
 const discordChannelContext = context({
   type: "discord:channel",
   key: ({ channelId }) => channelId,
-  schema: z.object({ channelId: z.string() }),
-
-  async setup(args, setttings, { container }) {
-    const channel = await container
-      .resolve<DiscordClient>("discord")
-      .client.channels.fetch(args.channelId);
-
-    if (!channel) throw new Error("Invalid channel");
-
-    return { channel };
+  schema: { channelId: z.string(), context: z.string(), personality: z.string() },
+  create(state) {
+    return {
+      channelId: state.channelId,
+      context: state.context,
+      userId: state.userId,
+      personality: personality,
+    };
   },
 
-  description({ options: { channel } }) {
-    return `Channel ID: ${channel.id}`;
+  description() {
+    return `Make sure to only reply to messages once, and to stop when you have nothing more to say. Only send messages when you are directly addressed or have something to add to the conversation.`;
+  },
+  render({args}) {
+    console.log(args);
+    return `Personality: ${args.personality}, Channel ID: ${args.channelId}, recent messages: ${args.context}, Your User ID: ${args.userId}`;
   },
 });
 
@@ -52,18 +58,14 @@ export const discord = extension({
   inputs: {
     "discord:message": input({
       schema: z.object({
-        chat: z.object({ id: z.string() }),
-        user: z.object({ id: z.string(), name: z.string() }),
+        channelId: z.string(),
+        context: z.string(),
+        userId: z.string(),
+        userName: z.string(),
         text: z.string(),
       }),
-      format: (input) =>
-        formatMsg({
-          role: "user",
-          user: input.data.user.name,
-          content: input.data.text,
-        }),
-      subscribe(send, { container }) {
-        function listener(message: Message) {
+      async subscribe(send, { container }) {
+        async function listener(message: Message) {
           if (
             message.author.displayName ==
             container.resolve<DiscordClient>("discord").credentials
@@ -74,19 +76,40 @@ export const discord = extension({
             );
             return;
           }
+
+          let channel = await client.channels.fetch(message.channelId);
+
+          if (!channel || !channel.isTextBased()) {
+            return;
+          }
+
+          let messages = await channel.messages.fetch({ limit: 15 });
+
+          let sortedMessages = messages.sort((a, b) => a.createdTimestamp - b.createdTimestamp);
+
+          let context = "";
+          let i = 0;
+
+          for (const message of sortedMessages) {
+            if (i == sortedMessages.size - 1){
+              context += `*NEW*`;
+            }
+            context += `From: @${message[1].author.displayName} (id: ${message[1].author.id}) (timestamp: ${message[1].createdTimestamp}) - ${message[1].content} \n`;            
+          }
+
+         // console.log(context);
+
           send(
             discord.contexts!.discordChannel,
-            { channelId: message.channelId },
+            { channelId: message.channelId, context: context, personality: personality },
             {
-              chat: {
-                id: message.channelId,
-              },
-              user: {
-                id: message.author.id,
-                name: message.author.displayName,
-              },
+              channelId: message.channelId,
+              context: context,
+              personality: personality,
+              userId: message.author.id,
+              userName: message.author.displayName,
               text: message.content,
-            }
+            },
           );
         }
 
@@ -95,6 +118,7 @@ export const discord = extension({
         client.on(Events.MessageCreate, listener);
         return () => {
           client.off(Events.MessageCreate, listener);
+          client.destroy();
         };
       },
     }),
@@ -103,12 +127,12 @@ export const discord = extension({
   actions: [
     action({
       name: "discord:send_message",
-      schema: z.object({
+      schema: {
         channelId: z
           .string()
           .describe("The Discord channel ID to send the message to"),
         content: z.string().describe("The content of the message to send"),
-      }),
+      },
       description: `
       Send a message to a Discord channel
       
@@ -117,6 +141,7 @@ export const discord = extension({
       2. Don't repeat yourself
       3. Don't take part in conversations unless you have been mentioned or asked to join the conversation
       4. Don't send multiple messages in a row
+      5. When you @ someone, use the syntax <@userId>
       
       `,
       handler: async (data, ctx, { container }) => {

@@ -92,21 +92,23 @@ export class TwitterClient {
         username: this.credentials.username,
       });
 
+
+      console.log('searching for mentions')
       const mentions = await this.scraper.fetchSearchTweets(
         `@${this.credentials.username}`,
-        50,
+        10,
         SearchMode.Latest
       );
 
       console.log('mentions', mentions)
-
       // Convert AsyncGenerator to array and process
       const mentionsArray: Tweet[] = [];
       for await (const mention of mentions.tweets) {
+        
         if (mention) {
           let hasReplied = await this.checkHasRepliedToTweet(mention.conversationId!, mention.id!);
 
-
+          console.log("Has replied", hasReplied);
           if (hasReplied) {
             continue;
           }
@@ -124,11 +126,16 @@ export class TwitterClient {
           }
         }
       }
-      console.log(mentionsArray)
       // Filter and format mentions
 
-      let res = mentionsArray.map(this.formatTweetData)
-      console.log('res', res)
+      let res = mentionsArray.map((mention) => this.formatTweetData(mention));
+
+      if (res.length > 0) {
+        console.log("New mentions: ", res);
+      }
+      else {
+        console.log("No new mentions");
+      }
       // Only return if we have new mentions
       return res.length > 0 ? res : [];
     } catch (error) {
@@ -202,12 +209,12 @@ export class TwitterClient {
     return false;
   }
 
-  private formatTweetData(mention: Tweet) {
+  async formatTweetData(mention: Tweet) {
     let tweet = mention;
-    console.log(tweet)
+    let content = await this.formatTweetText(tweet);
     let res =  {
       type: "tweet",
-      content: tweet.text ?? "",
+      content: content,
       metadata: {
         tweetId: tweet.id,
         userId: tweet.userId,
@@ -229,6 +236,18 @@ export class TwitterClient {
 
     return res
   }
+
+
+  async formatTweetText(tweet: Tweet): Promise<string> {
+    if (!tweet.inReplyToStatusId) {
+      return `From: @${tweet.username} - ${tweet.text} \n ------------------ \n`;
+    }
+      else {
+        let inReplyTo = await this.scraper.getTweet(tweet.inReplyToStatusId!);
+        console.log("In reply to", inReplyTo);
+        return (await this.formatTweetText(inReplyTo!)) + ` \n From: @${tweet.username} - ${tweet.text}`;
+      }
+    }
 }
 
 
@@ -248,4 +267,5 @@ core.registerInput(twitter.createTimelineInput("elonmusk"));
 // Register output
 core.registerOutput(twitter.createTweetOutput());
 */
+
 

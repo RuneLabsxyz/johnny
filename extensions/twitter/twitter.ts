@@ -5,29 +5,34 @@ import { TwitterClient } from "./twitter-client";
 import { extension, input, output } from "../../../fork/daydreams/packages/core/src";
 import { formatXml } from "../../../fork/daydreams/packages/core/src";
 import { personality } from "../../characters/ponzius";
-
+import { Tweet } from "agent-twitter-client";
 const template = `
 
   Make sure to tweet in character, and to base all tweets off the given input tweet or thought.
-
   
   <personality>
     {{personality}}
   </personality>
+
+  <thread>
+    {{thread}}
+  </thread>
 `;
 
 // Define Twitter context
 const twitterContext = context({
   type: "twitter:thread",
   key: ({ tweetId }) => tweetId.toString(),
-  schema: z.object({
-    personality: z.string(),
+  schema: {
     tweetId: z.string(),
-  }),
+    personality: z.string(),
+    thread: z.string()
+  },
 
-  render({ memory }) {
+  render({args}) {
     return render(template, {
-      personality: personality
+      personality: args.personality,
+      thread: args.thread
     });
   },
 });
@@ -63,7 +68,7 @@ export const twitter = extension({
       schema: z.object({
         userId: z.string(),
         tweetId: z.string(),
-        text: z.string(),
+        thread: z.string(),
       }),
       subscribe(send, agent) {
         const { container } = agent;
@@ -71,19 +76,21 @@ export const twitter = extension({
         const twitter = container.resolve("twitter") as TwitterClient;
         // Check mentions every minute
         const interval = setInterval(async () => {
-
           console.log('checking mentions')
-          const mentions = await twitter.checkMentions();
+
+          const mentions = await twitter.checkMentions(); 
 
           for (const mention of mentions) {
-            console.log("Mention", mention);
+            let mentionv = await mention;
+            console.log("Mention", mentionv.content);
+
             send(
               twitterContext,
-              { tweetId: mention.metadata.tweetId || "", personality: personality },
+              { tweetId: mentionv.metadata.tweetId || "", personality: personality, thread: mentionv.content },
               {
-                tweetId: mention.metadata.tweetId || "",
-                userId: mention.metadata.userId || "",
-                text: mention.content,
+                tweetId: mentionv.metadata.tweetId || "",
+                userId: mentionv.metadata.username || "",
+                thread: mentionv.content,
               }
             );
           }

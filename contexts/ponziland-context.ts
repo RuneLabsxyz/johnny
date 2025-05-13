@@ -2,12 +2,11 @@ import { render } from "../../fork/daydreams/packages/core/src";
 import { env } from "../env";
 import { fetchGraphQL } from "../../fork/daydreams/packages/core/src";
 import manifest from "../manifest.json";
-import view_manifest from "../contracts/manifest_release.json";
 import { BigNumberish, CairoCustomEnum, Contract, RpcProvider, type Abi } from "starknet";
 import { balance_query, auction_query, land_query } from "../querys";
-import { estimateNukeTime } from "../querys";
 import { nuke_query } from "../querys";
 import { getAllTokensFromAPI } from "../utils/ponziland_api";
+import view_manifest from "../contracts/manifest_sepolia.json";
 
 interface TokenPrice {
   symbol: string;
@@ -28,18 +27,26 @@ let abi = manifest.contracts[0].abi;
 const address = process.env.STARKNET_ADDRESS!;
 
 let ponziLandContract = (new Contract(abi, manifest.contracts[0].address, provider)).typedv2(abi as Abi);
-
+let viewContract = (new Contract(view_manifest.contracts[0].abi, view_manifest.contracts[0].address, provider)).typedv2(view_manifest.contracts[0].abi as Abi);
 let ponzilandAddress = manifest.contracts[0].address;
 let block_time = (await provider.getBlock()).timestamp;
 
-const getTokenName = (tokenAddr: string | number, tokens: TokenPrice[]): string => {
+const getTokenData = (tokenAddr: string | number, tokens: TokenPrice[]): TokenPrice => {
   for (const token of tokens) {
     if (BigInt(token.address) === BigInt(tokenAddr)) {
-      return token.symbol;
+      return token;
     }
   }
-  return tokenAddr.toString();
+  return null;
 };
+
+const calculateLandYield = async (land: any, tokens: TokenPrice[]) => {
+  let token = getTokenData(land.token_used, tokens);
+  let taxes = await ponziLandContract.getTaxRatePerNeighbor(land.location);
+  console.log('taxes', taxes)
+  let yield_per_second = taxes / (land.stake_duration * 60);
+  return yield_per_second;
+}
 
 const formatTokenAmount = (amount: bigint): string => {
   const divisor = BigInt(10 ** 18);
@@ -123,7 +130,7 @@ export const get_lands_str = async () => {
 
   let land_str = lands.map((land: any, index: number) => 
     `location: ${BigInt(land.location).toString()} - 
-    Token: ${getTokenName(land.token_used, tokens)}
+    Token: ${getTokenData(land.token_used, tokens).symbol}
     Remaining Stake Time: ${nuke_time[index]/BigInt(60)} minutes
   
     Listed Price: ${BigInt(land.sell_price).toString()}
@@ -210,17 +217,14 @@ export const get_auctions_str = async () => {
 
 export const get_neighbors_str = async (location: number) => {
 
-  let view_contract = new Contract(view_manifest.contracts[0].abi, view_manifest.contracts[0].address, provider).typedv2(view_manifest.contracts[0].abi as Abi);
-
-
-  let neighbors: Array<CairoCustomEnum> = await view_contract.get_neighbors(location);
+  let neighbors: Array<CairoCustomEnum> = await viewContract.get_neighbors(location);
 
   let tokens = await getAllTokensFromAPI();
 
   let res = neighbors.map((temp: CairoCustomEnum) => {
     if (temp.activeVariant() == "Land"){
       let neighbor = temp.unwrap();
-      return `Location: ${BigInt(neighbor.location).toString()} - Sell Price: ${BigInt(neighbor.sell_price).toString()} - Token: ${getTokenName(neighbor.token_used, tokens)}`;
+      return `Location: ${BigInt(neighbor.location).toString()} - Sell Price: ${BigInt(neighbor.sell_price).toString()} - Token: ${getTokenData(neighbor.token_used, tokens).symbol}`;
     } else if (temp.activeVariant() == "Auction") {
       let neighbor = temp.unwrap();
       return `Location: ${BigInt(neighbor.land_location).toString()} - Auction`;
@@ -247,7 +251,7 @@ export const get_all_lands_str = async () => {
   lands = lands.filter((land: any) => land.owner != address);
   console.log('lands', lands)
 
-  let land_str = lands.map((land: any) => ` Owner: ${land.owner} Location: ${BigInt(land.location).toString()} Token: ${getTokenName(land.token_used, tokens)} sell price: ${formatTokenAmount(BigInt(land.sell_price))}`).join("\n");
+  let land_str = lands.map((land: any) => ` Owner: ${land.owner} Location: ${BigInt(land.location).toString()} Token: ${getTokenData(land.token_used, tokens).symbol} sell price: ${formatTokenAmount(BigInt(land.sell_price))}`).join("\n");
   return land_str;
 }
 
@@ -290,8 +294,8 @@ If a transaction fails and you are sending an update in the discord, be explicit
 Never send a update about a failed transaction without any information about the error message
 
 Don't tweet about increasing stake. Only tweet about leveling up with somthing like "my empire grows stronger"
-PONZILAND_ACTIONS_ADDRESS: 0x77eeeef469121d1761bb25efbfce7650f5c7fbf00d63cb1b778b774783b2c6
-YOUR ADDRESS: 0x0576CC90c1BD97011CC9c6351ACe3A372f13290ad2f114Eee05f0Cc5ee78d8e7
+PONZILAND_ACTIONS ADDRESS: 0x19b9cef5b903e9838d649f40a8bfc34fbaf644c71f8b8768ece6a6ca1c46dc0
+YOUR Starknet ADDRESS: 0x00d29355d204c081b3a12c552cae38e0ffffb3e28c9dd956bee6466f545cf38a
 
 
 <state>
@@ -461,9 +465,6 @@ ALL LANDS CAN BE BOUGHT FOR THEIR LISTED SELL PRICE IN THEIR STAKED TOKEN
         When you attempt a buy transaction, the liquidity pool info will be added to the calldata after automatically, so don't attempt to add it.
         Use the exact calldata given in the example and ingore the liquidity pool info, if you get an error about it just send and update and stop.
 
-        BTC address: 0x04c090a1a34a3ba423e63a498ce23de7c7a4f0f1a8128fa768a09738606cbb9e
-
-        You will usually use BTC as the stake token. Make sure to approve it in addition to the token used for the sale.
         Be very careful to approval for the sale token is correct based on the listing, and you have approved more than enough
         </PARAMETERS>
       <EXAMPLE>
@@ -473,7 +474,7 @@ ALL LANDS CAN BE BOUGHT FOR THEIR LISTED SELL PRICE IN THEIR STAKED TOKEN
             "entrypoint": "buy",
             "calldata": [
               <land_location>,         
-              0x04c090a1a34a3ba423e63a498ce23de7c7a4f0f1a8128fa768a09738606cbb9e,           
+              <token_for_sale>,           
               <sell_price>,
               0,
               <amount_to_stake>,
@@ -500,12 +501,8 @@ ALL LANDS CAN BE BOUGHT FOR THEIR LISTED SELL PRICE IN THEIR STAKED TOKEN
         When you attempt a bid transaction, the liquidity pool info will be added to the calldata after automatically, so don't attempt to add it.
         Use the exact calldata given in the example and ingore the liquidity pool info, if you get an error about it just send and update and stop.
 
-        BTC address: 0x04c090a1a34a3ba423e63a498ce23de7c7a4f0f1a8128fa768a09738606cbb9e
-
-        You will usually use BTC as the stake token. Make sure to approve it in addition to the token used for the sale.
         Before any bid, make sure to approve enough estark for the bid, and btc for the stake.
 
-        You should always set the sell price to 3 Btc (*10^18 of course), and the amount to stake to 10 Btc (*10^18 of course).
 
         If your bid fails due to unauthorized token, try to approve more of each token used. 
         If you cannot stake with btc then DO NOT BID, just stop.
@@ -517,7 +514,7 @@ ALL LANDS CAN BE BOUGHT FOR THEIR LISTED SELL PRICE IN THEIR STAKED TOKEN
             "entrypoint": "bid",
             "calldata": [
               <land_location>,         
-              0x04c090a1a34a3ba423e63a498ce23de7c7a4f0f1a8128fa768a09738606cbb9e,           
+              <token_for_sale>,           
               <sell_price>,
               0,
               <amount_to_stake>,
