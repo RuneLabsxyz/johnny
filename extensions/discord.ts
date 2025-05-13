@@ -22,6 +22,9 @@ const discordService = service({
         )
     );
   },
+  destroy(container) {
+    container.resolve<DiscordClient>("discord").client.destroy();
+  },
 });
 
 const discordChannelContext = context({
@@ -32,16 +35,17 @@ const discordChannelContext = context({
     return {
       channelId: state.channelId,
       context: state.context,
+      userId: state.userId,
       personality: personality,
     };
   },
 
   description() {
-    return `Make sure to only reply to messages once, and to stop when you have nothing more to say`;
+    return `Make sure to only reply to messages once, and to stop when you have nothing more to say. Only send messages when you are directly addressed or have something to add to the conversation.`;
   },
   render({args}) {
     console.log(args);
-    return `Personality: ${args.personality}, Channel ID: ${args.channelId}, recent messages: ${args.context}`;
+    return `Personality: ${args.personality}, Channel ID: ${args.channelId}, recent messages: ${args.context}, Your User ID: ${args.userId}`;
   },
 });
 
@@ -90,7 +94,7 @@ export const discord = extension({
             if (i == sortedMessages.size - 1){
               context += `*NEW*`;
             }
-            context += `From: @${message[1].author.displayName} (timestamp: ${message[1].createdTimestamp}) - ${message[1].content} \n`;            
+            context += `From: @${message[1].author.displayName} (id: ${message[1].author.id}) (timestamp: ${message[1].createdTimestamp}) - ${message[1].content} \n`;            
           }
 
          // console.log(context);
@@ -114,6 +118,7 @@ export const discord = extension({
         client.on(Events.MessageCreate, listener);
         return () => {
           client.off(Events.MessageCreate, listener);
+          client.destroy();
         };
       },
     }),

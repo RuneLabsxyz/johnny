@@ -9,25 +9,30 @@ import { Tweet } from "agent-twitter-client";
 const template = `
 
   Make sure to tweet in character, and to base all tweets off the given input tweet or thought.
-
   
   <personality>
     {{personality}}
   </personality>
+
+  <thread>
+    {{thread}}
+  </thread>
 `;
 
 // Define Twitter context
 const twitterContext = context({
   type: "twitter:thread",
   key: ({ tweetId }) => tweetId.toString(),
-  schema: z.object({
-    personality: z.string(),
+  schema: {
     tweetId: z.string(),
-  }),
+    personality: z.string(),
+    thread: z.string()
+  },
 
-  async render({ memory }) {
+  render({args}) {
     return render(template, {
-      personality: personality
+      personality: args.personality,
+      thread: args.thread
     });
   },
 });
@@ -63,7 +68,7 @@ export const twitter = extension({
       schema: z.object({
         userId: z.string(),
         tweetId: z.string(),
-        text: z.string(),
+        thread: z.string(),
       }),
       subscribe(send, agent) {
         const { container } = agent;
@@ -71,6 +76,7 @@ export const twitter = extension({
         const twitter = container.resolve("twitter") as TwitterClient;
         // Check mentions every minute
         const interval = setInterval(async () => {
+          console.log('checking mentions')
 
           const mentions = await twitter.checkMentions(); 
 
@@ -80,15 +86,15 @@ export const twitter = extension({
 
             send(
               twitterContext,
-              { tweetId: mentionv.metadata.tweetId || "", personality: personality },
+              { tweetId: mentionv.metadata.tweetId || "", personality: personality, thread: mentionv.content },
               {
                 tweetId: mentionv.metadata.tweetId || "",
-                userId: mentionv.metadata.userId || "",
-                text: mentionv.content,
+                userId: mentionv.metadata.username || "",
+                thread: mentionv.content,
               }
             );
           }
-        }, 60000);
+        }, 600000);
 
         return () => clearInterval(interval);
       },

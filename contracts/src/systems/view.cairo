@@ -56,6 +56,6 @@ pub mod player_actions {
     }
 
     pub fn namespace() -> @ByteArray {
-        @"orchards2"
+        @"orchards3"
     }
 }

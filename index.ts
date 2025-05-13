@@ -33,7 +33,7 @@ const agent = createDreams({
   logger: logger,
   model: openrouter("google/gemini-2.0-flash-001"),
   extensions: [discord, twitter, 
-   // ponziland(chain)
+    ponziland(chain)
     ],
   memory: {
     store: createMemoryStore(),

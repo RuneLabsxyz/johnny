@@ -92,15 +92,19 @@ export class TwitterClient {
         username: this.credentials.username,
       });
 
+
+      console.log('searching for mentions')
       const mentions = await this.scraper.fetchSearchTweets(
         `@${this.credentials.username}`,
-        50,
+        10,
         SearchMode.Latest
       );
 
+      console.log('mentions', mentions)
       // Convert AsyncGenerator to array and process
       const mentionsArray: Tweet[] = [];
       for await (const mention of mentions.tweets) {
+        
         if (mention) {
           let hasReplied = await this.checkHasRepliedToTweet(mention.conversationId!, mention.id!);
 
@@ -235,12 +239,10 @@ export class TwitterClient {
 
 
   async formatTweetText(tweet: Tweet): Promise<string> {
-    console.log("Tweet", tweet);
     if (!tweet.inReplyToStatusId) {
-      return `From: @${tweet.username} - ${tweet.text} \n`;
+      return `From: @${tweet.username} - ${tweet.text} \n ------------------ \n`;
     }
       else {
-        console.log(this.scraper)
         let inReplyTo = await this.scraper.getTweet(tweet.inReplyToStatusId!);
         console.log("In reply to", inReplyTo);
         return (await this.formatTweetText(inReplyTo!)) + ` \n From: @${tweet.username} - ${tweet.text}`;

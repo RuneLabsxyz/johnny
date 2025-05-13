@@ -8,7 +8,7 @@ import { get_auctions_str } from "../../contexts/ponziland-context"
 import { get_nukeable_lands_str } from "../../contexts/ponziland-context"
 import { Abi, Contract } from "starknet"
 import manifest from "../../contracts/manifest_release.json"
-
+import { CONTEXT } from "../../contexts/ponziland-context"
 export const get_auctions = (chain: StarknetChain) => action({
     name: "get-auctions",
     description: "Get all of the active auctions",
@@ -91,3 +91,14 @@ export const get_all_lands = (chain: StarknetChain) => action({
         
     }
 })
+
+export const get_context = (chain: StarknetChain) => action({
+    name: "get-context",
+    description: "Get the general context about ponziland. Use this for general information about the game.",
+    schema: z.object({}),
+    async handler(data: {}, ctx: any, agent: Agent) {
+
+        return CONTEXT
+
+    }
+})  

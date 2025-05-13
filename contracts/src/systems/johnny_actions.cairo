@@ -27,7 +27,7 @@ mod johnny_actions {
     use dojo::event::EventStorage;
 
     pub fn namespace() -> @ByteArray {
-        @"orchards2"
+        @"orchards3"
     }
 
     fn dojo_init(ref self: ContractState) {
