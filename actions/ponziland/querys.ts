@@ -27,7 +27,7 @@ export const get_auctions = (chain: StarknetChain) => action({
 
 export const get_owned_lands = (chain: StarknetChain) => action({
     name: "get-owned-lands",
-    description: "Get all of your lands in ponziland",
+    description: "Get all of your lands in ponziland. Remember this expects no arguments",
     schema: z.object({}),
     async handler(data: {}, ctx: any, agent: Agent) {
         
@@ -47,7 +47,7 @@ export const get_owned_lands = (chain: StarknetChain) => action({
 
 export const get_claims = (chain: StarknetChain) => action({
     name: "get-claims",
-    description: "Get all of the claims in ponziland",
+    description: "Get all of the claims in ponziland. Remember this expects no arguments",
     schema: z.object({}),
     async handler(data: {}, ctx: any, agent: Agent) {
         
@@ -61,7 +61,7 @@ export const get_claims = (chain: StarknetChain) => action({
 
 export const get_neighbors = (chain: StarknetChain) => action({
     name: "get-neighbors",
-    description: "Get all of your lands neighbors in ponziland",
+    description: "Get all of your lands neighbors in ponziland. Remember this expects a location argument",
     schema: z.object({location: z.number()}),
     async handler(data: {location: number}, ctx: any, agent: Agent) {
 
@@ -94,7 +94,7 @@ export const get_all_lands = (chain: StarknetChain) => action({
 
 export const get_context = (chain: StarknetChain) => action({
     name: "get-context",
-    description: "Get the general context about ponziland. Use this for general information about the game.",
+    description: "Get general information about Ponziland. This should be called first before attempting any other ponziland actions. The content for this action should always be {}",
     schema: z.object({}),
     async handler(data: {}, ctx: any, agent: Agent) {
 

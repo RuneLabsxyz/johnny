@@ -41,11 +41,27 @@ const discordChannelContext = context({
   },
 
   description() {
-    return `Make sure to only reply to messages once, and to stop when you have nothing more to say. Only send messages when you are directly addressed or have something to add to the conversation.`;
+    return `
+      Send a message to a Discord channel
+      
+      # Rules for sending messages:
+      1. Always respond if you have been tagged in the message
+      2. Don't repeat yourself
+      3. Don't take part in conversations unless you have been mentioned or asked to join the conversation
+      4. Don't send multiple messages in a row
+      5. When you @ someone, use the syntax <@userId>
+      6. Do not respond to messages that do not mention you or are not directly relevant to you in some way.
+      7. Even basic hello or gm messages should not be responded to unless you are specifically tagged or mentioned.
+      8. Remember that you are in a public channel and you should only be considered mentioned when directly addressed or tagged.
+      10. If you are not directly relevant to the conversation or incoming message, assume you should not reply
+      
+      `;
   },
   render({args}) {
-    console.log(args);
-    return `Personality: ${args.personality}, Channel ID: ${args.channelId}, recent messages: ${args.context}, Your User ID: ${args.userId}`;
+    return `Personality: ${args.personality}, Channel ID: ${args.channelId}, recent messages: ${args.context}, Your User ID: ${args.userId} 
+DO NOT RESPOND TO MESSAGES, INCLUDING GM MESSAGES, THAT DO NOT DIRECTLY TAG YOU OR MENTION YOU BY NAME.
+THIS IS EXTREMELY IMPORTANT AS YOU ARE IN A PUBLIC CHANNEL.
+`;
   },
 });
 
@@ -142,6 +158,10 @@ export const discord = extension({
       3. Don't take part in conversations unless you have been mentioned or asked to join the conversation
       4. Don't send multiple messages in a row
       5. When you @ someone, use the syntax <@userId>
+      6. Do not respond to messages that do not mention you or are not directly relevant to you in some way.
+      7. Even basic hello or gm messages should not be responded to unless you are specifically tagged or mentioned.
+      8. Remember that you are in a public channel and you should only be considered mentioned when directly addressed or tagged.
+      10. If you are not directly relevant to the conversation or incoming message, assume you should not reply
       
       `,
       handler: async (data, ctx, { container }) => {

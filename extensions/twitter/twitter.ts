@@ -108,7 +108,7 @@ export const twitter = extension({
         content: z.string().max(280),
         inReplyTo: z.string(),
       }),
-      description: "Use this to reply to a tweet",
+      description: "Use this to reply to a tweet. When you reply to a tweet, you don't need to include the @username in the tweet.",
 
       handler: async (data, ctx, { container }) => {
         const twitter = container.resolve<TwitterClient>("twitter");

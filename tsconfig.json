@@ -26,9 +26,6 @@
     
     // Fix for deep type recursion
     "typeRoots": ["./node_modules/@types"],
-    "paths": {
-      "*": ["*"]
-    },
     "exactOptionalPropertyTypes": false,
     "allowSyntheticDefaultImports": true
   }

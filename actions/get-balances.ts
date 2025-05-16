@@ -8,7 +8,7 @@ import { getBalances } from "../contexts/ponziland-context"
 
 export const get_balances = (chain: StarknetChain) => action({
     name: "get-balances",
-    description: "Get all of your starknet token balances",
+    description: "Get all of your starknet token balances. This should always be called before attempting to spend tokens",
     schema: z.object({}),
     async handler(data: {}, ctx: any, agent: Agent) {
         

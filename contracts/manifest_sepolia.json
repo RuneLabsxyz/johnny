@@ -1313,7 +1313,7 @@
   "contracts": [
     {
       "address": "0x4f70dce9f949a8fb02296b496d9422f9004de0308142926d0f5d3046d8e2309",
-      "class_hash": "0x7dc96084ac03c2fd59652dfb287ad5d668e48ede68aef2704e3ba578ba543d9",
+      "class_hash": "0x7f33fa0adc26b8a087b5174243d64392802c00eecd8de918aea2db49d9391d4",
       "abi": [
         {
           "type": "impl",
@@ -1528,6 +1528,22 @@
               "outputs": [
                 {
                   "type": "core::array::Array::<orchard::ponziland::models::LandOrAuction>"
+                }
+              ],
+              "state_mutability": "view"
+            },
+            {
+              "type": "function",
+              "name": "get_land_or_auction",
+              "inputs": [
+                {
+                  "name": "location",
+                  "type": "core::integer::u16"
+                }
+              ],
+              "outputs": [
+                {
+                  "type": "orchard::ponziland::models::LandOrAuction"
                 }
               ],
               "state_mutability": "view"

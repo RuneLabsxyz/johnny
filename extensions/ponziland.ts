@@ -7,7 +7,7 @@ import { Contract, Abi, Call } from "starknet";
 import { execute_transaction } from "../actions/execute-transaction";
 import { get_balances } from "../actions/get-balances";
 import { get_lands_str } from "../contexts/ponziland-context";
-
+import { bid } from "../actions/bid";
 import { character, personality } from "../characters/ponzius";
 
 import { CONTEXT } from "../contexts/ponziland-context";
@@ -178,6 +178,7 @@ export const ponziland = (chain: StarknetChain) => {
     get_all_lands(chain),
     get_context(chain),
     get_balances(chain),
+    bid(chain),
   ],
 
   });

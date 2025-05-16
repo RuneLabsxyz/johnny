@@ -100,13 +100,12 @@ export class TwitterClient {
         SearchMode.Latest
       );
 
-      console.log('mentions', mentions)
       // Convert AsyncGenerator to array and process
       const mentionsArray: Tweet[] = [];
       for await (const mention of mentions.tweets) {
         
         if (mention) {
-          let hasReplied = await this.checkHasRepliedToTweet(mention.conversationId!, mention.id!);
+          let hasReplied = await this.checkHasRepliedToTweet(mention.conversationId!, mention.id!, mention.timestamp!);
 
           console.log("Has replied", hasReplied);
           if (hasReplied) {
@@ -196,14 +195,15 @@ export class TwitterClient {
     }
   }
 
-  async checkHasRepliedToTweet(conversationId: string, tweetId: string): Promise<boolean> {
+  async checkHasRepliedToTweet(conversationId: string, tweetId: string, tweet_timestamp: number): Promise<boolean> {
     const query = `conversation_id:${conversationId} from:${this.credentials.username}`;
-    const search = (await this.scraper.searchTweets(query, 250, SearchMode.Latest));
+    const search = (await this.scraper.searchTweets(query, 25, SearchMode.Latest));
 
     for await (const tweet of search) {
-      if (tweet.username?.toLowerCase() === this.credentials.username.toLowerCase()) {
+      if (tweet.username?.toLowerCase() === this.credentials.username.toLowerCase() && tweet.timestamp >= tweet_timestamp) {
         return true;
       }
+      console.log("Tweet", tweet);
     }
 
     return false;

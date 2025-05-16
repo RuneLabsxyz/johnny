@@ -3,7 +3,7 @@ use orchard::ponziland::models::{Land, Auction, LandOrAuction};
 #[starknet::interface]
 pub trait IPlayerActions<T> {
     fn get_neighbors(self: @T, location: u16) -> Array<LandOrAuction>;
-
+    fn get_land_or_auction(self: @T, location: u16) -> LandOrAuction;
 }
 
 // dojo decorator
@@ -50,6 +50,27 @@ pub mod player_actions {
 
             neighbors_array
         }
+
+        fn get_land_or_auction(self: @ContractState, location: u16) -> LandOrAuction {
+            let mut world = self.world(namespace());
+            let ponziland = self.world(@"ponzi_land");
+
+            let maybe_auction: Auction = ponziland.read_model(location);
+            let maybe_land: Land = ponziland.read_model(location);
+
+            if maybe_auction.floor_price != 0 && maybe_auction.is_finished == false {
+                LandOrAuction::Auction(maybe_auction)
+            }
+            else if maybe_land.sell_price != 0 {
+                LandOrAuction::Land(maybe_land)
+            }
+            else {
+                LandOrAuction::None
+            }
+            
+            
+        }
+
 
 
         
