@@ -12,12 +12,12 @@ import manifest from "../contracts/manifest_sepolia.json";
 import ponziland_manifest from "../manifest.json";
 
 
-export const bid = (chain: StarknetChain) => action({
-    name: "bid",
-    description: "Bid on an auction",
+export const buy = (chain: StarknetChain) => action({
+    name: "buy",
+    description: "Buy a land",
     schema: z.object({
-        land_location: z.string().describe("Location of the land to bid on"),
-        token_for_sale: z.string().describe("Contract address of the token to be used for the stake and new listing. This should be a token in your wallet that you have enough of."),
+        land_location: z.string().describe("Location of the land to buy"),
+        token_for_sale: z.string().describe("Contract address of the token to be used for the purchase. This should be a token in your wallet that you have enough of."),
         sell_price: z.string().describe("The price the land will be listed for after the auction ends (in wei, so x10^18)"),
         amount_to_stake: z.string().describe("The amount to be staked to pay the lands taxes (in wei, so x10^18)"),
     }),
@@ -34,23 +34,26 @@ export const bid = (chain: StarknetChain) => action({
 
         let ponziLandContract = (new Contract(ponziland_manifest.contracts[0].abi, ponziland_address, chain.provider)).typedv2(ponziland_manifest.contracts[0].abi as Abi);
 
-        let price = await ponziLandContract.get_current_auction_price(data.land_location);
+        let land = await ponziLandContract.get_land(data.land_location);
 
-        if (data.token_for_sale == estark_address) {
-            let estark_call: Call = {contractAddress: estark_address, entrypoint: "approve", calldata: CallData.compile({spender: ponziland_address, amount: cairo.uint256(data.amount_to_stake + price)})};
-            calls.push(estark_call);
+        let token = land.token_for_sale;
+        let price = land.sell_price;
+
+        if (token == data.token_for_sale) {
+            let approve_call: Call = {contractAddress: data.token_for_sale, entrypoint: "approve", calldata: CallData.compile({spender: ponziland_address, amount: cairo.uint256(price)})};
+            calls.push(approve_call);
         }
         else {
-            let estark_call: Call = {contractAddress: estark_address, entrypoint: "approve", calldata: CallData.compile({spender: ponziland_address, amount: cairo.uint256(price)})};
-            let stake_approve_call: Call = {contractAddress: data.token_for_sale, entrypoint: "approve", calldata: CallData.compile({spender: ponziland_address, amount: cairo.uint256(data.amount_to_stake)})};
-            calls.push(estark_call);
-            calls.push(stake_approve_call);
+            let token_call: Call = {contractAddress: data.token_for_sale, entrypoint: "approve", calldata: CallData.compile({spender: ponziland_address, amount: cairo.uint256(data.amount_to_stake)})};
+            let sale_call: Call = {contractAddress: token, entrypoint: "approve", calldata: CallData.compile({spender: ponziland_address, amount: cairo.uint256(price)})};
+            calls.push(token_call);
+            calls.push(sale_call);
         }
 
 
-        let bid_call: Call = {contractAddress: ponziland_address, entrypoint: "bid", calldata: CallData.compile({land_location: data.land_location, token_for_sale: data.token_for_sale, sell_price: cairo.uint256(data.sell_price), amount_to_stake: cairo.uint256(data.amount_to_stake)})};
+        let buy_call: Call = {contractAddress: ponziland_address, entrypoint: "buy", calldata: CallData.compile({land_location: data.land_location, token_for_sale: data.token_for_sale, sell_price: cairo.uint256(data.sell_price), amount_to_stake: cairo.uint256(data.amount_to_stake)})};
 
-        calls.push(bid_call);
+        calls.push(buy_call);
 
 
         let res = await chain.write(calls);
