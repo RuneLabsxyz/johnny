@@ -1,4 +1,4 @@
-import { PoolKey } from '../types';
+import { PoolKey } from '../../../types';
 
 interface TokenPrice {
   symbol: string;

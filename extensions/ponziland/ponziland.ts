@@ -1,21 +1,21 @@
-import { action, ActionCall, Agent, context, extension, formatXml, input } from "../../fork/daydreams/packages/core/src";
+import { action, ActionCall, Agent, context, extension, formatXml, input } from "../../../fork/daydreams/packages/core/src";
 import { z } from "zod";
-import { render } from "../../fork/daydreams/packages/core/src";
-import { StarknetChain } from "../../fork/daydreams/packages/defai/src";
-import manifest  from "../contracts/manifest_sepolia.json"
+import { render } from "../../../fork/daydreams/packages/core/src";
+import { StarknetChain } from "../../../fork/daydreams/packages/defai/src";
+import manifest  from "../../contracts/manifest_sepolia.json"
 import { Contract, Abi, Call } from "starknet";
 import { execute_transaction } from "../actions/execute-transaction";
-import { get_balances } from "../actions/get-balances";
-import { get_lands_str } from "../contexts/ponziland-context";
-import { character, personality } from "../characters/ponzius";
+import { get_balances } from "./actions/get-balances";
+import { character, personality } from "../../characters/ponzius";
 
-import { CONTEXT } from "../contexts/ponziland-context";
-import { getBalances } from "../contexts/ponziland-context";
-import { get_auctions, get_claims, get_neighbors, get_all_lands, get_owned_lands, get_context } from "../actions/ponziland/querys";
 
-import { bid } from "../actions/bid";
-import { buy } from "../actions/buy";
-import { increase_price, level_up, increase_stake } from "../actions/misc";
+import { CONTEXT } from "./contexts/ponziland-context";
+import { getBalances, get_lands_str } from "./contexts/ponziland-context";
+import { get_auctions, get_claims, get_neighbors, get_all_lands, get_owned_lands, get_context } from "./actions/ponziland/querys";
+
+import { bid } from "./actions/ponziland/bid";
+import { buy } from "./actions/ponziland/buy";
+import { increase_price, level_up, increase_stake } from "./actions/ponziland/misc";
 
 
 const template = `

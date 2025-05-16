@@ -1,15 +1,15 @@
-import { action } from "../../fork/daydreams/packages/core/src"
-import { StarknetChain } from "../../fork/daydreams/packages/defai/src"
-import { ActionCall } from "../../fork/daydreams/packages/core/src"
-import { Agent } from "../../fork/daydreams/packages/core/src"
+import { action } from "../../../../../fork/daydreams/packages/core/src"
+import { StarknetChain } from "../../../../../fork/daydreams/packages/defai/src"
+import { ActionCall } from "../../../../../fork/daydreams/packages/core/src"
+import { Agent } from "../../../../../fork/daydreams/packages/core/src"
 import { z } from "zod"
-import { getBalances } from "../contexts/ponziland-context"
+import { getBalances } from "../../contexts/ponziland-context"
 import { Abi, CallData, Contract, cairo } from "starknet";
 import { Call } from "starknet";
-import { getLiquidityPoolFromAPI } from "../utils/ponziland_api"
-import { decodeTokenTransferEvents } from "../utils/utils";
-import manifest from "../contracts/manifest_sepolia.json";
-import ponziland_manifest from "../manifest.json";
+import { getLiquidityPoolFromAPI } from "../../utils/ponziland_api"
+import { decodeTokenTransferEvents } from "../../utils/utils";
+import manifest from "../../../../contracts/manifest_sepolia.json";
+import ponziland_manifest from "../../../../manifest.json";
 
 
 export const level_up = (chain: StarknetChain) => action({

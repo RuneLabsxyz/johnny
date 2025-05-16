@@ -1,6 +1,6 @@
-import { action } from "../../fork/daydreams/packages/core/src"
-import { StarknetChain } from "../../fork/daydreams/packages/defai/src"
-import { Agent } from "../../fork/daydreams/packages/core/src"
+import { action } from "../../../../fork/daydreams/packages/core/src"
+import { StarknetChain } from "../../../../fork/daydreams/packages/defai/src"
+import { Agent } from "../../../../fork/daydreams/packages/core/src"
 import { z } from "zod"
 import { getBalances } from "../contexts/ponziland-context"
 

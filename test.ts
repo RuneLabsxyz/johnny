@@ -7,9 +7,9 @@ import { z } from "zod";
 import { generateText } from "ai";
 import { consciousness } from "./consciousness";
 import { twitter } from "./extensions/twitter/twitter";
-import { get_balances } from "./actions/get-balances";
+import { get_balances } from "./extensions/ponziland/actions/get-balances";
 import { StarknetChain } from "../fork/daydreams/packages/core/src";
-import { ponziland } from "./extensions/ponziland";
+import { ponziland } from "./extensions/ponziland/ponziland";
 import { orchard } from "./extensions/orchard";
 
 let openrouter = createOpenRouter({

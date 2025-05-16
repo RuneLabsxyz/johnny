@@ -1,13 +1,13 @@
-import { action } from "../../../fork/daydreams/packages/core/src"
-import { StarknetChain } from "../../../fork/daydreams/packages/defai/src"
-import { ActionCall } from "../../../fork/daydreams/packages/core/src"
-import { Agent } from "../../../fork/daydreams/packages/core/src"
+import { action } from "../../../../../fork/daydreams/packages/core/src"
+import { StarknetChain } from "../../../../../fork/daydreams/packages/defai/src"
+import { ActionCall } from "../../../../../fork/daydreams/packages/core/src"
+import { Agent } from "../../../../../fork/daydreams/packages/core/src"
 import { z } from "zod"
 import { get_claims_str, get_lands_str, get_neighbors_str, getBalances, get_all_lands_str } from "../../contexts/ponziland-context"
 import { get_auctions_str } from "../../contexts/ponziland-context"
 import { get_nukeable_lands_str } from "../../contexts/ponziland-context"
 import { Abi, Contract } from "starknet"
-import manifest from "../../contracts/manifest_release.json"
+import manifest from "../../../../contracts/manifest_release.json"
 import { CONTEXT } from "../../contexts/ponziland-context"
 export const get_auctions = (chain: StarknetChain) => action({
     name: "get-auctions",

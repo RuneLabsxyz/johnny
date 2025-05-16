@@ -1,12 +1,12 @@
-import { render } from "../../fork/daydreams/packages/core/src";
-import { env } from "../env";
-import { fetchGraphQL } from "../../fork/daydreams/packages/core/src";
-import manifest from "../manifest.json";
+import { render } from "../../../../fork/daydreams/packages/core/src";
+import { env } from "../../../env";
+import { fetchGraphQL } from "../../../../fork/daydreams/packages/core/src";
+import manifest from "../../../manifest.json";
 import { BigNumberish, CairoCustomEnum, Contract, RpcProvider, type Abi } from "starknet";
-import { balance_query, auction_query, land_query } from "../querys";
-import { nuke_query } from "../querys";
+import { balance_query, auction_query, land_query } from "../../../gql_querys";
+import { nuke_query } from "../../../gql_querys";
 import { getAllTokensFromAPI } from "../utils/ponziland_api";
-import view_manifest from "../contracts/manifest_sepolia.json";
+import view_manifest from "../../../contracts/manifest_sepolia.json";
 
 interface TokenPrice {
   symbol: string;
