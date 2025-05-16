@@ -7,12 +7,17 @@ import { Contract, Abi, Call } from "starknet";
 import { execute_transaction } from "../actions/execute-transaction";
 import { get_balances } from "../actions/get-balances";
 import { get_lands_str } from "../contexts/ponziland-context";
-import { bid } from "../actions/bid";
 import { character, personality } from "../characters/ponzius";
 
 import { CONTEXT } from "../contexts/ponziland-context";
 import { getBalances } from "../contexts/ponziland-context";
 import { get_auctions, get_claims, get_neighbors, get_all_lands, get_owned_lands, get_context } from "../actions/ponziland/querys";
+
+import { bid } from "../actions/bid";
+import { buy } from "../actions/buy";
+import { increase_price, level_up, increase_stake } from "../actions/misc";
+
+
 const template = `
   <character_info>
     {{character}}
@@ -170,7 +175,6 @@ export const ponziland = (chain: StarknetChain) => {
  //   "ponziland_check": ponziland_check(chain),
   },
   actions: [
-    execute_transaction(chain),
     get_owned_lands(chain),
     get_auctions(chain),
     get_claims(chain),
@@ -179,6 +183,10 @@ export const ponziland = (chain: StarknetChain) => {
     get_context(chain),
     get_balances(chain),
     bid(chain),
+    buy(chain),
+    level_up(chain),
+    increase_stake(chain),
+    increase_price(chain),
   ],
 
   });
