@@ -1,5 +1,5 @@
 export const balance_query = `query GetTokenBalances {
-    tokenBalances(accountAddress:"0x00d29355d204c081b3a12c552cae38e0ffffb3e28c9dd956bee6466f545cf38a"){
+    tokenBalances(accountAddress:"0xd29355d204c081b3a12c552cae38e0ffffb3e28c9dd956bee6466f545cf38a"){
       edges{
         node{
           tokenMetadata{

@@ -42,15 +42,15 @@ Ponzilands website is https://ponzi.land and the twitter is @ponzidotland, so ma
 They just need to join the discord, get their cartridge controller ready, and get ready for the next tournament.
 
 <balances>
-  {{balance_str}}
+  {{balances}}
 </balances>
 
 <auctions>
-  {{auction_str}}
+  {{auctions}}
 </auctions>
 
 <lands>
-  {{land_str}}
+  {{lands}}
 </lands>
 
 Here is a how you obtain the current state of the game: 

@@ -42,10 +42,55 @@ const getTokenData = (tokenAddr: string | number, tokens: TokenPrice[]): TokenPr
 
 export const calculateLandYield = async (land: any, tokens: TokenPrice[]) => {
   let token = getTokenData(land.token_used, tokens);
-  let taxes = await ponziLandContract.getTaxRatePerNeighbor(land.location);
-  console.log('taxes', taxes)
-  let yield_per_second = taxes / (land.stake_duration * 60);
-  return yield_per_second;
+  let tax_rate = await viewContract.get_tax_rate_per_neighbor(land.location);
+  console.log('tax rate', tax_rate)
+  if (token.ratio){
+    tax_rate = tax_rate * token.ratio;
+  }
+  let neighbors = await viewContract.get_neighbors(land.location);
+  let income = BigInt(0);
+
+  let neighbor_tax_rates = await Promise.all(neighbors.map(async (neighbor: any) => {
+    if (neighbor.activeVariant() == "Land"){
+      let value = neighbor.unwrap();
+      return await viewContract.get_tax_rate_per_neighbor(value.location);
+    }
+  }));
+
+  console.log('tax_rate', tax_rate)
+  neighbors.forEach((neighbor: any, index: number) => {
+    if (neighbor.activeVariant() == "Land"){
+
+        let value = neighbor.unwrap();
+        console.log('value', value)
+      let neighbor_yield = neighbor_tax_rates[index];
+      let neighbor_token = getTokenData(value.token_used, tokens);
+      if (!neighbor_token){
+        console.log("No token?")
+      }
+      else{
+        // Yield is in estark
+        if (!neighbor_token.ratio){
+          income += BigInt(neighbor_yield);
+        }
+        else{
+          income += BigInt(Math.floor(Number(neighbor_yield) * neighbor_token.ratio));
+        }
+      }
+    }
+  });
+
+  console.log('income', income)
+
+  if (tax_rate == 0){
+    return 0;
+  }
+  let adjusted_income = BigInt(income) / BigInt(tax_rate);
+
+  console.log('adjusted income', adjusted_income)
+
+  return adjusted_income;
+
 }
 
 const formatTokenAmount = (amount: bigint): string => {
@@ -99,12 +144,12 @@ export const get_nukeable_lands_str = async () => {
     nuke_query,
     {}
   ).then((res: any) => res?.ponziLandLandModels?.edges?.map((edge: any) => edge?.node));
+  console.log('lands', lands)
 
   if (!lands) {
     return "there are no nukeable lands"
   }
 
-  console.log('lands', lands)
   return lands;
 }
 
@@ -120,18 +165,26 @@ export const get_lands_str = async () => {
     return "You do not own any lands"
   }
 
+  let tokens = await getAllTokensFromAPI();
+
   let nuke_time = await Promise.all(lands.map((land: any) => {
     let info = ponziLandContract.call("get_time_to_nuke", [land.location]);
     return info;
   }));
 
-  let tokens = await getAllTokensFromAPI();
-  
+  let yields = await Promise.all(lands.map(async (land: any) => {
+    return await calculateLandYield(land, tokens);
+  }));
+
+  console.log('yields', yields)
 
   let land_str = lands.map((land: any, index: number) => 
     `location: ${BigInt(land.location).toString()} - 
     Token: ${getTokenData(land.token_used, tokens).symbol}
     Remaining Stake Time: ${nuke_time[index]/BigInt(60)} minutes
+
+
+    Yield: ${yields[index]}
   
     Listed Price: ${BigInt(land.sell_price).toString()}
   `).join("\n");

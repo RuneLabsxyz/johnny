@@ -26,7 +26,7 @@ export const get_auctions = (chain: StarknetChain) => action({
 
 export const get_owned_lands = (chain: StarknetChain) => action({
     name: "get-owned-lands",
-    description: "Get all of your lands in ponziland. Remember this expects no arguments",
+    description: "Get all of your lands in ponziland. Remember this expects no arguments. The content for this action should always be {}",
     schema: z.object({}),
     async handler(data: {}, ctx: any, agent: Agent) {
         
@@ -97,7 +97,9 @@ export const get_context = (chain: StarknetChain) => action({
     schema: z.object({}),
     async handler(data: {}, ctx: any, agent: Agent) {
 
-        return CONTEXT
+        let res = await CONTEXT();
+        console.log('res', res)
+        return res
 
     }
 })  
