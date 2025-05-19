@@ -5,6 +5,7 @@ pub mod systems {
 }
 
 pub mod models;
+pub mod consts;
 
 pub mod ponziland {
     pub mod consts;

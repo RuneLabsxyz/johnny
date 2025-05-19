@@ -4,6 +4,7 @@ use orchard::ponziland::models::{Land, Auction, LandOrAuction};
 pub trait IPlayerActions<T> {
     fn get_neighbors(self: @T, location: u16) -> Array<LandOrAuction>;
     fn get_land_or_auction(self: @T, location: u16) -> LandOrAuction;
+    fn get_tax_rate_per_neighbor(self: @T, location: u16) -> u256;
 }
 
 // dojo decorator
@@ -14,9 +15,10 @@ pub mod player_actions {
     use orchard::ponziland::coords::{position_to_index, index_to_position};
     use orchard::models::{Johnny, Orchard, OrchardTrait};
     use orchard::ponziland::consts::{PONZILAND_WORLD_ADDRESS, JOHNNY_ADDRESS};
+    use orchard::consts::{TAX_RATE};
 
-    use orchard::ponziland::coords::{get_all_neighbors};
-    use orchard::ponziland::models::{LandOrAuction, Land, Auction};
+    use orchard::ponziland::coords::{get_all_neighbors, max_neighbors};
+    use orchard::ponziland::models::{LandOrAuction, Land, Auction, Level};
     
     use dojo::model::{ModelStorage};
     use dojo::event::EventStorage;
@@ -71,6 +73,28 @@ pub mod player_actions {
             
         }
 
+        fn get_tax_rate_per_neighbor(self: @ContractState, location: u16) -> u256 {
+            let ponziland = self.world(@"ponzi_land");
+            let land: Land = ponziland.read_model(location);
+
+            let max_n = max_neighbors(land.location);
+            if max_n == 0 {
+                return 0;
+            }
+        
+            let mut discount = 0;
+            if land.level == Level::First {
+                discount = 10;
+            }
+            else if land.level == Level::Second {
+                discount = 15;
+            }
+            let base_tax_rate = (land.sell_price * TAX_RATE.into()) / (max_n.into() * 100); // Base rate per neighbor
+        
+            (base_tax_rate * (100 - discount).into()) / 100 // Apply 10% or 15% discount
+
+        }
+        
 
 
         

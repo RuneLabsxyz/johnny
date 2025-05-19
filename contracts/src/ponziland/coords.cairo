@@ -133,7 +133,7 @@ pub fn get_all_neighbors(index: u16) -> Array<u16> {
     neighbors
 }
 
-fn max_neighbors(index: u16) -> u8 {
+pub fn max_neighbors(index: u16) -> u8 {
     let mut count = 0;
 
     // Orthogonal neighbors
