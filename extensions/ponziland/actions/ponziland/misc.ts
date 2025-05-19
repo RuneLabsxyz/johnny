@@ -3,7 +3,6 @@ import { StarknetChain } from "../../../../../fork/daydreams/packages/defai/src"
 import { ActionCall } from "../../../../../fork/daydreams/packages/core/src"
 import { Agent } from "../../../../../fork/daydreams/packages/core/src"
 import { z } from "zod"
-import { getBalances } from "../../contexts/ponziland-context"
 import { Abi, CallData, Contract, cairo } from "starknet";
 import { Call } from "starknet";
 import { getLiquidityPoolFromAPI } from "../../utils/ponziland_api"

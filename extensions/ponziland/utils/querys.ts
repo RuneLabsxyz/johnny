@@ -1,0 +1,256 @@
+import { render } from "../../../../fork/daydreams/packages/core/src";
+import { env } from "../../../env";
+import { fetchGraphQL } from "../../../../fork/daydreams/packages/core/src";
+import manifest from "../../../manifest.json";
+import { BigNumberish, CairoCustomEnum, Contract, RpcProvider, type Abi } from "starknet";
+import { balance_query, auction_query, land_query } from "../../../gql_querys";
+import { nuke_query } from "../../../gql_querys";
+import { getAllTokensFromAPI } from "../utils/ponziland_api";
+import view_manifest from "../../../contracts/manifest_sepolia.json";
+
+interface TokenPrice {
+  symbol: string;
+  address: string;
+  ratio: number | null;
+  best_pool: {
+    token0: string;
+    token1: string;
+    fee: string;
+    tick_spacing: number;
+    extension: string;
+  } | null;
+}
+
+let provider = new RpcProvider({ nodeUrl: process.env.STARKNET_RPC_URL });
+let abi = manifest.contracts[0].abi;
+
+const address = process.env.STARKNET_ADDRESS!;
+
+let ponziLandContract = (new Contract(abi, manifest.contracts[0].address, provider)).typedv2(abi as Abi);
+let viewContract = (new Contract(view_manifest.contracts[0].abi, view_manifest.contracts[0].address, provider)).typedv2(view_manifest.contracts[0].abi as Abi);
+let ponzilandAddress = manifest.contracts[0].address;
+let block_time = (await provider.getBlock()).timestamp;
+
+const getTokenData = (tokenAddr: string | number, tokens: TokenPrice[]): TokenPrice => {
+  for (const token of tokens) {
+    if (BigInt(token.address) === BigInt(tokenAddr)) {
+      return token;
+    }
+  }
+  return null;
+};
+
+export const calculateLandYield = async (land: any, tokens: TokenPrice[]) => {
+  let token = getTokenData(land.token_used, tokens);
+  let taxes = await ponziLandContract.getTaxRatePerNeighbor(land.location);
+  console.log('taxes', taxes)
+  let yield_per_second = taxes / (land.stake_duration * 60);
+  return yield_per_second;
+}
+
+const formatTokenAmount = (amount: bigint): string => {
+  const divisor = BigInt(10 ** 18);
+  const wholePart = amount / divisor;
+  const fractionalPart = amount % divisor;
+  
+  // Convert fractional part to 4 decimal places
+  const fractionalStr = fractionalPart.toString().padStart(18, '0');
+  const decimalPlaces = fractionalStr.slice(0, 4);
+  
+  return `${wholePart}.${decimalPlaces}`;
+};
+
+export const get_balances = async () => {
+  // Retrieve balance and allowance info for each token via the contracts array.
+
+  let tokens = await getAllTokensFromAPI();
+  console.log('tokens', tokens)
+  const balancesData = await Promise.all(
+    tokens.map(async (token) => {
+      let abi = await provider.getClassAt(token.address);
+      let contract = new Contract(abi.abi, token.address, provider);
+      const balance = await contract.call("balanceOf", [address]);
+      const approved = await contract.call("allowance", [address, ponzilandAddress]);
+      return {
+        name: token.symbol,
+        balance: BigInt(balance.toString()) / BigInt(10 ** 18),
+        approved: BigInt(approved.toString()) / BigInt(10 ** 18),
+        address: token.address,
+      };
+    })
+  );
+
+  // Build the display parts using token names.
+  const tokenBalances = balancesData.map((t) => `<${t.name}> \n Balance: ${t.balance} \n Address: ${t.address} </${t.name}>`).join("\n\n\n");
+
+  let res = `
+
+  Token Balances:
+  ${tokenBalances}
+
+  `;
+  console.log('res', res)
+  return res;
+};
+
+export const get_nukeable_lands_str = async () => {
+  let lands = await fetchGraphQL(
+    env.GRAPHQL_URL + "/graphql",
+    nuke_query,
+    {}
+  ).then((res: any) => res?.ponziLandLandModels?.edges?.map((edge: any) => edge?.node));
+
+  if (!lands) {
+    return "there are no nukeable lands"
+  }
+
+  console.log('lands', lands)
+  return lands;
+}
+
+export const get_lands_str = async () => {
+  let lands = await fetchGraphQL(
+    env.GRAPHQL_URL + "/graphql",
+    land_query,
+    {}
+  ).then((res: any) => res?.ponziLandLandModels?.edges?.map((edge: any) => edge?.node));
+
+  console.log('lands', lands)
+  if (!lands) {
+    return "You do not own any lands"
+  }
+
+  let nuke_time = await Promise.all(lands.map((land: any) => {
+    let info = ponziLandContract.call("get_time_to_nuke", [land.location]);
+    return info;
+  }));
+
+  let tokens = await getAllTokensFromAPI();
+  
+
+  let land_str = lands.map((land: any, index: number) => 
+    `location: ${BigInt(land.location).toString()} - 
+    Token: ${getTokenData(land.token_used, tokens).symbol}
+    Remaining Stake Time: ${nuke_time[index]/BigInt(60)} minutes
+  
+    Listed Price: ${BigInt(land.sell_price).toString()}
+  `).join("\n");
+
+  console.log('land_str', land_str)
+  return land_str;
+}
+
+export const get_claims_str = async () => {
+  let lands = await fetchGraphQL(
+    env.GRAPHQL_URL + "/graphql",
+    land_query,
+    {}
+  ).then((res: any) => res?.ponziLandLandModels?.edges?.map((edge: any) => edge?.node));
+
+  if (!lands) {
+    return "You do not own any lands, so you have no claims"
+  }
+
+  let land_claims = await Promise.all(lands.map((land: any) => {
+    return ponziLandContract.call("get_next_claim_info", [land.location]);
+  }));
+
+  console.log('land_claims', land_claims)
+
+  let tokens = await getAllTokensFromAPI();
+
+  // Flatten the claims data and format it
+  let claims = lands.map((land: any, index: number) => {
+    let landClaims = land_claims[index]
+      .map((claim: any) => {
+        // Find matching contract for the token
+        for (let contract of tokens) {
+          if (BigInt(claim.token_address) === BigInt(contract.address)) {
+            return `    ${contract.symbol}: ${BigInt(claim.amount)}`;
+          }
+        }
+        return '';
+      })
+      .filter((claim: any) => claim !== '')
+      .join('\n');
+
+    return `Land ${BigInt(land.location).toString()}:\n${landClaims}`;
+  }).join('\n\n');
+
+
+  console.log('claims_str', claims)
+
+  return claims;
+}
+
+export const get_auctions_str = async () => {
+  let auctions = await fetchGraphQL(
+    env.GRAPHQL_URL + "/graphql",
+    auction_query,
+    {}
+  ).then((res: any) => res?.ponziLandAuctionModels?.edges?.map((edge: any) => edge?.node));
+
+  if (!auctions) {
+    return "There are no auctions"
+  }
+
+  let initial_prices = await Promise.all(auctions.map((auction: any) => {
+    let current_price = provider.callContract(
+        {
+            contractAddress: ponzilandAddress,
+            entrypoint: "get_current_auction_price",
+            calldata: [auction.land_location]
+        }
+    ).then((res: any) => BigInt(res[0])/BigInt(10**18));
+    return current_price;
+  }));
+
+  auctions.forEach((auction: any, index: number) => {
+    auction.current_price = initial_prices[index];
+  });
+  
+  let auction_str = auctions.map((auction: any) => 
+    `location: ${BigInt(auction.land_location).toString()} - Current Price: ${auction.current_price}`).join("\n");
+
+  return auction_str;
+}
+
+export const get_neighbors_str = async (location: number) => {
+
+  let neighbors: Array<CairoCustomEnum> = await viewContract.get_neighbors(location);
+
+  let tokens = await getAllTokensFromAPI();
+
+  let res = neighbors.map((temp: CairoCustomEnum) => {
+    if (temp.activeVariant() == "Land"){
+      let neighbor = temp.unwrap();
+      return `Location: ${BigInt(neighbor.location).toString()} - Sell Price: ${BigInt(neighbor.sell_price).toString()} - Token: ${getTokenData(neighbor.token_used, tokens).symbol}`;
+    } else if (temp.activeVariant() == "Auction") {
+      let neighbor = temp.unwrap();
+      return `Location: ${BigInt(neighbor.land_location).toString()} - Auction`;
+    }
+    else {
+      return ``
+    }
+  }).join("\n");
+
+  console.log('get_all_lands_str', await get_all_lands_str());
+
+  return res;
+}
+
+export const get_all_lands_str = async () => {
+  let lands = await fetchGraphQL(
+    env.GRAPHQL_URL + "/graphql",
+    "query { ponziLandLandModels(first: 50) { edges { node { location token_used sell_price owner } } } }",
+    {}
+  ).then((res: any) => res?.ponziLandLandModels?.edges?.map((edge: any) => edge?.node));
+
+  let tokens = await getAllTokensFromAPI();
+
+  lands = lands.filter((land: any) => land.owner != address);
+  console.log('lands', lands)
+
+  let land_str = lands.map((land: any) => ` Owner: ${land.owner} Location: ${BigInt(land.location).toString()} Token: ${getTokenData(land.token_used, tokens).symbol} sell price: ${formatTokenAmount(BigInt(land.sell_price))}`).join("\n");
+  return land_str;
+}

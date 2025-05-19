@@ -10,7 +10,7 @@ import { character, personality } from "../../characters/ponzius";
 
 
 import { CONTEXT } from "./contexts/ponziland-context";
-import { getBalances, get_lands_str } from "./contexts/ponziland-context";
+import { get_balances, get_lands_str } from "./utils/querys";
 import { get_auctions, get_claims, get_neighbors, get_all_lands, get_owned_lands, get_context } from "./actions/ponziland/querys";
 
 import { bid } from "./actions/ponziland/bid";
