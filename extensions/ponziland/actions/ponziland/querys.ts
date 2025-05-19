@@ -6,7 +6,7 @@ import { z } from "zod"
 import { Abi, Contract } from "starknet"
 import manifest from "../../../../contracts/manifest_release.json"
 import { CONTEXT } from "../../contexts/ponziland-context"
-import { get_auctions_str, get_balances, get_claims_str, get_lands_str, get_neighbors_str, get_nukeable_lands_str } from "../../utils/querys"
+import { get_auctions_str, get_balances, get_claims_str, get_lands_str, get_neighbors_str, get_nukeable_lands_str, get_auction_yield_str } from "../../utils/querys"
 
 export const get_auctions = (chain: StarknetChain) => action({
     name: "get-auctions",
@@ -103,3 +103,16 @@ export const get_context = (chain: StarknetChain) => action({
 
     }
 })  
+
+export const get_auction_yield = (chain: StarknetChain) => action({
+    name: "get-auction-yield",
+    description: "Get the potential yield of a land that is up for auction. This expects a location argument. This should be called to evaluate auctions before deciding to bid or not,.",
+    schema: z.object({location: z.number()}),
+    async handler(data: {location: number}, ctx: any, agent: Agent) {
+
+        let info = await get_auction_yield_str(data.location);
+
+        return info;
+
+    }
+})

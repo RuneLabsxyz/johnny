@@ -4,14 +4,13 @@ import { render } from "../../../fork/daydreams/packages/core/src";
 import { StarknetChain } from "../../../fork/daydreams/packages/defai/src";
 import manifest  from "../../contracts/manifest_sepolia.json"
 import { Contract, Abi, Call } from "starknet";
-import { execute_transaction } from "../actions/execute-transaction";
-import { get_balances } from "./actions/get-balances";
 import { character, personality } from "../../characters/ponzius";
 
 
 import { CONTEXT } from "./contexts/ponziland-context";
+
 import { get_balances, get_lands_str } from "./utils/querys";
-import { get_auctions, get_claims, get_neighbors, get_all_lands, get_owned_lands, get_context } from "./actions/ponziland/querys";
+import { get_auctions, get_claims, get_neighbors, get_all_lands, get_owned_lands, get_context, get_auction_yield } from "./actions/ponziland/querys";
 
 import { bid } from "./actions/ponziland/bid";
 import { buy } from "./actions/ponziland/buy";
@@ -135,7 +134,7 @@ export const ponziland_check = (chain: StarknetChain) => input({
         let goal = "Build your bitcoin empire in ponziland"
 
         let lands = await get_lands_str()
-        let balance = await getBalances()
+        let balance = await get_balances()
 
         let context = {
           id: "ponziland",
@@ -187,6 +186,7 @@ export const ponziland = (chain: StarknetChain) => {
     level_up(chain),
     increase_stake(chain),
     increase_price(chain),
+    get_auction_yield(chain),
   ],
 
   });

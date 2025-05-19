@@ -323,3 +323,60 @@ export const get_all_lands_str = async () => {
   let land_str = lands.map((land: any) => ` Owner: ${land.owner} Location: ${BigInt(land.location).toString()} Token: ${getTokenData(land.token_used, tokens).symbol} sell price: ${formatTokenAmount(BigInt(land.sell_price))}`).join("\n");
   return land_str;
 }
+
+export const get_auction_yield_str = async (location: number) => {
+  let neighbors = await viewContract.get_neighbors(location);
+  let tokens = await getAllTokensFromAPI();
+  let income = BigInt(0);
+
+  let neighbor_tax_rates = await Promise.all(neighbors.map(async (neighbor: any) => {
+    if (neighbor.activeVariant() == "Land"){
+      let value = neighbor.unwrap();
+      return await viewContract.get_tax_rate_per_neighbor(value.location);
+    }
+  }));
+
+  let detailed_income = "";
+
+  neighbors.forEach((neighbor: any, index: number) => {
+    if (neighbor.activeVariant() == "Land"){
+
+        let value = neighbor.unwrap();
+        console.log('value', value)
+      let neighbor_yield = neighbor_tax_rates[index];
+      let neighbor_token = getTokenData(value.token_used, tokens);
+      if (!neighbor_token){
+        console.log("No token?")
+      }
+      else{
+        // Yield is in estark
+        if (!neighbor_token.ratio){
+          income += BigInt(neighbor_yield);
+          detailed_income += `
+          Location: ${value.location} - Yield: ${formatTokenAmount(BigInt(neighbor_yield))} estark
+          `;
+        }
+        else{
+          let adjusted_yield = Math.floor(Number(neighbor_yield) * neighbor_token.ratio);
+          income += BigInt(adjusted_yield);
+          detailed_income += `
+          Location: ${value.location} - Yield: ${formatTokenAmount(BigInt(neighbor_yield))} ${neighbor_token.symbol} (${formatTokenAmount(BigInt(adjusted_yield))} estark)
+          `;
+        }
+      }
+    }
+  });
+
+  let min_price = (Number(income) * 8) * .02;
+
+  return `
+  
+  PotentialIncome: ${formatTokenAmount(income)} estark
+  <detailed_income>
+  ${detailed_income}
+  </detailed_income>;
+
+  Minimum Listing Price For Profit: ${formatTokenAmount(BigInt(min_price))} estark
+
+  `;
+}
