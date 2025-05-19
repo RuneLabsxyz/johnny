@@ -79,7 +79,7 @@ export const calculateLandYield = async (land: any, tokens: TokenPrice[]) => {
           `;
         }
         else{
-          let adjusted_yield = Math.floor(Number(neighbor_yield) * neighbor_token.ratio);
+          let adjusted_yield = Math.floor(Number(neighbor_yield) / neighbor_token.ratio);
           income += BigInt(adjusted_yield);
           detailed_income += `
           Location: ${value.location} - Yield: ${formatTokenAmount(BigInt(neighbor_yield))} ${neighbor_token.symbol} (${formatTokenAmount(BigInt(adjusted_yield))} estark)
@@ -357,7 +357,7 @@ export const get_auction_yield_str = async (location: number) => {
           `;
         }
         else{
-          let adjusted_yield = Math.floor(Number(neighbor_yield) * neighbor_token.ratio);
+          let adjusted_yield = Math.floor(Number(neighbor_yield) / neighbor_token.ratio);
           income += BigInt(adjusted_yield);
           detailed_income += `
           Location: ${value.location} - Yield: ${formatTokenAmount(BigInt(neighbor_yield))} ${neighbor_token.symbol} (${formatTokenAmount(BigInt(adjusted_yield))} estark)
@@ -367,8 +367,7 @@ export const get_auction_yield_str = async (location: number) => {
     }
   });
 
-  let min_price = (Number(income) * 8) * .02;
-
+  let max_price = (Number(income) * 8) / .02;
   return `
   
   PotentialIncome: ${formatTokenAmount(income)} estark
@@ -376,7 +375,7 @@ export const get_auction_yield_str = async (location: number) => {
   ${detailed_income}
   </detailed_income>;
 
-  Minimum Listing Price For Profit: ${formatTokenAmount(BigInt(min_price))} estark
-
+  Maximum Listing Price For Profit: ${formatTokenAmount(BigInt(Math.floor(max_price)))} estark. (If you list for more than this you will lose money)
+  Only bid on auctions if you can list it for less than this, but more than the auction price. 
   `;
 }
