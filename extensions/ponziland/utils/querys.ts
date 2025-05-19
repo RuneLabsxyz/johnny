@@ -57,6 +57,8 @@ export const calculateLandYield = async (land: any, tokens: TokenPrice[]) => {
     }
   }));
 
+  let detailed_income = "";
+
   console.log('tax_rate', tax_rate)
   neighbors.forEach((neighbor: any, index: number) => {
     if (neighbor.activeVariant() == "Land"){
@@ -72,9 +74,16 @@ export const calculateLandYield = async (land: any, tokens: TokenPrice[]) => {
         // Yield is in estark
         if (!neighbor_token.ratio){
           income += BigInt(neighbor_yield);
+          detailed_income += `
+          Location: ${value.location} - Yield: ${formatTokenAmount(BigInt(neighbor_yield))} estark
+          `;
         }
         else{
-          income += BigInt(Math.floor(Number(neighbor_yield) * neighbor_token.ratio));
+          let adjusted_yield = Math.floor(Number(neighbor_yield) * neighbor_token.ratio);
+          income += BigInt(adjusted_yield);
+          detailed_income += `
+          Location: ${value.location} - Yield: ${formatTokenAmount(BigInt(neighbor_yield))} ${neighbor_token.symbol} (${formatTokenAmount(BigInt(adjusted_yield))} estark)
+          `;
         }
       }
     }
@@ -89,7 +98,14 @@ export const calculateLandYield = async (land: any, tokens: TokenPrice[]) => {
 
   console.log('adjusted income', adjusted_income)
 
-  return adjusted_income;
+  return `
+  Income: ${formatTokenAmount(income)} estark
+  <detailed_income>
+  ${detailed_income}
+  </detailed_income>
+  Tax Rate: ${formatTokenAmount(tax_rate)}
+  Net Yield: ${adjusted_income * BigInt(100)}% ( + ${formatTokenAmount(income - tax_rate)} estark)
+  `;
 
 }
 
