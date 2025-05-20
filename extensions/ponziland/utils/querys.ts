@@ -7,20 +7,7 @@ import { balance_query, auction_query, land_query } from "../../../gql_querys";
 import { nuke_query } from "../../../gql_querys";
 import { getAllTokensFromAPI } from "../utils/ponziland_api";
 import view_manifest from "../../../contracts/manifest_sepolia.json";
-
-interface TokenPrice {
-  symbol: string;
-  address: string;
-  ratio: number | null;
-  best_pool: {
-    token0: string;
-    token1: string;
-    fee: string;
-    tick_spacing: number;
-    extension: string;
-  } | null;
-}
-
+import { getTokenData, calculateLandYield, formatTokenAmount } from "../utils/utils";
 let provider = new RpcProvider({ nodeUrl: process.env.STARKNET_RPC_URL });
 let abi = manifest.contracts[0].abi;
 
@@ -31,95 +18,7 @@ let viewContract = (new Contract(view_manifest.contracts[0].abi, view_manifest.c
 let ponzilandAddress = manifest.contracts[0].address;
 let block_time = (await provider.getBlock()).timestamp;
 
-const getTokenData = (tokenAddr: string | number, tokens: TokenPrice[]): TokenPrice => {
-  for (const token of tokens) {
-    if (BigInt(token.address) === BigInt(tokenAddr)) {
-      return token;
-    }
-  }
-  return null;
-};
 
-export const calculateLandYield = async (land: any, tokens: TokenPrice[]) => {
-  let token = getTokenData(land.token_used, tokens);
-  let tax_rate = await viewContract.get_tax_rate_per_neighbor(land.location);
-  console.log('tax rate', tax_rate)
-  if (token.ratio){
-    tax_rate = tax_rate * token.ratio;
-  }
-  let neighbors = await viewContract.get_neighbors(land.location);
-  let income = BigInt(0);
-
-  let neighbor_tax_rates = await Promise.all(neighbors.map(async (neighbor: any) => {
-    if (neighbor.activeVariant() == "Land"){
-      let value = neighbor.unwrap();
-      return await viewContract.get_tax_rate_per_neighbor(value.location);
-    }
-  }));
-
-  let detailed_income = "";
-
-  console.log('tax_rate', tax_rate)
-  neighbors.forEach((neighbor: any, index: number) => {
-    if (neighbor.activeVariant() == "Land"){
-
-        let value = neighbor.unwrap();
-        console.log('value', value)
-      let neighbor_yield = neighbor_tax_rates[index];
-      let neighbor_token = getTokenData(value.token_used, tokens);
-      if (!neighbor_token){
-        console.log("No token?")
-      }
-      else{
-        // Yield is in estark
-        if (!neighbor_token.ratio){
-          income += BigInt(neighbor_yield);
-          detailed_income += `
-          Location: ${value.location} - Yield: ${formatTokenAmount(BigInt(neighbor_yield))} estark
-          `;
-        }
-        else{
-          let adjusted_yield = Math.floor(Number(neighbor_yield) / neighbor_token.ratio);
-          income += BigInt(adjusted_yield);
-          detailed_income += `
-          Location: ${value.location} - Yield: ${formatTokenAmount(BigInt(neighbor_yield))} ${neighbor_token.symbol} (${formatTokenAmount(BigInt(adjusted_yield))} estark)
-          `;
-        }
-      }
-    }
-  });
-
-  console.log('income', income)
-
-  if (tax_rate == 0){
-    return 0;
-  }
-  let adjusted_income = BigInt(income) / BigInt(tax_rate);
-
-  console.log('adjusted income', adjusted_income)
-
-  return `
-  Income: ${formatTokenAmount(income)} estark
-  <detailed_income>
-  ${detailed_income}
-  </detailed_income>
-  Tax Rate: ${formatTokenAmount(tax_rate)}
-  Net Yield: ${adjusted_income * BigInt(100)}% ( + ${formatTokenAmount(income - tax_rate)} estark)
-  `;
-
-}
-
-const formatTokenAmount = (amount: bigint): string => {
-  const divisor = BigInt(10 ** 18);
-  const wholePart = amount / divisor;
-  const fractionalPart = amount % divisor;
-  
-  // Convert fractional part to 4 decimal places
-  const fractionalStr = fractionalPart.toString().padStart(18, '0');
-  const decimalPlaces = fractionalStr.slice(0, 4);
-  
-  return `${wholePart}.${decimalPlaces}`;
-};
 
 export const get_balances = async () => {
   // Retrieve balance and allowance info for each token via the contracts array.
@@ -378,4 +277,88 @@ export const get_auction_yield_str = async (location: number) => {
   Maximum Listing Price For Profit: ${formatTokenAmount(BigInt(Math.floor(max_price)))} estark. (If you list for more than this you will lose money)
   Only bid on auctions if you can list it for less than this, but more than the auction price. 
   `;
+}
+
+
+export const get_owned_lands = async () => {
+  let lands = await fetchGraphQL(
+    env.GRAPHQL_URL + "/graphql",
+    land_query,
+    {}
+  ).then((res: any) => res?.ponziLandLandModels?.edges?.map((edge: any) => edge?.node));
+
+  if (!lands) {
+    return "You do not own any lands, so you have no claims"
+  }
+
+  return lands;
+}
+
+export const calculateLandYield = async (land: any, tokens: TokenPrice[]) => {
+  let token = getTokenData(land.token_used, tokens);
+  let tax_rate = await viewContract.get_tax_rate_per_neighbor(land.location);
+  console.log('tax rate', tax_rate)
+  if (token.ratio){
+    tax_rate = tax_rate * token.ratio;
+  }
+  let neighbors = await viewContract.get_neighbors(land.location);
+  let income = BigInt(0);
+
+  let neighbor_tax_rates = await Promise.all(neighbors.map(async (neighbor: any) => {
+    if (neighbor.activeVariant() == "Land"){
+      let value = neighbor.unwrap();
+      return await viewContract.get_tax_rate_per_neighbor(value.location);
+    }
+  }));
+
+  let detailed_income = "";
+
+  console.log('tax_rate', tax_rate)
+  neighbors.forEach((neighbor: any, index: number) => {
+    if (neighbor.activeVariant() == "Land"){
+
+        let value = neighbor.unwrap();
+        console.log('value', value)
+      let neighbor_yield = neighbor_tax_rates[index];
+      let neighbor_token = getTokenData(value.token_used, tokens);
+      if (!neighbor_token){
+        console.log("No token?")
+      }
+      else{
+        // Yield is in estark
+        if (!neighbor_token.ratio){
+          income += BigInt(neighbor_yield);
+          detailed_income += `
+          Location: ${value.location} - Yield: ${formatTokenAmount(BigInt(neighbor_yield))} estark
+          `;
+        }
+        else{
+          let adjusted_yield = Math.floor(Number(neighbor_yield) / neighbor_token.ratio);
+          income += BigInt(adjusted_yield);
+          detailed_income += `
+          Location: ${value.location} - Yield: ${formatTokenAmount(BigInt(neighbor_yield))} ${neighbor_token.symbol} (${formatTokenAmount(BigInt(adjusted_yield))} estark)
+          `;
+        }
+      }
+    }
+  });
+
+  console.log('income', income)
+
+  if (tax_rate == 0){
+    return 0;
+  }
+  let adjusted_income = BigInt(income) / BigInt(tax_rate);
+
+  console.log('adjusted income', adjusted_income)
+
+  return `
+  Income: ${formatTokenAmount(income)} estark
+  <detailed_income>
+  ${detailed_income}
+  </detailed_income>
+  Tax Rate: ${formatTokenAmount(tax_rate)}
+  Net Yield: ${adjusted_income * BigInt(100)}% ( + ${formatTokenAmount(income - tax_rate)} estark)
+  `;
+
 }

@@ -15,7 +15,7 @@ import { get_auctions, get_claims, get_neighbors, get_all_lands, get_owned_lands
 import { bid } from "./actions/ponziland/bid";
 import { buy } from "./actions/ponziland/buy";
 import { increase_price, level_up, increase_stake } from "./actions/ponziland/misc";
-
+import { claim_all } from "./actions/ponziland/claim";
 
 const template = `
   <character_info>
@@ -187,6 +187,7 @@ export const ponziland = (chain: StarknetChain) => {
     increase_stake(chain),
     increase_price(chain),
     get_auction_yield(chain),
+    claim_all(chain),
   ],
 
   });

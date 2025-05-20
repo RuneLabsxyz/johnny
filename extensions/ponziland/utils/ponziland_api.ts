@@ -1,6 +1,6 @@
 import { PoolKey } from '../../../types';
 
-interface TokenPrice {
+export interface TokenPrice {
   symbol: string;
   address: string;
   ratio: number | null;
