@@ -135,7 +135,7 @@ export const ponziland_check = (chain: StarknetChain) => input({
         let lands = await get_lands_str()
         let balance = await get_balances()
 
-        let guide = await get_context(chain);
+        let guide = await CONTEXT();
 
         let context = {
           id: "ponziland",
@@ -144,7 +144,7 @@ export const ponziland_check = (chain: StarknetChain) => input({
           goal: goal,
           character: character,
           personality: personality,
-          context: CONTEXT,
+          context: guide,
         }
 
         console.log('ponziland context', context);
