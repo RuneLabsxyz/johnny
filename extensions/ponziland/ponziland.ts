@@ -1,9 +1,8 @@
-import { action, ActionCall, Agent, context, extension, formatXml, input } from "../../../fork/daydreams/packages/core/src";
+import { action, type ActionCall, type Agent, context, extension, formatXml, input } from "../../../fork/daydreams/packages/core/src";
 import { z } from "zod";
 import { render } from "../../../fork/daydreams/packages/core/src";
 import { StarknetChain } from "../../../fork/daydreams/packages/defai/src";
 import manifest  from "../../contracts/manifest_sepolia.json"
-import { Contract, Abi, Call } from "starknet";
 import { character, personality } from "../../characters/ponzius";
 
 
@@ -97,6 +96,7 @@ const ponzilandContext = context({
   },
 
   render({ memory }) {
+
     return render(template, {
       guide: CONTEXT,
       lands: memory.lands,
@@ -104,7 +104,6 @@ const ponzilandContext = context({
       goal: memory.goal,
       character: character,
       personality: personality,
-      context: CONTEXT,
     });
   },
 });
@@ -135,6 +134,8 @@ export const ponziland_check = (chain: StarknetChain) => input({
 
         let lands = await get_lands_str()
         let balance = await get_balances()
+
+        let guide = await get_context(chain);
 
         let context = {
           id: "ponziland",
@@ -171,7 +172,7 @@ export const ponziland = (chain: StarknetChain) => {
     ponziland: ponzilandContext,
   },
   inputs: {
- //   "ponziland_check": ponziland_check(chain),
+    "ponziland_check": ponziland_check(chain),
   },
   actions: [
     get_owned_lands(chain),

@@ -13,14 +13,18 @@ import { orchard } from "./extensions/orchard";
 import { ponziland } from "./extensions/ponziland/ponziland";
 import { discord } from "./extensions/discord";
 import { Logger } from "../fork/daydreams/packages/core/src";
+import { env } from "env";
+
 
 let openrouter = createOpenRouter({
   apiKey: process.env.OPENROUTER_API_KEY!,
 });
 
-const chain = new StarknetChain({rpcUrl: process.env.STARKNET_RPC_URL ?? "", 
-                                  address: process.env.STARKNET_ADDRESS ?? "",
-                                  privateKey: process.env.STARKNET_PRIVATE_KEY ?? "" 
+
+
+const chain = new StarknetChain({rpcUrl: env.STARKNET_RPC_URL ?? "", 
+                                  address: env.STARKNET_ADDRESS ?? "",
+                                  privateKey: env.STARKNET_PRIVATE_KEY ?? "" 
 })
 
 const logger = new Logger({
@@ -32,7 +36,8 @@ let c = consciousness("Give me a brief thought you want to share on social media
 const agent = createDreams({
   logger: logger,
   model: openrouter("google/gemini-2.0-flash-001"),
-  extensions: [discord, twitter, 
+  extensions: [discord, 
+    //twitter, 
     ponziland(chain)
     ],
   memory: {

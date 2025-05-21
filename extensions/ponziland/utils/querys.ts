@@ -7,7 +7,7 @@ import { balance_query, auction_query, land_query } from "../../../gql_querys";
 import { nuke_query } from "../../../gql_querys";
 import { getAllTokensFromAPI } from "../utils/ponziland_api";
 import view_manifest from "../../../contracts/manifest_sepolia.json";
-import { getTokenData, calculateLandYield, formatTokenAmount } from "../utils/utils";
+import { getTokenData, formatTokenAmount } from "../utils/utils";
 let provider = new RpcProvider({ nodeUrl: process.env.STARKNET_RPC_URL });
 let abi = manifest.contracts[0].abi;
 
@@ -95,7 +95,7 @@ export const get_lands_str = async () => {
 
   let land_str = lands.map((land: any, index: number) => 
     `location: ${BigInt(land.location).toString()} - 
-    Token: ${getTokenData(land.token_used, tokens).symbol}
+    Token: ${getTokenData(land.token_used, tokens)?.symbol}
     Remaining Stake Time: ${nuke_time[index]/BigInt(60)} minutes
 
 

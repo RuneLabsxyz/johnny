@@ -1,4 +1,5 @@
 import { z } from "zod";
+import minimist from "minimist";
 
 const envSchema = z.object({
     TWITTER_USERNAME: z.string(),
@@ -15,4 +16,5 @@ const envSchema = z.object({
         .preprocess((val) => val === "1" || val === "true", z.boolean())
         .default(true),
 });
+
 export const env = envSchema.parse(process.env);
