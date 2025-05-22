@@ -32,6 +32,7 @@ const logger = new Logger({
 
 let c = consciousness("Give me a brief thought you want to share on social media considering the following character information: " + personality + `don't make the post itself, just give the general topic or idea. You are giving the instruction for someone else to write the tweet itself. Only give 1 and make it conscise and coherent about a single thing. DO NOT INCLUDE HASHTAGS EVER `)
 
+console.log(getPersonality())
 const agent = createDreams({
   logger: logger,
   model: openrouter("google/gemini-2.0-flash-001"),

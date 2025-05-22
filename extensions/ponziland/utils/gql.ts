@@ -1,5 +1,10 @@
+import { env } from '../../../env';
+
+const address = env.STARKNET_ADDRESS;
+
+
 export const balance_query = `query GetTokenBalances {
-    tokenBalances(accountAddress:"0xd29355d204c081b3a12c552cae38e0ffffb3e28c9dd956bee6466f545cf38a"){
+    tokenBalances(accountAddress:"${address}"){
       edges{
         node{
           tokenMetadata{
@@ -30,7 +35,7 @@ export const auction_query = `query GetActiveAuctions {
   }`
   
 export const land_query = `query GetOwnedLands {
-ponziLandLandModels(where:{owner:"0x00d29355d204c081b3a12c552cae38e0ffffb3e28c9dd956bee6466f545cf38a"}){
+ponziLandLandModels(where:{owner:"${address}"){
   edges{
     node{
       location
@@ -40,14 +45,4 @@ ponziLandLandModels(where:{owner:"0x00d29355d204c081b3a12c552cae38e0ffffb3e28c9d
   }
   }
 
-  }`
-
-  export const nuke_query = `query GetNukeableLands {
-    ponziLandLandModels(where:{stake_amount: "0"}){
-      edges{
-        node{
-          location
-        }
-      }
-    }
   }`

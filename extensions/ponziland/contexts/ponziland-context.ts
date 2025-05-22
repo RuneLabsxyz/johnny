@@ -1,4 +1,4 @@
-import { get_balances_str, get_auctions_str, get_lands_str, get_claims_str, get_nukeable_lands_str, get_neighbors_str } from "../utils/querys";
+import { get_balances_str, get_auctions_str, get_lands_str, get_claims_str, get_neighbors_str } from "../utils/querys";
 import { render } from "../../../../fork/daydreams/packages/core/src/formatters";
 /*
 s contract before you can use them.

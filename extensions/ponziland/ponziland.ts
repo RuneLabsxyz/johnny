@@ -92,6 +92,7 @@ const ponzilandContext = context({
       lands: state.args.lands,
       balance: state.args.balance,
       goal: state.args.goal,
+      personality: state.args.personality,
     };
   },
 
@@ -102,7 +103,7 @@ const ponzilandContext = context({
       lands: memory.lands,
       balance: memory.balance,
       goal: memory.goal,
-      personality: personality,
+      personality: memory.personality,
     });
   },
 });

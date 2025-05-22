@@ -8,6 +8,8 @@ import { service } from "../../fork/daydreams/packages/core/src";
 import { LogLevel } from "../../fork/daydreams/packages/core/src"
 import { personality } from "../characters/ponzius";
 import { env } from "../env";
+import { getPersonality } from "../env";
+
 const discordService = service({
   register(container) {
     container.singleton(
@@ -36,7 +38,7 @@ const discordChannelContext = context({
       channelId: state.channelId,
       context: state.context,
       userId: state.userId,
-      personality: personality,
+      personality: state.personality,
     };
   },
 
@@ -114,6 +116,8 @@ export const discord = extension({
           }
 
          // console.log(context);
+
+         let personality = getPersonality()
 
           send(
             discord.contexts!.discordChannel,
