@@ -3,13 +3,13 @@ import { z } from "zod";
 import { render } from "../../../fork/daydreams/packages/core/src";
 import { StarknetChain } from "../../../fork/daydreams/packages/defai/src";
 import manifest  from "../../contracts/manifest_sepolia.json"
-import { character, personality } from "../../characters/ponzius";
 
 
 import { CONTEXT } from "./contexts/ponziland-context";
 
-import { get_balances, get_lands_str } from "./utils/querys";
+import { get_balances_str, get_lands_str } from "./utils/querys";
 import { get_auctions, get_claims, get_neighbors, get_all_lands, get_owned_lands, get_context, get_auction_yield } from "./actions/ponziland/querys";
+import { get_balances } from "./actions/get-balances";
 
 import { bid } from "./actions/ponziland/bid";
 import { buy } from "./actions/ponziland/buy";
@@ -18,8 +18,6 @@ import { claim_all } from "./actions/ponziland/claim";
 
 const template = `
   <character_info>
-    {{character}}
-
     {{personality}}
   </character_info>
 
@@ -133,7 +131,7 @@ export const ponziland_check = (chain: StarknetChain) => input({
         let goal = "Build your bitcoin empire in ponziland"
 
         let lands = await get_lands_str()
-        let balance = await get_balances()
+        let balance = await get_balances_str()
 
         let guide = await CONTEXT();
 
@@ -142,7 +140,6 @@ export const ponziland_check = (chain: StarknetChain) => input({
           lands: lands,
           balance: balance,
           goal: goal,
-          character: character,
           personality: personality,
           context: guide,
         }
@@ -164,7 +161,7 @@ export const ponziland_check = (chain: StarknetChain) => input({
   },
 });
 
-export const ponziland = (chain: StarknetChain) => {
+export const ponziland = (chain: StarknetChain, personality?: string) => {
 
   return extension({
   name: "ponziland",

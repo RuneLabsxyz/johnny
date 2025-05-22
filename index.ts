@@ -1,4 +1,4 @@
-import { Action, createDreams, createMemoryStore, LogLevel, memory, action, ActionCall, input, formatXml } from "../fork/daydreams/packages/core/src";
+import { createDreams, createMemoryStore, LogLevel, memory, action, input, formatXml } from "../fork/daydreams/packages/core/src";
 import { createOpenRouter } from "@openrouter/ai-sdk-provider";
 import { createChromaVectorStore } from "../fork/daydreams/packages/chroma/src";
 import { createGroq } from "@ai-sdk/groq";
@@ -15,14 +15,12 @@ import { discord } from "./extensions/discord";
 import { Logger } from "../fork/daydreams/packages/core/src";
 import { env } from "env";
 import { ChromaClient, GoogleGenerativeAiEmbeddingFunction } from "chromadb";
-
+import { getPersonality } from "./env";
 
 let openrouter = createOpenRouter({
   apiKey: process.env.OPENROUTER_API_KEY!,
 });
 
-
-console.log(env);
 const chain = new StarknetChain({rpcUrl: env.STARKNET_RPC_URL ?? "", 
                                   address: env.STARKNET_ADDRESS ?? "",
                                   privateKey: env.STARKNET_PRIVATE_KEY ?? "" 
@@ -39,7 +37,7 @@ const agent = createDreams({
   model: openrouter("google/gemini-2.0-flash-001"),
   extensions: [discord, 
     //twitter, 
-    ponziland(chain)
+    ponziland(chain, getPersonality())
     ],
   memory: {
     store: createMemoryStore(),

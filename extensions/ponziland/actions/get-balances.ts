@@ -2,7 +2,7 @@ import { action } from "../../../../fork/daydreams/packages/core/src"
 import { StarknetChain } from "../../../../fork/daydreams/packages/defai/src"
 import { Agent } from "../../../../fork/daydreams/packages/core/src"
 import { z } from "zod"
-import { getBalances } from "../contexts/ponziland-context"
+import { get_balances_str } from "../utils/querys"
 
 
 
@@ -13,7 +13,7 @@ export const get_balances = (chain: StarknetChain) => action({
     async handler(data: {}, ctx: any, agent: Agent) {
         
        //todo
-       let balances = await getBalances();
+       let balances = await get_balances_str();
 
         return balances
 

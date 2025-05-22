@@ -1,4 +1,4 @@
-import { get_balances, get_auctions_str, get_lands_str, get_claims_str, get_nukeable_lands_str, get_neighbors_str } from "../utils/querys";
+import { get_balances_str, get_auctions_str, get_lands_str, get_claims_str, get_nukeable_lands_str, get_neighbors_str } from "../utils/querys";
 import { render } from "../../../../fork/daydreams/packages/core/src/formatters";
 /*
 s contract before you can use them.
@@ -90,7 +90,7 @@ ALL LANDS CAN BE BOUGHT FOR THEIR LISTED SELL PRICE IN THEIR STAKED TOKEN
 
 
 export const CONTEXT = async () => {
-  let balance_str = await get_balances();
+  let balance_str = await get_balances_str();
   let auction_str = await get_auctions_str();
   let land_str = await get_lands_str();
   let claims_str = await get_claims_str();

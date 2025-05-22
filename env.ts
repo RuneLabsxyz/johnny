@@ -1,8 +1,25 @@
 import { z } from "zod";
 import minimist from "minimist";
+import { personality as ponziusPersonality } from "./characters/ponzius";
+import { personality as duckPersonality } from "./characters/duck";
+import { personality as everaiPersonality } from "./characters/everai";
+import { personality as wolfPersonality } from "./characters/wolf";
+import { personality as johnnyPersonality } from "./characters/johnny";
+
+const personalities = {
+    "ponzius": ponziusPersonality,
+    "duck": duckPersonality,
+    "everai": everaiPersonality,
+    "wolf": wolfPersonality,
+    "johnny": johnnyPersonality
+}
 
 const args = minimist(process.argv.slice(2));
 const character = args.character;
+
+export const getPersonality = () => {
+    return personalities[character as keyof typeof personalities] || ponziusPersonality;
+}
 
 export const getEnvWithPrefix = (name: string) => {
     let prefix = name.toUpperCase();
