@@ -102,7 +102,6 @@ const ponzilandContext = context({
       lands: memory.lands,
       balance: memory.balance,
       goal: memory.goal,
-      character: character,
       personality: personality,
     });
   },
