@@ -7,7 +7,7 @@ import { context } from "../../fork/daydreams/packages/core/src";
 import { service } from "../../fork/daydreams/packages/core/src";
 import { LogLevel } from "../../fork/daydreams/packages/core/src"
 import { personality } from "../characters/ponzius";
-
+import { env } from "../env";
 const discordService = service({
   register(container) {
     container.singleton(
@@ -15,8 +15,8 @@ const discordService = service({
       () =>
         new DiscordClient(
           {
-            discord_token: process.env.DISCORD_TOKEN!,
-            discord_bot_name: process.env.DISCORD_BOT_NAME!,
+            discord_token: env.DISCORD_TOKEN!,
+            discord_bot_name: env.DISCORD_BOT_NAME!,
           },
           LogLevel.DEBUG
         )

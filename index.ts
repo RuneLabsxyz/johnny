@@ -14,6 +14,7 @@ import { ponziland } from "./extensions/ponziland/ponziland";
 import { discord } from "./extensions/discord";
 import { Logger } from "../fork/daydreams/packages/core/src";
 import { env } from "env";
+import { ChromaClient, GoogleGenerativeAiEmbeddingFunction } from "chromadb";
 
 
 let openrouter = createOpenRouter({
@@ -21,7 +22,7 @@ let openrouter = createOpenRouter({
 });
 
 
-
+console.log(env);
 const chain = new StarknetChain({rpcUrl: env.STARKNET_RPC_URL ?? "", 
                                   address: env.STARKNET_ADDRESS ?? "",
                                   privateKey: env.STARKNET_PRIVATE_KEY ?? "" 
@@ -42,7 +43,9 @@ const agent = createDreams({
     ],
   memory: {
     store: createMemoryStore(),
-    vector: createChromaVectorStore("agent", "http://localhost:8000"),
+    vector: createChromaVectorStore("agent", "http://localhost:8000", new GoogleGenerativeAiEmbeddingFunction({
+      apiKey: process.env.GOOGLE_API_KEY!,
+    })),
     vectorModel: openrouter("google/gemini-2.0-flash-001"),
   },
   inputs: {

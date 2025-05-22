@@ -1,20 +1,27 @@
 import { z } from "zod";
 import minimist from "minimist";
 
-const envSchema = z.object({
-    TWITTER_USERNAME: z.string(),
-    TWITTER_PASSWORD: z.string(),
-    CHROMA_URL: z.string().default("http://localhost:8000"),
-    STARKNET_RPC_URL: z.string(),
-    STARKNET_ADDRESS: z.string(),
-    STARKNET_PRIVATE_KEY: z.string(),
-    OPENROUTER_API_KEY: z.string(),
-    GRAPHQL_URL: z.string(),
-    DISCORD_TOKEN: z.string(),
-    WEBSOCKET_URL: z.string().default("ws://localhost:8080"),
-    DRY_RUN: z
-        .preprocess((val) => val === "1" || val === "true", z.boolean())
-        .default(true),
-});
+const args = minimist(process.argv.slice(2));
+const character = args.character;
 
-export const env = envSchema.parse(process.env);
+export const getEnvWithPrefix = (name: string) => {
+    let prefix = name.toUpperCase();
+  return {
+    TWITTER_USERNAME: process.env[`${prefix}_TWITTER_USERNAME`],
+    TWITTER_PASSWORD: process.env[`${prefix}_TWITTER_PASSWORD`], 
+    DISCORD_TOKEN: process.env[`${prefix}_DISCORD_TOKEN`],
+    DISCORD_BOT_NAME: process.env[`${prefix}_DISCORD_BOT_NAME`],
+    STARKNET_ADDRESS: process.env[`${prefix}_STARKNET_ADDRESS`],
+    STARKNET_PRIVATE_KEY: process.env[`${prefix}_STARKNET_PRIVATE_KEY`],
+
+    CHROMA_URL: process.env.CHROMA_URL || "http://localhost:8000",
+    STARKNET_RPC_URL: process.env.STARKNET_RPC_URL,
+    OPENROUTER_API_KEY: process.env.OPENROUTER_API_KEY,
+    GRAPHQL_URL: process.env.GRAPHQL_URL,
+    GOOGLE_API_KEY: process.env.GOOGLE_API_KEY,
+    WEBSOCKET_URL: process.env.WEBSOCKET_URL || "ws://localhost:8080",
+    DRY_RUN: process.env.DRY_RUN === "1" || process.env.DRY_RUN === "true"
+  };
+}
+
+export const env = getEnvWithPrefix(character);

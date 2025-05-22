@@ -8,10 +8,14 @@ import { nuke_query } from "../../../gql_querys";
 import { getAllTokensFromAPI } from "../utils/ponziland_api";
 import view_manifest from "../../../contracts/manifest_sepolia.json";
 import { getTokenData, formatTokenAmount } from "../utils/utils";
-let provider = new RpcProvider({ nodeUrl: process.env.STARKNET_RPC_URL });
+import { env } from "../../../env";
+
+
+
+let provider = new RpcProvider({ nodeUrl: env.STARKNET_RPC_URL });
 let abi = manifest.contracts[0].abi;
 
-const address = process.env.STARKNET_ADDRESS!;
+const address = env.STARKNET_ADDRESS!;
 
 let ponziLandContract = (new Contract(abi, manifest.contracts[0].address, provider)).typedv2(abi as Abi);
 let viewContract = (new Contract(view_manifest.contracts[0].abi, view_manifest.contracts[0].address, provider)).typedv2(view_manifest.contracts[0].abi as Abi);
