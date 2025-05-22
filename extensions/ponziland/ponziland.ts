@@ -16,6 +16,8 @@ import { buy } from "./actions/ponziland/buy";
 import { increase_price, level_up, increase_stake } from "./actions/ponziland/misc";
 import { claim_all } from "./actions/ponziland/claim";
 
+import { getPersonality } from "../../env";
+
 const template = `
   <character_info>
     {{personality}}
@@ -134,6 +136,8 @@ export const ponziland_check = (chain: StarknetChain) => input({
         let balance = await get_balances_str()
 
         let guide = await CONTEXT();
+
+        let personality = getPersonality()
 
         let context = {
           id: "ponziland",
