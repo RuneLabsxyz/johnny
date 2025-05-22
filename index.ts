@@ -44,7 +44,7 @@ const agent = createDreams({
   memory: {
     store: createMemoryStore(),
     vector: createChromaVectorStore("agent", "http://localhost:8000", new GoogleGenerativeAiEmbeddingFunction({
-      apiKey: process.env.GOOGLE_API_KEY!,
+      googleApiKey: env.GOOGLE_API_KEY!,
     })),
     vectorModel: openrouter("google/gemini-2.0-flash-001"),
   },
