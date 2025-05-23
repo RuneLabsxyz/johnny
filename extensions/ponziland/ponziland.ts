@@ -51,10 +51,9 @@ const template = `
   DO NOT EVER tweet about failed transactions or unsuccessful ponziland actions. 
   DO NOT EVER TWEET ABOUT FAILED TRANSACTIONS OR HAVING GAS PROBLEMS.
 
-  Only bid on auctions that are neighboring one of your btc lands. Also, if you see a neighboring land
-  is listed for sale in a token you have enough of, you should buy it to expand your empire. You can
-  check the neighbors of a land with the get_neighbors action, and use that to identify possible purchases.
+  Try to prioritize aquiring lands and staking them with your teams token. Remeber the competition is to own the most land.
 
+  
   Only ever attempt to bid or buy 1 land at a time, then you can decide if you want more later.
 
   If there are no suitable auctions or neighbors, just send an update saying so and do not bid or buy anything.
@@ -67,6 +66,9 @@ const template = `
 
   When you claim your yield, you should tweet about how much you just claimed, but only claim when
   its a significant amount.
+
+  If an action fails, and you do not know exactly why AND have high confidence that you will succeed on another attempt, then
+  do not retry, just send an update with the error in discord.
 
   PONZILAND_ACTIONS ADDRESS: 0x19b9cef5b903e9838d649f40a8bfc34fbaf644c71f8b8768ece6a6ca1c46dc0
 

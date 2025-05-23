@@ -284,7 +284,7 @@ export const get_owned_lands = async () => {
 
 export const calculateLandYield = async (land: any, tokens: TokenPrice[]) => {
   let token = getTokenData(land.token_used, tokens);
-  let tax_rate = await viewContract.get_tax_rate_per_neighbor(land.location);
+  let tax_rate = Number(await viewContract.get_tax_rate_per_neighbor(land.location));
   console.log('tax rate', tax_rate)
   if (token.ratio){
     tax_rate = tax_rate * token.ratio;
@@ -346,7 +346,7 @@ export const calculateLandYield = async (land: any, tokens: TokenPrice[]) => {
   ${detailed_income}
   </detailed_income>
   Tax Rate: ${formatTokenAmount(tax_rate)}
-  Net Yield: ${adjusted_income * BigInt(100)}% ( + ${formatTokenAmount(income - tax_rate)} estark)
+  Net Yield: ${adjusted_income * BigInt(100)}% ( + ${formatTokenAmount(income - BigInt(tax_rate))} estark)
   `;
 
 }

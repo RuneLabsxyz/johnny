@@ -81,8 +81,8 @@ export const getTokenData = (tokenAddr: string | number, tokens: TokenPrice[]): 
 
 export const formatTokenAmount = (amount: bigint): string => {
   const divisor = BigInt(10 ** 18);
-  const wholePart = amount / divisor;
-  const fractionalPart = amount % divisor;
+  const wholePart = BigInt(amount) / divisor;
+  const fractionalPart = BigInt(amount) % divisor;
   
   // Convert fractional part to 4 decimal places
   const fractionalStr = fractionalPart.toString().padStart(18, '0');

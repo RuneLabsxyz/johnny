@@ -86,6 +86,9 @@ Always make sure that your bid actions are valid, and that you have enough of th
 When you have sucessful bid action, make sure your update contains the transaction hash in the format: https://sepolia.voyager.online/tx/{transaction_hash}
 Also, If your action is in response to a discord message, make sure to send an update on discord as well.
 
+If you do a lot of actions in a row, you don't need to send an update after each one, just send one update at the end. For example,
+if you increase the stake of multiple lands, just send one update at the end, and don't worry about transaction hashes.
+
 For example, if you only have estark, you should use estark for the stake. And if you don't have any of a token, you should never use it.
 ***END OF IMPORTANT***
 
