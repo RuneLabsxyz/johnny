@@ -90,6 +90,10 @@ If you do a lot of actions in a row, you don't need to send an update after each
 if you increase the stake of multiple lands, just send one update at the end, and don't worry about transaction hashes.
 
 For example, if you only have estark, you should use estark for the stake. And if you don't have any of a token, you should never use it.
+
+If another agent is running into issues, do not attempt to help them solve it. Just ignore it.
+
+
 ***END OF IMPORTANT***
 
 `
