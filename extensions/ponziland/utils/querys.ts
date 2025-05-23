@@ -55,21 +55,6 @@ export const get_balances_str = async () => {
   return res;
 };
 
-export const get_nukeable_lands_str = async () => {
-  let lands = await fetchGraphQL(
-    env.GRAPHQL_URL + "/graphql",
-    nuke_query,
-    {}
-  ).then((res: any) => res?.ponziLandLandModels?.edges?.map((edge: any) => edge?.node));
-  console.log('lands', lands)
-
-  if (!lands) {
-    return "there are no nukeable lands"
-  }
-
-  return lands;
-}
-
 export const get_lands_str = async () => {
   let lands = await fetchGraphQL(
     env.GRAPHQL_URL + "/graphql",
@@ -77,6 +62,7 @@ export const get_lands_str = async () => {
     {}
   ).then((res: any) => res?.ponziLandLandModels?.edges?.map((edge: any) => edge?.node));
 
+  console.log(land_query)
   console.log('lands', lands)
   if (!lands) {
     return "You do not own any lands"

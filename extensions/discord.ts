@@ -101,7 +101,9 @@ export const discord = extension({
 
           let channel = await client.channels.fetch(message.channelId);
 
-          if (!channel || !channel.isTextBased() || channel.id == "1375477437953216633") {
+          let blacklistedChannels = ["1375477437953216633", "1375502718877171794", "1375502743824891964", "1375502867686756534"];
+
+          if (!channel || !channel.isTextBased() || blacklistedChannels.includes(channel.id)) {
             console.log(`Skipping message`, message.content);
             return;
           }

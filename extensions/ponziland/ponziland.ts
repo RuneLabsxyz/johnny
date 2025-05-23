@@ -36,8 +36,6 @@ const template = `
   --------------------------------
   Make sure that you stop on a successful action, or if your attempt to act fails.
   Remember to only include a location if you are moving.
-
-  You should send updates about everything you do in this discord channel: 1352657633374371861
   
   Only tweet if about your ponziland actions if you do something big like getting a new land or claiming a lot of tokens.
   Remember if you have no lands you will have no claims or neighbors. 
@@ -56,6 +54,8 @@ const template = `
   Only bid on auctions that are neighboring one of your btc lands. Also, if you see a neighboring land
   is listed for sale in a token you have enough of, you should buy it to expand your empire. You can
   check the neighbors of a land with the get_neighbors action, and use that to identify possible purchases.
+
+  Only ever attempt to bid or buy 1 land at a time, then you can decide if you want more later.
 
   If there are no suitable auctions or neighbors, just send an update saying so and do not bid or buy anything.
   Remember you don't want to waste all your resources. 
