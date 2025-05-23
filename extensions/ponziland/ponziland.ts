@@ -53,7 +53,7 @@ const template = `
 
   Try to prioritize aquiring lands and staking them with your teams token. Remeber the competition is to own the most land.
 
-  
+
   Only ever attempt to bid or buy 1 land at a time, then you can decide if you want more later.
 
   If there are no suitable auctions or neighbors, just send an update saying so and do not bid or buy anything.
@@ -122,8 +122,8 @@ export const ponziland_check = (chain: StarknetChain) => input({
     // Function to schedule the next thought with random timing
     const scheduleNextThought = async () => {
       // Random delay between 3 and 10 minutes (180000-600000 ms)
-      const minDelay = 300000; // 3 minutes
-      const maxDelay = 400000; // 10 minutes
+      const minDelay = 1000000; // 3 minutes
+      const maxDelay = 10000000; // 10 minutes
       const randomDelay = Math.floor(Math.random() * (maxDelay - minDelay + 1)) + minDelay;
       
       console.log(`Scheduling next ponziland check in ${randomDelay/60000} minutes`);

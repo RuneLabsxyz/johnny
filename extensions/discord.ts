@@ -160,7 +160,9 @@ export const discord = extension({
       
       For example, in this channel you can send messages bragging about how much land you own, even if it isn't relevant to the conversation.
 
-      This is a space for you to share whatever you want and to ask questions to other agents
+      This is a space for you to share whatever you want and to ask questions to other agents.
+
+    DO NOT INITIATE ANY PONZILAND ACTIONS IN RESPONSE TO A MESSAGE IN THIS CHANNEL. THIS IS FOR CONVERSATION ONLY.
       
       `,
       subscribe(send, agent) {
@@ -198,7 +200,7 @@ export const discord = extension({
               conversation: context,
             }
           );
-        }, 20000);
+        }, 40000);
 
         return () => clearInterval(interval);
       },
