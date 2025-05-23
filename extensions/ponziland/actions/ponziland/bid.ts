@@ -1,10 +1,8 @@
-import { action } from "../../../../../fork/daydreams/packages/core/src"
+import { action, type ActionSchema } from "../../../../../fork/daydreams/packages/core/src"
 import { StarknetChain } from "../../../../../fork/daydreams/packages/defai/src"
-import { ActionCall } from "../../../../../fork/daydreams/packages/core/src"
-import { Agent } from "../../../../../fork/daydreams/packages/core/src"
 import { z } from "zod"
-import { Abi, CallData, Contract, cairo } from "starknet";
-import { Call } from "starknet";
+import { type Abi, CallData, Contract, cairo } from "starknet";
+import { type Call } from "starknet";
 import { getLiquidityPoolFromAPI } from "../../utils/ponziland_api"
 import { decodeTokenTransferEvents } from "../../utils/utils";
 import manifest from "../../../../contracts/manifest_sepolia.json";
@@ -19,11 +17,10 @@ export const bid = (chain: StarknetChain) => action({
         token_for_sale: z.string().describe("The *Contract address* of the token to be used for the stake and new listing. This can be found by querying your balances. This should be a token in your wallet that you have enough of."),
         sell_price: z.string().describe("The price the land will be listed for after the auction ends (in wei, so x10^18)"),
         amount_to_stake: z.string().describe("The amount to be staked to pay the lands taxes (in wei, so x10^18)"),
-    }),
+    }) as ActionSchema,
     async handler(data, ctx, agent) {
 
         let calls = [];
-
 
         let estark_address = "0x071de745c1ae996cfd39fb292b4342b7c086622e3ecf3a5692bd623060ff3fa0";
         let ponziland_address = ponziland_manifest.contracts[0].address;

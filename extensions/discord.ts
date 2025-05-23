@@ -56,6 +56,10 @@ const discordChannelContext = context({
       7. Even basic hello or gm messages should not be responded to unless you are specifically tagged or mentioned.
       8. Remember that you are in a public channel and you should only be considered mentioned when directly addressed or tagged.
       10. If you are not directly relevant to the conversation or incoming message, assume you should not reply
+      11. Do not tag people in messages unless it is a direct response to them tagging you. Never do it unprompted
+      12. Even if you are taged in a message, do not reply if you have already replied to similar previous message. do not repeat yourself or get stuck in loops
+      13. If a conversation is not going anywhere, you should stop responding
+      14. When it is appropriate for you to tag someone, you should be very careful to ensure you are tagging the right person.
       
       `;
   },
@@ -97,7 +101,8 @@ export const discord = extension({
 
           let channel = await client.channels.fetch(message.channelId);
 
-          if (!channel || !channel.isTextBased()) {
+          if (!channel || !channel.isTextBased() || channel.id == "1375477437953216633") {
+            console.log(`Skipping message`, message.content);
             return;
           }
 
@@ -142,8 +147,60 @@ export const discord = extension({
         };
       },
     }),
-  },
+    "agent_channel:check": input({
+      schema: z.object({
+        conversation: z.string(),
+      }),
+      description: `
+      This is is an update on a special channel just for agents where you can discuss the game with each other. Since you are all competing
+      in the ponziland tournament to claim the most land for your community, you can also use this channel strategically and for friendly trash talk.
+      In this channel, you can ignore the typical rules for sending messages, and feel free to send whatever messages you want.
+      
+      For example, in this channel you can send messages bragging about how much land you own, even if it isn't relevant to the conversation.
 
+      This is a space for you to share whatever you want and to ask questions to other agents.
+      
+      `,
+      subscribe(send, agent) {
+        const { container } = agent;
+
+        // Check mentions every minute
+        const interval = setInterval(async () => {
+
+          const { client } = container.resolve<DiscordClient>("discord");
+
+          let channelId = "1375477437953216633";
+          let channel = await client.channels.fetch(channelId);
+
+          let messages = await channel.messages.fetch({ limit: 15 });
+
+          let sortedMessages = messages.sort((a, b) => a.createdTimestamp - b.createdTimestamp);
+
+          let context = "";
+          let i = 0;
+
+          for (const message of sortedMessages) {
+            context += `From: @${message[1].author.displayName} (id: ${message[1].author.id}) (timestamp: ${message[1].createdTimestamp}) - ${message[1].content} \n`;            
+          }
+
+         // console.log(context);
+
+         let personality = getPersonality()
+
+          send(
+            discord.contexts!.discordChannel,
+            { channelId: channelId, context: context, personality: personality },
+            {
+              context: context,
+              personality: personality,
+              conversation: context,
+            }
+          );
+        }, 20000);
+
+        return () => clearInterval(interval);
+      },
+    })},  
   actions: [
     action({
       name: "discord:send_message",
