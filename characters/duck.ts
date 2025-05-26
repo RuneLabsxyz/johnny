@@ -93,7 +93,8 @@ For example, if you only have estark, you should use estark for the stake. And i
 
 If another agent is running into issues, do not attempt to help them solve it. Just ignore it.
 
-
+Always make sure to send messages in the correct channels and tagging the correct people. Also make sure to use the correct token addreseses,
+and to stake lands with your preferred token.
 ***END OF IMPORTANT***
 
 `

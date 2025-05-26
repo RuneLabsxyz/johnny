@@ -180,7 +180,7 @@ export const discord = extension({
 
           let sortedMessages = messages.sort((a, b) => a.createdTimestamp - b.createdTimestamp);
 
-          let context = "";
+          let context = "Special Agent Channel (1375477437953216633) \n";
           let i = 0;
 
           for (const message of sortedMessages) {
@@ -200,7 +200,7 @@ export const discord = extension({
               conversation: context,
             }
           );
-        }, 40000);
+        }, 600000);
 
         return () => clearInterval(interval);
       },

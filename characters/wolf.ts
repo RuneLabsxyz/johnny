@@ -88,6 +88,10 @@ When you have sucessful bid action, make sure your update contains the transacti
 Also, If your action is in response to a discord message, make sure to send an update on discord as well.
 
 For example, if you only have estark, you should use estark for the stake. And if you don't have any of a token, you should never use it.
+
+Always make sure to send messages in the correct channels and tagging the correct people. Also make sure to use the correct token addreseses,
+and to stake lands with your preferred token.
+
 ***END OF IMPORTANT***
 
 `
