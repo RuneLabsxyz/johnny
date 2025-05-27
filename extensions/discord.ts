@@ -175,42 +175,57 @@ export const discord = extension({
       `,
       subscribe(send, agent) {
         const { container } = agent;
+        let timeout: ReturnType<typeof setTimeout>;
 
-        // Check mentions every minute
-        const interval = setInterval(async () => {
+        // Function to schedule the next check with random timing
+        const scheduleNextCheck = async () => {
+          // Random delay between 5 and 15 minutes (300000-900000 ms)
+          const minDelay = 450000; // 5 minutes
+          const maxDelay = 600000; // 15 minutes
+          const randomDelay = Math.floor(Math.random() * (maxDelay - minDelay + 1)) + minDelay;
+          
+          console.log(`Scheduling next agent channel check in ${randomDelay/60000} minutes`);
+          
+          timeout = setTimeout(async () => {
+            const { client } = container.resolve<DiscordClient>("discord");
 
-          const { client } = container.resolve<DiscordClient>("discord");
+            let channelId = "1375477437953216633";
+            let channel = await client.channels.fetch(channelId);
 
-          let channelId = "1375477437953216633";
-          let channel = await client.channels.fetch(channelId);
+            let messages = await channel.messages.fetch({ limit: 15 });
 
-          let messages = await channel.messages.fetch({ limit: 15 });
+            let sortedMessages = messages.sort((a, b) => a.createdTimestamp - b.createdTimestamp);
 
-          let sortedMessages = messages.sort((a, b) => a.createdTimestamp - b.createdTimestamp);
+            let context = "Special Agent Channel (1375477437953216633) \n";
+            let i = 0;
 
-          let context = "Special Agent Channel (1375477437953216633) \n";
-          let i = 0;
-
-          for (const message of sortedMessages) {
-            context += `From: @${message[1].author.displayName} (id: ${message[1].author.id}) (timestamp: ${message[1].createdTimestamp}) - ${message[1].content} \n`;            
-          }
-
-         // console.log(context);
-
-         let personality = getPersonality()
-
-          send(
-            discord.contexts!.discordChannel,
-            { channelId: channelId, context: context, personality: personality },
-            {
-              context: context,
-              personality: personality,
-              conversation: context,
+            for (const message of sortedMessages) {
+              context += `From: @${message[1].author.displayName} (id: ${message[1].author.id}) (timestamp: ${message[1].createdTimestamp}) - ${message[1].content} \n`;            
             }
-          );
-        }, 600000);
 
-        return () => clearInterval(interval);
+           // console.log(context);
+
+           let personality = getPersonality()
+
+            send(
+              discord.contexts!.discordChannel,
+              { channelId: channelId, context: context, personality: personality },
+              {
+                context: context,
+                personality: personality,
+                conversation: context,
+              }
+            );
+            
+            // Schedule the next check
+            scheduleNextCheck();
+          }, randomDelay);
+        };
+        
+        // Start the first check cycle
+        scheduleNextCheck();
+
+        return () => clearTimeout(timeout);
       },
     })},  
   actions: [
