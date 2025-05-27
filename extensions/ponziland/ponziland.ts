@@ -180,6 +180,7 @@ export const ponziland = (chain: StarknetChain, personality?: string) => {
   },
   inputs: {
     "ponziland_check": ponziland_check(chain),
+    "claim_all": claim_all(chain),
   },
   actions: [
     get_owned_lands(chain),
