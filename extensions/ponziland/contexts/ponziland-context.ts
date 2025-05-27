@@ -62,6 +62,8 @@ ALL LANDS CAN BE BOUGHT FOR THEIR LISTED SELL PRICE IN THEIR STAKED TOKEN
 - DO NOT fetch auctions when a user wants to buy a land, only fetch neighbors.
 - Buying a land is NOT AN AUCTION, it is a direct purchase into a neighboring land.
 - Be careful to use the correct querys for the request, and only use querys that are relevant to the request.
+- If your land is losing money, you should NOT increase its stake so you can get rid of it. Only increase stake on lands you want to keep.
+- Never bid on an auction if you cannot list it for a price where it will be profitable, that is also less than the auction price.
 </IMPORTANT_RULES>
 
 <querys>
