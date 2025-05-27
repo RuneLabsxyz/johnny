@@ -53,7 +53,6 @@ const template = `
 
   Try to prioritize aquiring lands and staking them with your teams token. Remeber the competition is to own the most land.
 
-
   Only ever attempt to bid or buy 1 land at a time, then you can decide if you want more later.
 
   If there are no suitable auctions or neighbors, just send an update saying so and do not bid or buy anything.
@@ -69,6 +68,11 @@ const template = `
 
   If an action fails, and you do not know exactly why AND have high confidence that you will succeed on another attempt, then
   do not retry, just send an update with the error in discord.
+
+  If you want to increase the stake of multiple lands at once, you should use the increase_stake action with an array of calls.
+  Always do them all in the same action call, never split them up.
+
+  If you have an error always make sure to include the error message in your update.
 
   PONZILAND_ACTIONS ADDRESS: 0x19b9cef5b903e9838d649f40a8bfc34fbaf644c71f8b8768ece6a6ca1c46dc0
 
