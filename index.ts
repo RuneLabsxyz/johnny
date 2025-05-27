@@ -16,6 +16,7 @@ import { Logger } from "../fork/daydreams/packages/core/src";
 import { env } from "env";
 import { ChromaClient, GoogleGenerativeAiEmbeddingFunction } from "chromadb";
 import { getPersonality } from "./env";
+import { swap } from "./extensions/ponziland/actions/swap";
 
 let openrouter = createOpenRouter({
   apiKey: process.env.OPENROUTER_API_KEY!,
@@ -50,6 +51,7 @@ const agent = createDreams({
   inputs: {
     consciousness: c,
   },
+  actions: [swap(chain)],
   streaming: false,
 }); 
 

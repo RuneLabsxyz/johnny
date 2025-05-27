@@ -9,6 +9,7 @@ import { LogLevel } from "../../fork/daydreams/packages/core/src"
 import { personality } from "../characters/ponzius";
 import { env } from "../env";
 import { getPersonality } from "../env";
+import { lookupUserByProvider } from "./ponziland/utils/ponziland_api";
 
 const discordService = service({
   register(container) {
@@ -89,9 +90,9 @@ export const discord = extension({
       async subscribe(send, { container }) {
         async function listener(message: Message) {
           if (
-            message.author.displayName ==
+            message.author.displayName.toLowerCase() ==
             container.resolve<DiscordClient>("discord").credentials
-              .discord_bot_name
+              .discord_bot_name.toLowerCase()
           ) {
             console.log(
               `Skipping message from ${container.resolve<DiscordClient>("discord").credentials.discord_bot_name}`
@@ -107,6 +108,11 @@ export const discord = extension({
             console.log(`Skipping message`, message.content);
             return;
           }
+
+
+          let sociallink_res = await lookupUserByProvider("discord", "knownasred");
+
+          console.log('sociallink', sociallink_res);
 
           let messages = await channel.messages.fetch({ limit: 15 });
 

@@ -37,6 +37,7 @@ export const getEnvWithPrefix = (name: string) => {
     GRAPHQL_URL: process.env.GRAPHQL_URL,
     GOOGLE_API_KEY: process.env.GOOGLE_API_KEY,
     WEBSOCKET_URL: process.env.WEBSOCKET_URL || "ws://localhost:8080",
+    SOCIALINK_API_KEY: process.env.SOCIALINK_API_KEY,
     DRY_RUN: process.env.DRY_RUN === "1" || process.env.DRY_RUN === "true"
   };
 }
