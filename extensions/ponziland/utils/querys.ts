@@ -55,10 +55,10 @@ export const get_balances_str = async () => {
   return res;
 };
 
-export const get_lands_str = async () => {
+export const get_lands_str = async (address: string) => {
   let lands = await fetchGraphQL(
     env.GRAPHQL_URL + "/graphql",
-    land_query,
+    land_query(address),
     {}
   ).then((res: any) => res?.ponziLandLandModels?.edges?.map((edge: any) => edge?.node));
 
@@ -99,7 +99,7 @@ export const get_lands_str = async () => {
 export const get_claims_str = async () => {
   let lands = await fetchGraphQL(
     env.GRAPHQL_URL + "/graphql",
-    land_query,
+    land_query(address),
     {}
   ).then((res: any) => res?.ponziLandLandModels?.edges?.map((edge: any) => edge?.node));
 
@@ -267,16 +267,23 @@ export const get_auction_yield_str = async (location: number) => {
   `;
 }
 
+export const get_player_lands_str = async (address: string) => {
+  let lands = await fetchGraphQL(
+    env.GRAPHQL_URL + "/graphql",
+    land_query(address),
+    {}
+  ).then((res: any) => res?.ponziLandLandModels?.edges?.map((edge: any) => edge?.node));
+}
 
 export const get_owned_lands = async () => {
   let lands = await fetchGraphQL(
     env.GRAPHQL_URL + "/graphql",
-    land_query,
+    land_query(address),
     {}
   ).then((res: any) => res?.ponziLandLandModels?.edges?.map((edge: any) => edge?.node));
 
   if (!lands) {
-    return "You do not own any lands, so you have no claims"
+    return "You do not own any lands"
   }
 
   return lands;

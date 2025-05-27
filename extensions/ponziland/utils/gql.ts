@@ -34,7 +34,7 @@ export const auction_query = `query GetActiveAuctions {
     }
   }`
   
-export const land_query = `query GetOwnedLands {
+export const land_query = (address: string) => `query GetOwnedLands {
   ponziLandLandModels(where:{owner:"${address}"}){
     edges{
       node{

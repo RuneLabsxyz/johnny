@@ -70,7 +70,7 @@ export async function getLiquidityPoolFromAPI(tokenAddress: string): Promise<Poo
 export async function lookupUserByProvider(
   provider: string, 
   username: string,
-  baseUrl: string = 'https://socialink.ponzi.land'
+  baseUrl: string = 'https://socialink-sepolia.ponzi.land'
 ): Promise<UserLookupResponse> {
   try {
     const url = new URL('/api/user/provider-lookup', baseUrl);

@@ -42,6 +42,13 @@ export const swap = (chain: StarknetChain) => action({
             const sellAmount = BigInt(data.amount);
             let pool = token_buying.best_pool;
 
+            if (!pool) {
+                pool = {
+                    token0: token_selling.address,
+                    token1: token_buying.address,
+                }
+            }
+
             const quoteParams = {
                 sellTokenAddress: pool.token1,
                 buyTokenAddress: pool.token0,

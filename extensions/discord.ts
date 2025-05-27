@@ -110,7 +110,7 @@ export const discord = extension({
           }
 
 
-          let sociallink_res = await lookupUserByProvider("discord", "knownasred");
+          let sociallink_res = await lookupUserByProvider("discord", message.author.id);
 
           console.log('sociallink', sociallink_res);
 
@@ -125,7 +125,7 @@ export const discord = extension({
             if (i == sortedMessages.size - 1){
               context += `*NEW*`;
             }
-            context += `From: @${message[1].author.displayName} (id: ${message[1].author.id}) (timestamp: ${message[1].createdTimestamp}) - ${message[1].content} \n`;            
+            context += `<msg from=(@${message[1].author.displayName} id: ${message[1].author.id}) timestamp=${message[1].createdTimestamp}> \n ${message[1].content} \n </msg>`;            
           }
 
          // console.log(context);

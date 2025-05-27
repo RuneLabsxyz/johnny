@@ -8,7 +8,7 @@ import manifest  from "../../contracts/manifest_sepolia.json"
 import { CONTEXT } from "./contexts/ponziland-context";
 
 import { get_balances_str, get_lands_str } from "./utils/querys";
-import { get_auctions, get_claims, get_neighbors, get_all_lands, get_owned_lands, get_context, get_auction_yield } from "./actions/ponziland/querys";
+import { get_auctions, get_claims, get_neighbors, get_all_lands, get_owned_lands, get_context, get_auction_yield, socialink_lookup, get_player_lands } from "./actions/ponziland/querys";
 import { get_balances } from "./actions/get-balances";
 
 import { bid } from "./actions/ponziland/bid";
@@ -134,7 +134,7 @@ export const ponziland_check = (chain: StarknetChain) => input({
 
         let goal = "Build your bitcoin empire in ponziland"
 
-        let lands = await get_lands_str()
+        let lands = await get_lands_str(env.STARKNET_ADDRESS!)
         let balance = await get_balances_str()
 
         let guide = await CONTEXT();
@@ -192,6 +192,8 @@ export const ponziland = (chain: StarknetChain, personality?: string) => {
     increase_price(chain),
     get_auction_yield(chain),
     claim_all(chain),
+    get_player_lands(chain),
+    socialink_lookup,
   ],
 
   });

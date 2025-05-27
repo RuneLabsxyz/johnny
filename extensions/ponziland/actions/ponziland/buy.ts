@@ -35,11 +35,15 @@ export const buy = (chain: StarknetChain) => action({
 
         let land = await ponziLandContract.get_land(data.land_location);
 
-        let token = land.token_for_sale;
-        let price = land.sell_price;
+        let token = land[0].token_for_sale;
+        let price = land[0].sell_price;
+
+        console.log('land', land);
+        console.log('land 0', land[0]);
+        console.log('price', price);
 
         if (token == data.token_for_sale) {
-            let approve_call: Call = {contractAddress: data.token_for_sale, entrypoint: "approve", calldata: CallData.compile({spender: ponziland_address, amount: cairo.uint256(price)})};
+            let approve_call: Call = {contractAddress: data.token_for_sale, entrypoint: "approve", calldata: CallData.compile({spender: ponziland_address, amount: cairo.uint256(price + data.amount_to_stake)})};
             calls.push(approve_call);
         }
         else {

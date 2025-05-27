@@ -6,7 +6,8 @@ import { z } from "zod"
 import { Abi, Contract } from "starknet"
 import manifest from "../../../../contracts/manifest_release.json"
 import { CONTEXT } from "../../contexts/ponziland-context"
-import { get_auctions_str, get_balances, get_claims_str, get_lands_str, get_neighbors_str, get_nukeable_lands_str, get_auction_yield_str } from "../../utils/querys"
+import { get_auctions_str, get_balances, get_player_lands_str, get_claims_str, get_lands_str, get_neighbors_str, get_nukeable_lands_str, get_auction_yield_str } from "../../utils/querys"
+import { env } from "../../../../env"
 
 export const get_auctions = (chain: StarknetChain) => action({
     name: "get-auctions",
@@ -30,8 +31,9 @@ export const get_owned_lands = (chain: StarknetChain) => action({
     schema: z.object({}),
     async handler(data: {}, ctx: any, agent: Agent) {
         
+        let address = env.STARKNET_ADDRESS!;
        //todo
-       let lands = await get_lands_str()
+       let lands = await get_lands_str(address)
 
        console.log('lands str', lands)
 
@@ -113,6 +115,33 @@ export const get_auction_yield = (chain: StarknetChain) => action({
         let info = await get_auction_yield_str(data.location);
 
         return info;
+
+    }
+})
+
+export const get_player_lands = (chain: StarknetChain) => action({
+    name: "get-player-lands",
+    description: "Get all of the lands that a player owns in ponziland. This expects a starknet address argument",
+    schema: z.object({address: z.string()}),
+    async handler(data: {address: string}, ctx: any, agent: Agent) {
+        
+        let res = await get_lands_str(data.address);
+
+        return res;
+
+    
+    }
+})
+
+export const socialink_lookup = action({
+    name: "socialink-lookup",
+    description: "Lookup a user's socialink profile using their discord username. This returns their starknet address if they are registered",
+    schema: z.object({username: z.string()}),
+    async handler(data: {usename: string}, ctx: any, agent: Agent) {
+        
+        let res = await lookupUserByProvider("discord", data.id);
+
+        return res;
 
     }
 })
