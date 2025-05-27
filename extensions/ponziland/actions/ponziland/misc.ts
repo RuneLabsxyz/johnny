@@ -39,7 +39,7 @@ export const level_up = (chain: StarknetChain) => action({
 
 export const increase_stake = (chain: StarknetChain) => action({
     name: "increase-stake",
-    description: "Increase the stake of a land",
+    description: "Increase the stake of a land. This amount should always be <10 tokens, x10^18 of course so to increase stake with 1 toke pass in 1000000000000000000",
     schema: z.object({
         land_location: z.string().describe("Location of the land to increase stake on"),
         amount: z.string().describe("The new stake amount (in wei, so x10^18)"),

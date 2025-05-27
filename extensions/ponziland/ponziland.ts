@@ -15,7 +15,7 @@ import { bid } from "./actions/ponziland/bid";
 import { buy } from "./actions/ponziland/buy";
 import { increase_price, level_up, increase_stake } from "./actions/ponziland/misc";
 import { claim_all } from "./actions/ponziland/claim";
-
+import { env } from "../../env";
 import { getPersonality } from "../../env";
 
 const template = `
