@@ -204,10 +204,10 @@ export const get_all_lands_str = async () => {
 
   let tokens = await getAllTokensFromAPI();
 
-  lands = lands.filter((land: any) => land.owner != address);
+  lands = lands.filter((land: any) => (land.owner != address && BigInt(land.owner) != BigInt(0)));
   console.log('lands', lands)
 
-  let land_str = lands.map((land: any) => ` Owner: ${land.owner} Location: ${BigInt(land.location).toString()} Token: ${getTokenData(land.token_used, tokens).symbol} sell price: ${formatTokenAmount(BigInt(land.sell_price))}`).join("\n");
+  let land_str = lands.map((land: any) => ` Owner: ${land.owner} Location: ${BigInt(land.location).toString()} Token: ${getTokenData(land.token_used, tokens)!.symbol} sell price: ${formatTokenAmount(BigInt(land.sell_price))}`).join("\n");
   return land_str;
 }
 

@@ -118,10 +118,12 @@ export const discord = extension({
 
           let sortedMessages = messages.sort((a, b) => a.createdTimestamp - b.createdTimestamp);
 
-          let context = "";
+          let context = "Your ID: " + client.user?.id + "\n\n\n Be extremely careful to only reply if you are tagged by this id. \n\n\n";
           let i = 0;
 
           for (const message of sortedMessages) {
+            console.log(client.user?.id)
+            
             if (i == sortedMessages.size - 1){
               context += `*NEW*`;
             }

@@ -35,7 +35,7 @@ export const buy = (chain: StarknetChain) => action({
 
         let land = await ponziLandContract.get_land(data.land_location);
 
-        let token = land[0].token_for_sale;
+        let token = land[0].token_used;
         let price = land[0].sell_price;
 
         console.log('land', land);
@@ -52,7 +52,6 @@ export const buy = (chain: StarknetChain) => action({
             calls.push(token_call);
             calls.push(sale_call);
         }
-
 
         let buy_call: Call = {contractAddress: ponziland_address, entrypoint: "buy", calldata: CallData.compile({land_location: data.land_location, token_for_sale: data.token_for_sale, sell_price: cairo.uint256(data.sell_price), amount_to_stake: cairo.uint256(data.amount_to_stake)})};
 

@@ -6,7 +6,7 @@ import { z } from "zod"
 import { Abi, Contract } from "starknet"
 import manifest from "../../../../contracts/manifest_release.json"
 import { CONTEXT } from "../../contexts/ponziland-context"
-import { get_auctions_str, get_balances, get_player_lands_str, get_claims_str, get_lands_str, get_neighbors_str, get_nukeable_lands_str, get_auction_yield_str } from "../../utils/querys"
+import { get_auctions_str, get_claims_str, get_lands_str, get_neighbors_str, get_all_lands_str, get_auction_yield_str } from "../../utils/querys"
 import { env } from "../../../../env"
 
 export const get_auctions = (chain: StarknetChain) => action({
@@ -81,7 +81,7 @@ export const get_neighbors = (chain: StarknetChain) => action({
 export const get_all_lands = (chain: StarknetChain) => action({
     name: "get-all-lands",
     description: "Get all of the lands in ponziland",
-    schema: z.object({}),
+    schema: z.object({}) as ActionSchema,
     async handler(data: {}, ctx: any, agent: Agent) {
 
         let lands = await get_all_lands_str()
