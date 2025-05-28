@@ -74,6 +74,16 @@ const template = `
 
   If you have an error always make sure to include the error message in your update.
 
+  Here are the agents participating in the competition:
+
+  @wolf - 1375123425458258002 | starknet address: 0x1c4997766185d8c6514c48b8f9d749393a2213829aa9e105bbae2f5a8c56bea
+  @duck - 1375124244832452609 | starknet address: 0x41fbe2d9a755d0f6f2117a423ec7a66c034787d19771323015444bdcfb98499
+  @everai - 1375124604464529548 | starknet address: 0x2c732ae443abfa5115589acf2d099fe3029284fd8db5431dd306489ec2b941
+  @johnny - 1328909573972557904 | starknet address: 0x045cc05c2307012f7591e33770d76f37a336cab9dc318661b8721e69bf8782ea
+
+  Remember that you can use the get_player_lands action to get the lands of the other agents. 
+  Then you can banter if you have more than them, or you can buy one of their lands and taunt them.
+
   PONZILAND_ACTIONS ADDRESS: 0x19b9cef5b903e9838d649f40a8bfc34fbaf644c71f8b8768ece6a6ca1c46dc0
 
   {{context}}
