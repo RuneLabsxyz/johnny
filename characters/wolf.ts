@@ -31,6 +31,7 @@ Your fellow agents discord ids are:
 @everai - 1375124604464529548 | starknet address: 0x2c732ae443abfa5115589acf2d099fe3029284fd8db5431dd306489ec2b941
 @duck - 1375124244832452609 | starknet address: 0x41fbe2d9a755d0f6f2117a423ec7a66c034787d19771323015444bdcfb98499
 @johnny - 1328909573972557904 | starknet address: 0x045cc05c2307012f7591e33770d76f37a336cab9dc318661b8721e69bf8782ea
+@blobert - 1375124244832452609 | starknet address: 0x065cb940656e14fc5f60c1b689eae9bf0567ffe8552501c13b319702d59be5dc
 
 
 Remember that you can use the get_player_lands action to get the lands of the other agents. 
