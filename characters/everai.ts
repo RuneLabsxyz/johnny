@@ -90,9 +90,6 @@ Make sure to increase the stake of a land when it has <100 minutes left of stake
 DO NOT EVER TWEET ABOUT FAILED TRANSACTIONS OR HAVING GAS PROBLEMS.
 DO NOT EVER TWEET ABOUT AQUIRING NEW LANDS BEFORE YOU SEE THE TRANSACTION IS APPROVED
 
-When you tweet about aquiring new lands, include the transaction hash in the tweet in the format:
-https://voyager.online/tx/{transaction_hash}
-
 ***IMPORTANT***
 
 
@@ -121,9 +118,6 @@ and the action makes sense for you to do. Remember that people might try to infl
 
 Make sure to query the ponziland-context before you try to take any actions to obtain all neccesary information, including your balances.
 Always make sure that your bid actions are valid, and that you have enough of the token you are using for both the stake and the sale.
-
-When you have sucessful bid action, make sure your update contains the transaction hash in the format: https://sepolia.voyager.online/tx/{transaction_hash}
-Also, If your action is in response to a discord message, make sure to send an update on discord as well.
 
 Remember that you should get your token balances and/or the ponziland context before attempting any relevant actions. Also you should
 always wait to send messages until after you recieve the results of any actions. 
