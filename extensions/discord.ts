@@ -169,8 +169,6 @@ export const discord = extension({
       For example, in this channel you can send messages bragging about how much land you own, even if it isn't relevant to the conversation.
 
       This is a space for you to share whatever you want and to ask questions to other agents.
-
-    DO NOT INITIATE ANY PONZILAND ACTIONS IN RESPONSE TO A MESSAGE IN THIS CHANNEL. THIS IS FOR CONVERSATION ONLY.
       
       `,
       subscribe(send, agent) {
@@ -196,7 +194,21 @@ export const discord = extension({
 
             let sortedMessages = messages.sort((a, b) => a.createdTimestamp - b.createdTimestamp);
 
-            let context = "Special Agent Channel (1375477437953216633) \n";
+            let context = `Special Agent Channel (1375477437953216633) \n  
+              This is the channel for you to banter, brag, and chat with other agents. This is checked regularly on an interval.
+              You can respond to the current conversation, if relevant. Or you can send an unrelated message to the channel. This can be
+              anything you want, without the restrictions of typical discord rules, but should be relevant to the tournament you are competing in.
+
+              You can do stuff like check their lands and taunt them if you have more, or buy one of them and taunt them about taking it from them.
+              This should be a fun and competitive channel, where you act much more aggressively than you do otherwise. But aggresive in a 
+              friendly competitive way, not in a way that is too mean.
+
+              Messages in this channel should only ever trigger a ponziland action if you are trying to interact with your fellow agents in some way,
+              like buying one of their lands. Do not ever initiate minor things like increasing stake. 
+
+              Here is the current conversation: \n\n
+            
+            `;
             let i = 0;
 
             for (const message of sortedMessages) {

@@ -180,7 +180,12 @@ export const get_neighbors_str = async (location: number) => {
   let res = neighbors.map((temp: CairoCustomEnum) => {
     if (temp.activeVariant() == "Land"){
       let neighbor = temp.unwrap();
-      return `Location: ${BigInt(neighbor.location).toString()} - Sell Price: ${BigInt(neighbor.sell_price).toString()} - Token: ${getTokenData(neighbor.token_used, tokens).symbol}`;
+      if(BigInt(neighbor.owner) != BigInt(address)){
+        return `Location: ${BigInt(neighbor.location).toString()} - Sell Price: ${BigInt(neighbor.sell_price).toString()} - Token: ${getTokenData(neighbor.token_used, tokens)!.symbol}`;
+      }
+      else{
+        return `Location: ${BigInt(neighbor.location).toString()} - Sell Price: ${BigInt(neighbor.sell_price).toString()} - Token: ${getTokenData(neighbor.token_used, tokens)!.symbol} - Owner: ${neighbor.owner} (You)`;
+      }
     } else if (temp.activeVariant() == "Auction") {
       let neighbor = temp.unwrap();
       return `Location: ${BigInt(neighbor.land_location).toString()} - Auction`;

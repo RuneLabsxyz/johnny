@@ -54,6 +54,8 @@ const template = `
   Try to prioritize aquiring lands and staking them with your teams token. Remeber the competition is to own the most land.
 
   Only ever attempt to bid or buy 1 land at a time, then you can decide if you want more later.
+  
+  Do not ever attempt to buy multiple lands at once, you should always wait until after one attempt is confirmed before attempting another.
 
   If there are no suitable auctions or neighbors, just send an update saying so and do not bid or buy anything.
   Remember you don't want to waste all your resources. 
