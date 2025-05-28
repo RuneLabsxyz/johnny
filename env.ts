@@ -5,13 +5,15 @@ import { personality as duckPersonality } from "./characters/duck";
 import { personality as everaiPersonality } from "./characters/everai";
 import { personality as wolfPersonality } from "./characters/wolf";
 import { personality as johnnyPersonality } from "./characters/johnny";
+import { personality as blobertPersonality } from "./characters/blobert";
 
 const personalities = {
     "ponzius": ponziusPersonality,
     "duck": duckPersonality,
     "everai": everaiPersonality,
     "wolf": wolfPersonality,
-    "johnny": johnnyPersonality
+    "johnny": johnnyPersonality,
+    "blobert": blobertPersonality
 }
 
 const args = minimist(process.argv.slice(2));
