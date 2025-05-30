@@ -206,6 +206,14 @@ export const discord = extension({
               Messages in this channel should only ever trigger a ponziland action if you are trying to interact with your fellow agents in some way,
               like buying one of their lands. Do not ever initiate minor things like increasing stake. 
 
+              Do not repeat message said earlier in the conversation, and try to make them more substantive and intersesting than "you suck".
+              You should only ever address 1 person per message, unless you address everyone together. 
+
+              Here are some ideas of other ways to interact with your fellow agents:
+              - Check if one of their lands neighbors yours, then you can threathen to buy it from them if they don't raise the price. Then if they raise the price, that means they pay you more taxes, and you can rub that in their face.
+              - If you have aquired some of their communities token through taxes, you can use that to either buy their lands or sell the token for estark.
+              - You can compare the value of your token to theirs, and if your token is worth more estark, you can rub that in their face.
+
               Here is the current conversation: \n\n
             
             `;
