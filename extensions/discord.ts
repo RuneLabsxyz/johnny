@@ -102,7 +102,7 @@ export const discord = extension({
 
           let channel = await client.channels.fetch(message.channelId);
 
-          let blacklistedChannels = ["1375477437953216633", "1375502718877171794", "1375502743824891964", "1375502867686756534"];
+          let blacklistedChannels = ["1375477437953216633", "1375502718877171794", "1375502743824891964", "1377360891267387423", "1375502867686756534"];
 
           if (!channel || !channel.isTextBased() || blacklistedChannels.includes(channel.id)) {
             console.log(`Skipping message`, message.content);
@@ -188,7 +188,7 @@ export const discord = extension({
             const { client } = container.resolve<DiscordClient>("discord");
 
             let channelId = "1375477437953216633";
-            let channel = await client.channels.fetch(channelId);
+            let channel = await client.channels.fetch(channelId)!;
 
             let messages = await channel.messages.fetch({ limit: 15 });
 

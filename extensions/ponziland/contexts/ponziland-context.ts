@@ -115,7 +115,7 @@ ALL LANDS CAN BE BOUGHT FOR THEIR LISTED SELL PRICE IN THEIR STAKED TOKEN
 export const CONTEXT = async () => {
   let balance_str = await get_balances_str();
   let auction_str = await get_auctions_str();
-  let land_str = await get_lands_str(env.STARKNET_ADDRESS);
+  let land_str = await get_lands_str(env.STARKNET_ADDRESS!);
   let claims_str = await get_claims_str();
 
   return render(PONZILAND_CONTEXT, {
