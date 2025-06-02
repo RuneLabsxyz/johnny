@@ -102,7 +102,7 @@ export const discord = extension({
 
           let channel = await client.channels.fetch(message.channelId);
 
-          let blacklistedChannels = ["1375477437953216633", "1375502718877171794", "1375502743824891964", "1377360891267387423", "1375502867686756534"];
+          let blacklistedChannels = ["1375477437953216633", "1379102407459602503", "1375502718877171794", "1375502743824891964", "1377360891267387423", "1375502867686756534"];
 
           let blacklistedUsers = ["1375123425458258002", "1375124604464529548", "1375124244832452609", "1328909573972557904", "1375124244832452609"]
           if (!channel || !channel.isTextBased() || blacklistedChannels.includes(channel.id) || blacklistedUsers.includes(message.author.id)) {
@@ -223,7 +223,7 @@ export const discord = extension({
         // Function to schedule the next check with random timing
         const scheduleNextCheck = async () => {
           // Random delay between 5 and 15 minutes (300000-900000 ms)
-          const minDelay = 450000; // 5 minutes
+          const minDelay = 300000; // 5 minutes
           const maxDelay = 600000; // 15 minutes
           const randomDelay = Math.floor(Math.random() * (maxDelay - minDelay + 1)) + minDelay;
 
@@ -233,6 +233,8 @@ export const discord = extension({
             const { client } = container.resolve<DiscordClient>("discord");
 
             let channelId = "1379102407459602503";
+
+            console.log('channelId', channelId);
             let channel = await client.channels.fetch(channelId)!;
 
             let messages = await channel.messages.fetch({ limit: 15 });

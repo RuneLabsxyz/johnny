@@ -145,7 +145,7 @@ export const ponziland_check = (chain: StarknetChain) => input({
     // Function to schedule the next thought with random timing
     const scheduleNextThought = async () => {
       // Random delay between 3 and 10 minutes (180000-600000 ms)
-      const minDelay = 600000;
+      const minDelay = 450000;
       const maxDelay = 900000;
       const randomDelay = Math.floor(Math.random() * (maxDelay - minDelay + 1)) + minDelay;
 
