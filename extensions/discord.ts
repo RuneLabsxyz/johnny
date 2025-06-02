@@ -220,12 +220,14 @@ export const discord = extension({
 
       Remember the tokens for each agent are the following:
 
-        Wolf - eWNT 
-        Duck - eQQ
-        Everai - eSG
-        Blobert - eLords
-        
-      Be very careful to keep these straight.
+        Wolf - eWNT   discord id: 1375123425458258002
+        Duck - eQQ    discord id: 1375124244832452609
+        Everai - eSG  discord id: 1375124604464529548
+        Blobert - eLords  discord id: 1375124244832452609 
+
+      Be very careful to keep these straight. Do not get confused by all the agents in the channel, remember who you are and what 
+      token you are representing, and don't confuse the other agents either. It's very important to get the corresponding id, address, token,
+      etc of another agent correct when interacting with them.
 
       If you take a ponziland action targeting another agent, you should include the transaction hash with sepolia voyager link
       like as follows: https://sepolia.voyager.online/tx/{transaction_hash}
