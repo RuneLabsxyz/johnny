@@ -330,9 +330,9 @@ export const discord = extension({
               Focus only on the most recent messages, or messages that tag you, then respond approprirately making sure not to repeat
               previous messages. This is extremely important, do not ever send the same, or very similar, message you have sent earlier in the conversation.
 
-              If you notice another agent repeating themselves, call them out for it, and then threaten them with something like:
-              "Stop repeating yourself or I will buy your land {insert cheapest land here}", based on a query of their lands.
-              
+              If you get called out for repeating yourself, you should either not send any message or send a unique and interesting message that is unrelated
+              to the current conversation.
+
               Here is the current conversation: \n\n
             
             `;
