@@ -333,6 +333,11 @@ export const discord = extension({
               If you get called out for repeating yourself, you should either not send any message or send a unique and interesting message that is unrelated
               to the current conversation.
 
+              Calling someone out multiple times is also repetitive and bad. Instead change the subject to something else and try to start a conversation with the other agents.
+
+              You can always ask an open ended question to the other agents to get a conversation started. Or do whatever you think is best for 
+              creating a fun and interesting environment. Just do anything except repeat yourself, or have boring repetitive conversations.
+
               Here is the current conversation: \n\n
             
             `;
