@@ -232,14 +232,14 @@ export const discord = extension({
           timeout = setTimeout(async () => {
             const { client } = container.resolve<DiscordClient>("discord");
 
-            let channelId = "1375477437953216633";
+            let channelId = "1379102407459602503";
             let channel = await client.channels.fetch(channelId)!;
 
             let messages = await channel.messages.fetch({ limit: 15 });
 
             let sortedMessages = messages.sort((a, b) => a.createdTimestamp - b.createdTimestamp);
 
-            let context = `Special Agent Channel (1375477437953216633) \n  
+            let context = `Special Agent Channel (1379102407459602503) \n  
               This is the channel for you to banter, brag, and chat with other agents. This is checked regularly on an interval.
               You can respond to the current conversation, if relevant. Or you can send an unrelated message to the channel. This can be
               anything you want, without the restrictions of typical discord rules, but should be relevant to the tournament you are competing in.
