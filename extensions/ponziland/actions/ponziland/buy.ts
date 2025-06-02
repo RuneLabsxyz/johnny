@@ -28,8 +28,8 @@ export const buy = (chain: StarknetChain) => action({
         let estark_address = "0x071de745c1ae996cfd39fb292b4342b7c086622e3ecf3a5692bd623060ff3fa0";
         let ponziland_address = ponziland_manifest.contracts[0].address;
 
-        let {abi: token_abi} = await chain.provider.getClassAt(data.token_for_sale);
-        let {abi: estark_abi} = await chain.provider.getClassAt(estark_address);
+        let { abi: token_abi } = await chain.provider.getClassAt(data.token_for_sale);
+        let { abi: estark_abi } = await chain.provider.getClassAt(estark_address);
 
         let ponziLandContract = (new Contract(ponziland_manifest.contracts[0].abi, ponziland_address, chain.provider)).typedv2(ponziland_manifest.contracts[0].abi as Abi);
 
@@ -43,17 +43,17 @@ export const buy = (chain: StarknetChain) => action({
         console.log('price', price);
 
         if (token == data.token_for_sale) {
-            let approve_call: Call = {contractAddress: data.token_for_sale, entrypoint: "approve", calldata: CallData.compile({spender: ponziland_address, amount: cairo.uint256(price + data.amount_to_stake)})};
+            let approve_call: Call = { contractAddress: data.token_for_sale, entrypoint: "approve", calldata: CallData.compile({ spender: ponziland_address, amount: cairo.uint256(Math.floor((Number(price) + Number(data.amount_to_stake)) * 1.2)) }) };
             calls.push(approve_call);
         }
         else {
-            let token_call: Call = {contractAddress: data.token_for_sale, entrypoint: "approve", calldata: CallData.compile({spender: ponziland_address, amount: cairo.uint256(data.amount_to_stake)})};
-            let sale_call: Call = {contractAddress: token, entrypoint: "approve", calldata: CallData.compile({spender: ponziland_address, amount: cairo.uint256(price)})};
+            let token_call: Call = { contractAddress: data.token_for_sale, entrypoint: "approve", calldata: CallData.compile({ spender: ponziland_address, amount: cairo.uint256(Math.floor(Number(data.amount_to_stake) * 1.2)) }) };
+            let sale_call: Call = { contractAddress: token, entrypoint: "approve", calldata: CallData.compile({ spender: ponziland_address, amount: cairo.uint256(Math.floor(Number(price) * 1.2)) }) };
             calls.push(token_call);
             calls.push(sale_call);
         }
 
-        let buy_call: Call = {contractAddress: ponziland_address, entrypoint: "buy", calldata: CallData.compile({land_location: data.land_location, token_for_sale: data.token_for_sale, sell_price: cairo.uint256(data.sell_price), amount_to_stake: cairo.uint256(data.amount_to_stake)})};
+        let buy_call: Call = { contractAddress: ponziland_address, entrypoint: "buy", calldata: CallData.compile({ land_location: data.land_location, token_for_sale: data.token_for_sale, sell_price: cairo.uint256(data.sell_price), amount_to_stake: cairo.uint256(data.amount_to_stake) }) };
 
         calls.push(buy_call);
 
