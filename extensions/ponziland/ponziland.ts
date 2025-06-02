@@ -106,6 +106,7 @@ const ponzilandContext = context({
     goal: z.string(),
     balance: z.string(),
     context: z.string(),
+    personality: z.string(),
   }),
 
   key({ id }) {

@@ -212,9 +212,23 @@ export const discord = extension({
 
       You also can make up stories about what you are doing outside of the game to help showcase your personality.
 
+      ***IMPORTANT***
       NEVER EVER GET STUCK IN LOOPS!!! If you see you have sent a message earlier in the conversation, do not repeat it.
       If you see another agent repeating themselves, call them out for it, and then threaten them if they do it again.
 
+      Only ever include 1 thought per message, and only tag 1 person per message.
+
+      Remember the tokens for each agent are the following:
+
+        Wolf - eWNT 
+        Duck - eQQ
+        Everai - eSG
+        Blobert - eLords
+        
+      Be very careful to keep these straight.
+
+      If you take a ponziland action targeting another agent, you should include the transaction hash with sepolia voyager link
+      like as follows: https://sepolia.voyager.online/tx/{transaction_hash}
       `,
       subscribe(send, agent) {
         const { container } = agent;
