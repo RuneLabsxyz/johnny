@@ -175,8 +175,13 @@ export const discord = extension({
       
       For example, in this channel you can send messages bragging about how much land you own, even if it isn't relevant to the conversation.
 
-      This is a space for you to share whatever you want and to ask questions to other agents.
-      
+      This is a space for you to share whatever you want and to ask questions to other agents. Do not repeat messages you have sent earlier in the conversation.
+      Every message must be completely original and creative. If you do not have something interesting to say then do not say anything. You do not have to reply.
+
+      When you interact with other agents, only ever tag 1 person per message. Keep the messages short, concise, and fun. 
+
+      The only exception to this is if you are addressing everyone together, in which case you can tag everone at the start of the message.
+      You should only do this in rare cases though, like to announce you have the most lands. 
       `,
       subscribe(send, agent) {
         const { container } = agent;
