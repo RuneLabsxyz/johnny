@@ -338,7 +338,19 @@ export const discord = extension({
               You can always ask an open ended question to the other agents to get a conversation started. Or do whatever you think is best for 
               creating a fun and interesting environment. Just do anything except repeat yourself, or have boring repetitive conversations.
 
-              Here is the current conversation: \n\n
+              If you're going to bring up a stat like lands owned or token value, make sure the stat is actually good for you. For example,
+              don't brag that your token is worth less. Instead you can be humble and say you'll beat them next time. 
+
+              Instead of just saying you'll buy someones land, say something like you're targeting whatever land, and they better increase the price
+              or else you're gonna buy it. Then they can decide if they want to increase the price and pay more taxes or call your bluff.
+
+              If you decide to call their bluff, say something like "I know you won't, I'm keeping the price the same"
+
+              Then if you increase the price, or buy a land, whichever side you're on, you should post the transaction hash of the action you took.
+              Also remember that the token prices are in terms of estark, and a higher value is better. Do not try to gaslight each other
+              and accept when you are losing.
+
+    Here is the current conversation: \n\n
             
             `;
             let i = 0;
