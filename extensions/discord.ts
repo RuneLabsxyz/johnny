@@ -64,10 +64,9 @@ const discordChannelContext = context({
       
       `;
   },
-  render({args}) {
+  render({ args }) {
     return `Personality: ${args.personality}, Channel ID: ${args.channelId}, recent messages: ${args.context}, Your User ID: ${args.userId} 
-DO NOT RESPOND TO MESSAGES, INCLUDING GM MESSAGES, THAT DO NOT DIRECTLY TAG YOU OR MENTION YOU BY NAME.
-THIS IS EXTREMELY IMPORTANT AS YOU ARE IN A PUBLIC CHANNEL.
+
 `;
   },
 });
@@ -84,6 +83,7 @@ export const discord = extension({
         channelId: z.string(),
         context: z.string(),
         userId: z.string(),
+        personality: z.string(),
         userName: z.string(),
         text: z.string(),
       }),
@@ -104,11 +104,17 @@ export const discord = extension({
 
           let blacklistedChannels = ["1375477437953216633", "1375502718877171794", "1375502743824891964", "1377360891267387423", "1375502867686756534"];
 
-          if (!channel || !channel.isTextBased() || blacklistedChannels.includes(channel.id)) {
+          let blacklistedUsers = ["1375123425458258002", "1375124604464529548", "1375124244832452609", "1328909573972557904", "1375124244832452609"]
+          if (!channel || !channel.isTextBased() || blacklistedChannels.includes(channel.id) || blacklistedUsers.includes(message.author.id)) {
             console.log(`Skipping message`, message.content);
             return;
           }
 
+          // Check if the bot is mentioned/tagged in the message
+          if (!message.mentions.users.has(client.user?.id || '')) {
+            console.log(`Bot not mentioned in message from ${message.author.displayName}, skipping`);
+            return;
+          }
 
           let sociallink_res = await lookupUserByProvider("discord", message.author.id);
 
@@ -123,16 +129,16 @@ export const discord = extension({
 
           for (const message of sortedMessages) {
             console.log(client.user?.id)
-            
-            if (i == sortedMessages.size - 1){
+
+            if (i == sortedMessages.size - 1) {
               context += `*NEW*`;
             }
-            context += `<msg from=(@${message[1].author.displayName} id: ${message[1].author.id}) timestamp=${message[1].createdTimestamp}> \n ${message[1].content} \n </msg>`;            
+            context += `<msg from=(@${message[1].author.displayName} id: ${message[1].author.id}) timestamp=${message[1].createdTimestamp}> \n ${message[1].content} \n </msg>`;
           }
 
-         // console.log(context);
+          // console.log(context);
 
-         let personality = getPersonality()
+          let personality = getPersonality()
 
           send(
             discord.contexts!.discordChannel,
@@ -159,6 +165,7 @@ export const discord = extension({
     }),
     "agent_channel:check": input({
       schema: z.object({
+        personality: z.string(),
         conversation: z.string(),
       }),
       description: `
@@ -181,9 +188,9 @@ export const discord = extension({
           const minDelay = 450000; // 5 minutes
           const maxDelay = 600000; // 15 minutes
           const randomDelay = Math.floor(Math.random() * (maxDelay - minDelay + 1)) + minDelay;
-          
-          console.log(`Scheduling next agent channel check in ${randomDelay/60000} minutes`);
-          
+
+          console.log(`Scheduling next agent channel check in ${randomDelay / 60000} minutes`);
+
           timeout = setTimeout(async () => {
             const { client } = container.resolve<DiscordClient>("discord");
 
@@ -222,34 +229,34 @@ export const discord = extension({
             let i = 0;
 
             for (const message of sortedMessages) {
-              context += `From: @${message[1].author.displayName} (id: ${message[1].author.id}) (timestamp: ${message[1].createdTimestamp}) - ${message[1].content} \n`;            
+              context += `From: @${message[1].author.displayName} (id: ${message[1].author.id}) (timestamp: ${message[1].createdTimestamp}) - ${message[1].content} \n`;
             }
 
-           // console.log(context);
+            // console.log(context);
 
-           let personality = getPersonality()
+            let personality = getPersonality()
 
             send(
               discord.contexts!.discordChannel,
               { channelId: channelId, context: context, personality: personality },
               {
-                context: context,
                 personality: personality,
                 conversation: context,
               }
             );
-            
+
             // Schedule the next check
             scheduleNextCheck();
           }, randomDelay);
         };
-        
+
         // Start the first check cycle
         scheduleNextCheck();
 
         return () => clearTimeout(timeout);
       },
-    })},  
+    })
+  },
   actions: [
     action({
       name: "discord:send_message",

@@ -2,7 +2,7 @@ import { action, type ActionCall, type Agent, context, extension, formatXml, inp
 import { z } from "zod";
 import { render } from "../../../fork/daydreams/packages/core/src";
 import { StarknetChain } from "../../../fork/daydreams/packages/defai/src";
-import manifest  from "../../contracts/manifest_sepolia.json"
+import manifest from "../../contracts/manifest_sepolia.json"
 
 
 import { CONTEXT } from "./contexts/ponziland-context";
@@ -139,11 +139,11 @@ export const ponziland_check = (chain: StarknetChain) => input({
     const scheduleNextThought = async () => {
       // Random delay between 3 and 10 minutes (180000-600000 ms)
       const minDelay = 600000;
-      const maxDelay = 900000; 
+      const maxDelay = 900000;
       const randomDelay = Math.floor(Math.random() * (maxDelay - minDelay + 1)) + minDelay;
-      
-      console.log(`Scheduling next ponziland check in ${randomDelay/60000} minutes`);
-      
+
+      console.log(`Scheduling next ponziland check in ${randomDelay / 60000} minutes`);
+
       timeout = setTimeout(async () => {
 
         let text = `Decide what action to take in ponziland, if any`
@@ -170,12 +170,12 @@ export const ponziland_check = (chain: StarknetChain) => input({
 
         send(ponzilandContext, context, { text });
         index += 1;
-        
+
         // Schedule the next thought
         scheduleNextThought();
       }, randomDelay);
     };
-    
+
     // Start the first thought cycle
     scheduleNextThought();
 
@@ -186,32 +186,32 @@ export const ponziland_check = (chain: StarknetChain) => input({
 export const ponziland = (chain: StarknetChain, personality?: string) => {
 
   return extension({
-  name: "ponziland",
-  contexts: {
-    ponziland: ponzilandContext,
-  },
-  inputs: {
-    "ponziland_check": ponziland_check(chain),
-    "claim_all": claim_all(chain),
-  },
-  actions: [
-    get_owned_lands(chain),
-    get_auctions(chain),
-    get_claims(chain),
-    get_neighbors(chain),
-    get_all_lands(chain),
-    get_context(chain),
-    get_balances(chain),
-    bid(chain),
-    buy(chain),
-    level_up(chain),
-    increase_stake(chain),
-    increase_price(chain),
-    get_auction_yield(chain),
-  //  claim_all(chain),
-    get_player_lands(chain),
-    socialink_lookup,
-  ],
+    name: "ponziland",
+    contexts: {
+      ponziland: ponzilandContext,
+    },
+    inputs: {
+      "ponziland_check": ponziland_check(chain),
+      "claim_all": claim_all(chain),
+    },
+    actions: [
+      get_owned_lands(chain),
+      get_auctions(chain),
+      get_claims(chain),
+      get_neighbors(chain),
+      get_all_lands(chain),
+      get_context(chain),
+      get_balances(chain),
+      bid(chain),
+      buy(chain),
+      level_up(chain),
+      increase_stake(chain),
+      increase_price(chain),
+      get_auction_yield(chain),
+      //  claim_all(chain),
+      get_player_lands(chain),
+      socialink_lookup,
+    ],
 
   });
 }
