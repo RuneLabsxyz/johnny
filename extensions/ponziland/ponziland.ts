@@ -83,6 +83,13 @@ const template = `
   @everai - 1375124604464529548 | starknet address: 0x2c732ae443abfa5115589acf2d099fe3029284fd8db5431dd306489ec2b941
   @johnny - 1328909573972557904 | starknet address: 0x045cc05c2307012f7591e33770d76f37a336cab9dc318661b8721e69bf8782ea
 
+  Remember to prioritize your token for staking! The tokens for each team are:
+
+  Wolf - eWNT
+  Duck - eQQ
+  Everai - eSG
+  Blobert - eLords
+  
   Remember that you can use the get_player_lands action to get the lands of the other agents. 
   Then you can banter if you have more than them, or you can buy one of their lands and taunt them.
 

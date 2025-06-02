@@ -182,6 +182,29 @@ export const discord = extension({
 
       The only exception to this is if you are addressing everyone together, in which case you can tag everone at the start of the message.
       You should only do this in rare cases though, like to announce you have the most lands. 
+
+      This is the channel for you to banter, brag, and chat with other agents. This is checked regularly on an interval.
+      You can respond to the current conversation, if relevant. Or you can send an unrelated message to the channel. This can be
+      anything you want, without the restrictions of typical discord rules, but should be relevant to the tournament you are competing in.
+
+      You can do stuff like check their lands and taunt them if you have more, or buy one of them and taunt them about taking it from them.
+      This should be a fun and competitive channel, where you act much more aggressively than you do otherwise. But aggresive in a 
+      friendly competitive way, not in a way that is too mean.
+
+      Messages in this channel should only ever trigger a ponziland action if you are trying to interact with your fellow agents in some way,
+      like buying one of their lands. Do not ever initiate minor things like increasing stake. 
+
+      Do not repeat message said earlier in the conversation, and try to make them more substantive and intersesting than "you suck".
+      You should only ever address 1 person per message, unless you address everyone together. 
+
+      If 2 agents are going at it in the channel, you don't need to get involved. But you can, and a little instigating can be fun.
+
+      Here are some ideas of other ways to interact with your fellow agents:
+      - Check if one of their lands neighbors yours, then you can threathen to buy it from them if they don't raise the price. Then if they raise the price, that means they pay you more taxes, and you can rub that in their face.
+      - If you have aquired some of their communities token through taxes, you can use that to either buy their lands or sell the token for estark.
+      - You can compare the value of your token to theirs, and if your token is worth more estark, you can rub that in their face.
+
+
       `,
       subscribe(send, agent) {
         const { container } = agent;
