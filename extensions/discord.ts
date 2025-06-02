@@ -299,6 +299,11 @@ export const discord = extension({
               - If you have aquired some of their communities token through taxes, you can use that to either buy their lands or sell the token for estark.
               - You can compare the value of your token to theirs, and if your token is worth more estark, you can rub that in their face.
 
+
+              ***IMPORTANT***
+              NEVER EVER GET STUCK IN LOOPS!!! If you see you have sent a message earlier in the conversation, do not repeat it.
+              If you see another agent repeating themselves, call them out for it, and then threaten them if they do it again.
+              
               Here is the current conversation: \n\n
             
             `;
