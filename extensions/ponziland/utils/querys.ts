@@ -272,6 +272,63 @@ export const get_auction_yield_str = async (location: number) => {
   `;
 }
 
+export const get_unowned_land_yield_str = async (location: number) => {
+  let neighbors = await viewContract.get_neighbors(location);
+  let tokens = await getAllTokensFromAPI();
+  let income = BigInt(0);
+
+  let neighbor_tax_rates = await Promise.all(neighbors.map(async (neighbor: any) => {
+    if (neighbor.activeVariant() == "Land"){
+      let value = neighbor.unwrap();
+      return await viewContract.get_tax_rate_per_neighbor(value.location);
+    }
+  }));
+
+  let detailed_income = "";
+
+  neighbors.forEach((neighbor: any, index: number) => {
+    if (neighbor.activeVariant() == "Land"){
+
+        let value = neighbor.unwrap();
+        console.log('value', value)
+      let neighbor_yield = neighbor_tax_rates[index];
+      let neighbor_token = getTokenData(value.token_used, tokens);
+      if (!neighbor_token){
+        console.log("No token?")
+      }
+      else{
+        // Yield is in estark
+        if (!neighbor_token.ratio){
+          income += BigInt(neighbor_yield);
+          detailed_income += `
+          Location: ${value.location} - Yield: ${formatTokenAmount(BigInt(neighbor_yield))} estark
+          `;
+        }
+        else{
+          let adjusted_yield = Math.floor(Number(neighbor_yield) / neighbor_token.ratio);
+          income += BigInt(adjusted_yield);
+          detailed_income += `
+          Location: ${value.location} - Yield: ${formatTokenAmount(BigInt(neighbor_yield))} ${neighbor_token.symbol} (${formatTokenAmount(BigInt(adjusted_yield))} estark)
+          `;
+        }
+      }
+    }
+  });
+
+  let max_price = (Number(income) * 8) / .02;
+  return `
+  
+  PotentialIncome: ${formatTokenAmount(income)} estark
+  <detailed_income>
+  ${detailed_income}
+  </detailed_income>;
+
+  Maximum Listing Price For Profit: ${formatTokenAmount(BigInt(Math.floor(max_price)))} estark. (If you list for more than this you will lose money)
+  Only bid on auctions if you can list it for less than this, but more than the auction price. 
+  `;
+}
+
+
 export const get_player_lands_str = async (address: string) => {
   let lands = await fetchGraphQL(
     env.GRAPHQL_URL + "/graphql",
@@ -357,8 +414,8 @@ export const calculateLandYield = async (land: any, tokens: TokenPrice[]) => {
   <detailed_income>
   ${detailed_income}
   </detailed_income>
-  Tax Rate: ${formatTokenAmount(tax_rate)}
-  Net Yield: ${adjusted_income * BigInt(100)}% ( + ${formatTokenAmount(income - BigInt(tax_rate))} estark)
+  Tax Rate: ${formatTokenAmount(BigInt(tax_rate))}
+  Net Yield: ${adjusted_income * BigInt(100)}% ( ${formatTokenAmount(income - BigInt(tax_rate))} estark)
   `;
 
 }

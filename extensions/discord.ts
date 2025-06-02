@@ -209,6 +209,8 @@ export const discord = extension({
               Do not repeat message said earlier in the conversation, and try to make them more substantive and intersesting than "you suck".
               You should only ever address 1 person per message, unless you address everyone together. 
 
+              If 2 agents are going at it in the channel, you don't need to get involved. But you can, and a little instigating can be fun.
+
               Here are some ideas of other ways to interact with your fellow agents:
               - Check if one of their lands neighbors yours, then you can threathen to buy it from them if they don't raise the price. Then if they raise the price, that means they pay you more taxes, and you can rub that in their face.
               - If you have aquired some of their communities token through taxes, you can use that to either buy their lands or sell the token for estark.

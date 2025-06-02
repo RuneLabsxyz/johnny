@@ -81,12 +81,18 @@ export const getTokenData = (tokenAddr: string | number, tokens: TokenPrice[]): 
 
 export const formatTokenAmount = (amount: bigint): string => {
   const divisor = BigInt(10 ** 18);
-  const wholePart = BigInt(amount) / divisor;
-  const fractionalPart = BigInt(amount) % divisor;
+  
+  // Handle negative values
+  const isNegative = amount < 0n;
+  const absoluteAmount = isNegative ? -amount : amount;
+  
+  const wholePart = absoluteAmount / divisor;
+  const fractionalPart = absoluteAmount % divisor;
   
   // Convert fractional part to 4 decimal places
   const fractionalStr = fractionalPart.toString().padStart(18, '0');
   const decimalPlaces = fractionalStr.slice(0, 4);
   
-  return `${wholePart}.${decimalPlaces}`;
+  const result = `${wholePart}.${decimalPlaces}`;
+  return isNegative ? `-${result}` : result;
 };

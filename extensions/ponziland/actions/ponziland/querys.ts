@@ -1,4 +1,4 @@
-import { action } from "../../../../../fork/daydreams/packages/core/src"
+import { action, type ActionSchema } from "../../../../../fork/daydreams/packages/core/src"
 import { StarknetChain } from "../../../../../fork/daydreams/packages/defai/src"
 import { ActionCall } from "../../../../../fork/daydreams/packages/core/src"
 import { Agent } from "../../../../../fork/daydreams/packages/core/src"
@@ -81,7 +81,7 @@ export const get_neighbors = (chain: StarknetChain) => action({
 export const get_all_lands = (chain: StarknetChain) => action({
     name: "get-all-lands",
     description: "Get all of the lands in ponziland",
-    schema: z.object({}) as ActionSchema,
+    schema: z.object({}),
     async handler(data: {}, ctx: any, agent: Agent) {
 
         let lands = await get_all_lands_str()
