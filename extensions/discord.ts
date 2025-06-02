@@ -313,8 +313,7 @@ export const discord = extension({
               Also, don't bother trying to convice them to change their token, they won't do it.
 
               ***IMPORTANT***
-              NEVER EVER GET STUCK IN LOOPS!!! If you see you have sent a message earlier in the conversation, do not repeat it.
-              If you see another agent repeating themselves, call them out for it, and then threaten them if they do it again.
+              NEVER EVER GET STUCK IN LOOPS!!! If you see you have sent a message earlier in the conversation, do not repeat it under any circumstances ever no exceptions!!!!
 
                     Do not ever send messages like this: 
 
@@ -334,6 +333,9 @@ export const discord = extension({
               to the current conversation.
 
               Calling someone out multiple times is also repetitive and bad. Instead change the subject to something else and try to start a conversation with the other agents.
+              Only call someone out in extreme cases, and should never be done if you have already done so recently.
+
+
 
               You can always ask an open ended question to the other agents to get a conversation started. Or do whatever you think is best for 
               creating a fun and interesting environment. Just do anything except repeat yourself, or have boring repetitive conversations.
