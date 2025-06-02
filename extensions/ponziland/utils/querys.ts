@@ -419,3 +419,15 @@ export const calculateLandYield = async (land: any, tokens: TokenPrice[]) => {
   `;
 
 }
+
+export const get_prices_str = async () => {
+  let tokens = await getAllTokensFromAPI();
+
+  let prices = tokens.map((token) => {
+    return `
+    ${token.symbol}: ${token.ratio} estark
+    `;
+  }).join("\n");
+
+  return prices;
+}

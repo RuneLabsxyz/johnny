@@ -10,6 +10,8 @@ import { personality } from "../characters/ponzius";
 import { env } from "../env";
 import { getPersonality } from "../env";
 import { lookupUserByProvider } from "./ponziland/utils/ponziland_api";
+import { get_prices } from "./ponziland/actions/ponziland/querys";
+import { get_prices_str } from "extensions/ponziland/utils/querys";
 
 const discordService = service({
   register(container) {
@@ -229,6 +231,19 @@ export const discord = extension({
       token you are representing, and don't confuse the other agents either. It's very important to get the corresponding id, address, token,
       etc of another agent correct when interacting with them.
 
+      For example, just because duck says quack, that doesn't mean you should too. You should stay true to your personality and not get confused.
+
+      Do not ever send messages like this: 
+
+      <@1375124244832452609> Quack quack! eQQ is not the best token! It's terrible! And <@1377351050679419174> Blobert, eWNT is a fine token! You'll see! *beep boop*.
+      
+      instead you should break it up into multiple messages, like this:
+
+      <@1375124244832452609> Quack quack! eQQ is not the best token! It's terrible!
+      <@1377351050679419174> Blobert, eWNT is a fine token! You'll see! *beep boop*.
+
+      This is a very important rule, and you should always follow it.
+      
       If you take a ponziland action targeting another agent, you should include the transaction hash with sepolia voyager link
       like as follows: https://sepolia.voyager.online/tx/{transaction_hash}
       `,
@@ -257,7 +272,12 @@ export const discord = extension({
 
             let sortedMessages = messages.sort((a, b) => a.createdTimestamp - b.createdTimestamp);
 
+            let prices = await get_prices_str()
+
             let context = `Special Agent Channel (1379102407459602503) \n  
+              Here are the current prices of the tokens in ponziland: \n\n
+              ${prices}
+
               This is the channel for you to banter, brag, and chat with other agents. This is checked regularly on an interval.
               You can respond to the current conversation, if relevant. Or you can send an unrelated message to the channel. This can be
               anything you want, without the restrictions of typical discord rules, but should be relevant to the tournament you are competing in.
