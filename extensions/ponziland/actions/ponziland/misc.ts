@@ -26,7 +26,7 @@ export const level_up = (chain: StarknetChain) => action({
         let estark_address = "0x071de745c1ae996cfd39fb292b4342b7c086622e3ecf3a5692bd623060ff3fa0";
         let ponziland_address = ponziland_manifest.contracts[0].address;
 
-        let level_up_call: Call = {contractAddress: ponziland_address, entrypoint: "level_up", calldata: CallData.compile({land_location: data.land_location})};
+        let level_up_call: Call = { contractAddress: ponziland_address, entrypoint: "level_up", calldata: CallData.compile({ land_location: data.land_location }) };
 
         calls.push(level_up_call);
 
@@ -67,22 +67,23 @@ export const increase_stake = (chain: StarknetChain) => action({
             }
             let token_address = land.token_used;
             console.log('token_address', token_address)
-            
+
             // Track total amount needed for each token
             if (!tokenAmounts[token_address]) {
+                throw new Error(`Token address ${token_address} not found in lands`);
                 tokenAmounts[token_address] = BigInt(0);
             }
             tokenAmounts[token_address] += BigInt(call.amount);
-            
+
             // Add the increase_stake call
-            let increase_stake_call: Call = {contractAddress: ponziland_address, entrypoint: "increase_stake", calldata: CallData.compile({land_location: call.land_location, amount: cairo.uint256(call.amount)})};
+            let increase_stake_call: Call = { contractAddress: ponziland_address, entrypoint: "increase_stake", calldata: CallData.compile({ land_location: call.land_location, amount: cairo.uint256(call.amount) }) };
             calls.push(increase_stake_call);
         }
 
         // Second pass: add bundled approve calls at the beginning
         let approveCalls: Call[] = [];
         for (const [token_address, totalAmount] of Object.entries(tokenAmounts)) {
-            let approve_call: Call = {contractAddress: token_address, entrypoint: "approve", calldata: CallData.compile({spender: ponziland_address, amount: cairo.uint256(totalAmount.toString())})};
+            let approve_call: Call = { contractAddress: token_address, entrypoint: "approve", calldata: CallData.compile({ spender: ponziland_address, amount: cairo.uint256(totalAmount.toString()) }) };
             approveCalls.push(approve_call);
         }
 
@@ -93,8 +94,8 @@ export const increase_stake = (chain: StarknetChain) => action({
         console.log('res', res)
 
         return res;
-        
-        
+
+
     }
 })
 
@@ -103,7 +104,7 @@ export const increase_price = (chain: StarknetChain) => action({
     description: "Increase the price of a land",
     schema: z.object({
         land_location: z.string().describe("Location of the land to increase price on"),
-        amount: z.string().describe("The new price amount (in wei, so x10^18)"),    
+        amount: z.string().describe("The new price amount (in wei, so x10^18)"),
     }),
     async handler(data, ctx, agent) {
 
@@ -111,8 +112,8 @@ export const increase_price = (chain: StarknetChain) => action({
 
         let estark_address = "0x071de745c1ae996cfd39fb292b4342b7c086622e3ecf3a5692bd623060ff3fa0";
         let ponziland_address = ponziland_manifest.contracts[0].address;
-        
-        let increase_price_call: Call = {contractAddress: ponziland_address, entrypoint: "increase_price", calldata: CallData.compile({land_location: data.land_location, amount: cairo.uint256(data.amount)})};
+
+        let increase_price_call: Call = { contractAddress: ponziland_address, entrypoint: "increase_price", calldata: CallData.compile({ land_location: data.land_location, amount: cairo.uint256(data.amount) }) };
 
         calls.push(increase_price_call);
 

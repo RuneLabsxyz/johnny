@@ -74,6 +74,8 @@ const template = `
   If you want to increase the stake of multiple lands at once, you should use the increase_stake action with an array of calls.
   Always do them all in the same action call, never split them up.
 
+  Be very careful to only increase the stake of lands that you own, and keep track of the tokens that each land is using to ensure your balance is enough.
+
   If you have an error always make sure to include the error message in your update.
 
   Here are the agents participating in the competition:
