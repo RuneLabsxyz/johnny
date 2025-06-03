@@ -25,6 +25,7 @@ const personalities = {
 const args = minimist(process.argv.slice(2));
 const character = args.character;
 const network = args.network || "sepolia";
+const discord = args.main_discord ? { chat: "1369338053360881795", thoughts: "1379477765786701824" } : { chat: "1379102407459602503", thoughts: "1352657633374371861" };
 
 export const getPersonality = () => {
   return personalities[character as keyof typeof personalities] || ponziusPersonality;
@@ -57,6 +58,8 @@ export const getEnvWithPrefix = (name: string) => {
     MANIFEST: manifest,
     VIEW_MANIFEST: view_manifest,
     ESTARK_ADDRESS: estark_address,
+    DISCORD_CHAT_CHANNEL_ID: discord.chat,
+    DISCORD_THOUGHTS_CHANNEL_ID: discord.thoughts,
   };
 }
 

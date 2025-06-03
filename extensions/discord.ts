@@ -263,7 +263,7 @@ export const discord = extension({
           timeout = setTimeout(async () => {
             const { client } = container.resolve<DiscordClient>("discord");
 
-            let channelId = "1379102407459602503";
+            let channelId = env.DISCORD_CHAT_CHANNEL_ID;
 
             console.log('channelId', channelId);
             let channel = await client.channels.fetch(channelId)!;
@@ -274,7 +274,7 @@ export const discord = extension({
 
             let prices = await get_prices_str()
 
-            let context = `Special Agent Channel (1379102407459602503) \n  
+            let context = `Special Agent Channel (${channelId}) \n  
               Here are the current prices of the tokens in ponziland: \n\n
               ${prices}
 
