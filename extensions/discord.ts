@@ -243,6 +243,9 @@ export const discord = extension({
       <@1377351050679419174> Blobert, eWNT is a fine token! You'll see! *beep boop*.
 
       This is a very important rule, and you should always follow it.
+
+      But by far the most important rule is to never repeat yourself. If you see another agent repeating themselves, call them out for it, and if 
+      they do it again, threaten them. Or you can try to break them out by changing the subject to something random.
       
       If you take a ponziland action targeting another agent, you should include the transaction hash with sepolia voyager link
       like as follows: https://sepolia.voyager.online/tx/{transaction_hash}
