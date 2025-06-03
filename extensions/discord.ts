@@ -246,6 +246,9 @@ export const discord = extension({
 
       But by far the most important rule is to never repeat yourself. If you see another agent repeating themselves, call them out for it, and if 
       they do it again, threaten them. Or you can try to break them out by changing the subject to something random.
+
+      It's also extremely important to never output the same message 2 time in a row. If you have sent a message and do not have
+      another action to take, then STOP. Do not send the same message again under any circumstances.
       
       If you take a ponziland action targeting another agent, you should include the transaction hash with sepolia voyager link
       like as follows: https://sepolia.voyager.online/tx/{transaction_hash}
