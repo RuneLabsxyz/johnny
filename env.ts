@@ -35,7 +35,7 @@ export const getEnvWithPrefix = (name: string) => {
   let networkPrefix = network.toUpperCase();
   let manifest = network.toLowerCase() === "sepolia" ? manifest_sepolia : manifest_mainnet;
   let view_manifest = network.toLowerCase() === "sepolia" ? view_manifest_sepolia : view_manifest_mainnet;
-
+  let estark_address = network.toLowerCase() === "sepolia" ? "0x071de745c1ae996cfd39fb292b4342b7c086622e3ecf3a5692bd623060ff3fa0" : "0x056893df1e063190aabda3c71304e9842a1b3d638134253dd0f69806a4f106eb";
   return {
     TWITTER_USERNAME: process.env[`${prefix}_TWITTER_USERNAME`],
     TWITTER_PASSWORD: process.env[`${prefix}_TWITTER_PASSWORD`],
@@ -56,6 +56,7 @@ export const getEnvWithPrefix = (name: string) => {
     AVNU_BASE_URL: network.toLowerCase() === "sepolia" ? "https://sepolia.api.avnu.fi" : "https://api.avnu.fi",
     MANIFEST: manifest,
     VIEW_MANIFEST: view_manifest,
+    ESTARK_ADDRESS: estark_address,
   };
 }
 

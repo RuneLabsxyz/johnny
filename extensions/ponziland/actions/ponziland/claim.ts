@@ -49,7 +49,7 @@ export const claim_all = (chain: StarknetChain) => input({
         try {
           let calls = [];
 
-          let estark_address = "0x071de745c1ae996cfd39fb292b4342b7c086622e3ecf3a5692bd623060ff3fa0";
+          let estark_address = env.ESTARK_ADDRESS;
           let ponziland_address = env.MANIFEST.contracts[0].address;
 
           let lands = await get_owned_lands();

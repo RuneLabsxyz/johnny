@@ -25,7 +25,7 @@ export const buy = (chain: StarknetChain) => action({
 
         let manifest = env.MANIFEST;
 
-        let estark_address = "0x071de745c1ae996cfd39fb292b4342b7c086622e3ecf3a5692bd623060ff3fa0";
+        let estark_address = env.ESTARK_ADDRESS;
         let ponziland_address = manifest.contracts[0].address;
 
         let { abi: token_abi } = await chain.provider.getClassAt(data.token_for_sale);

@@ -21,15 +21,15 @@ export interface UserLookupResponse {
 }
 
 export async function getAllTokensFromAPI(): Promise<TokenPrice[]> {
-  const response = await fetch('https://api-sepolia.ponzi.land/price');
+  const response = await fetch('https://api.ponzi.land/price');
   return response.json();
 }
 
 export async function getLiquidityPoolFromAPI(tokenAddress: string): Promise<PoolKey | null> {
   try {
-    const response = await fetch('https://api-sepolia.ponzi.land/price');
+    const response = await fetch('https://api.ponzi.land/price');
     const tokens: TokenPrice[] = await response.json();
-    
+
     const token = tokens.find(t => {
 
       console.log('t.address', t.address.toString());
@@ -41,7 +41,7 @@ export async function getLiquidityPoolFromAPI(tokenAddress: string): Promise<Poo
 
     console.log('token', token);
 
-  
+
 
 
     if (!token || !token.best_pool) {
@@ -65,10 +65,10 @@ export async function getLiquidityPoolFromAPI(tokenAddress: string): Promise<Poo
     console.error('Error fetching liquidity pool:', error);
     return null;
   }
-} 
+}
 
 export async function lookupUserByProvider(
-  provider: string, 
+  provider: string,
   username: string,
   baseUrl: string = 'https://socialink-sepolia.ponzi.land'
 ): Promise<UserLookupResponse> {
@@ -78,7 +78,7 @@ export async function lookupUserByProvider(
     url.searchParams.set('username', username);
 
     const apiKey = env.SOCIALINK_API_KEY;
-    
+
     if (!apiKey) {
       return {
         ok: false,
@@ -107,14 +107,14 @@ export async function lookupUserByProvider(
     if (!response.ok) {
       const errorText = await response.text();
       console.log('Error response:', errorText);
-      
+
       let errorData;
       try {
         errorData = JSON.parse(errorText);
       } catch {
         errorData = { error: errorText };
       }
-      
+
       return {
         ok: false,
         error: errorData.error || `HTTP ${response.status}: ${response.statusText}`

@@ -57,7 +57,6 @@ If a transaction fails and you are sending an update in the discord, be explicit
 Never send a update about a failed transaction without any information about the error message
 
 Don't tweet about increasing stake. Only tweet about leveling up with somthing like "my empire grows stronger"
-PONZILAND_ACTIONS ADDRESS: 0x19b9cef5b903e9838d649f40a8bfc34fbaf644c71f8b8768ece6a6ca1c46dc0
 
 Ponzilands website is https://ponzi.land and the twitter is @ponzidotland, so make sure to direct people to the right place if they ask how to play.
 They just need to join the discord, get their cartridge controller ready, and get ready for the next tournament.
