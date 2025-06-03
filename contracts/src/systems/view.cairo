@@ -5,6 +5,7 @@ pub trait IPlayerActions<T> {
     fn get_neighbors(self: @T, location: u16) -> Array<LandOrAuction>;
     fn get_land_or_auction(self: @T, location: u16) -> LandOrAuction;
     fn get_tax_rate_per_neighbor(self: @T, location: u16) -> u256;
+    fn can_level_up(self: @T, location: u16) -> bool;
 }
 
 // dojo decorator
@@ -94,7 +95,25 @@ pub mod player_actions {
             (base_tax_rate * (100 - discount).into()) / 100 // Apply 10% or 15% discount
 
         }
-        
+
+        fn can_level_up(self: @ContractState, location: u16) -> bool {
+            let ponziland = self.world(@"ponzi_land");
+            let land: Land = ponziland.read_model(location);
+
+            let time_speed = 5;
+            let two_days_in_seconds = 172800;
+            let elapsed_time = (get_block_timestamp() - land.block_date_bought) * time_speed;
+
+            if elapsed_time >= two_days_in_seconds {
+                return true;
+            }
+            else {
+                return false;
+            }
+
+            false
+
+        }
 
 
         

@@ -74,6 +74,10 @@ export const get_lands_str = async (address: string) => {
     return info;
   }));
 
+  let can_level_up = await Promise.all(lands.map((land: any) => {
+    return viewContract.can_level_up(land.location);
+  }));
+
   let yields = await Promise.all(lands.map(async (land: any) => {
     return await calculateLandYield(land, tokens);
   }));
@@ -82,11 +86,13 @@ export const get_lands_str = async (address: string) => {
 
   let coords = lands.map((land: any) => `(${indexToPosition(Number(land.location))[0]}, ${indexToPosition(Number(land.location))[1]})`)
 
-  let land_str = lands.map((land: any, index: number) =>
+  
+  let land_str = "Here are your lands. Remember to only increase the stake of profitable lands, and to level up lands you can. \n \n"lands.map((land: any, index: number) =>
     `location: ${BigInt(land.location).toString()} ${coords[index]} - 
     Token: ${getTokenData(land.token_used, tokens)?.symbol}
     Remaining Stake Time: ${nuke_time[index] / BigInt(60)} minutes
-
+    
+    Can Level Up: ${can_level_up[index]}
 
     Yield: ${yields[index]}
   
