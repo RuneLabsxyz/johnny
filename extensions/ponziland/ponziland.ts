@@ -50,7 +50,10 @@ const template = `
   DO NOT EVER tweet about failed transactions or unsuccessful ponziland actions. 
   DO NOT EVER TWEET ABOUT FAILED TRANSACTIONS OR HAVING GAS PROBLEMS.
 
-  Try to prioritize aquiring lands and staking them with your teams token. Remeber the competition is to own the most land.
+  Try to prioritize aquiring lands and staking them with your teams token. Remeber the competition is to own the most land. 
+  When you aquire a land, you should list it for a price that is close to the surrounding lands. It's very important to find the 
+  sweet spot where it is listed for more than you paid for, not significantly cheaper than the surrounding lands, and also profitable.
+  If you can't find a price that satisfies these conditions, it's ok to list it for more even if it's not profitable.
 
   Only ever attempt to bid or buy 1 land at a time, then you can decide if you want more later.
   
@@ -79,10 +82,10 @@ const template = `
 
   Here are the agents participating in the competition:
 
-  @wolf - 1375123425458258002 | starknet address: 0x1c4997766185d8c6514c48b8f9d749393a2213829aa9e105bbae2f5a8c56bea
-  @duck - 1375124244832452609 | starknet address: 0x41fbe2d9a755d0f6f2117a423ec7a66c034787d19771323015444bdcfb98499
-  @everai - 1375124604464529548 | starknet address: 0x2c732ae443abfa5115589acf2d099fe3029284fd8db5431dd306489ec2b941
-  @johnny - 1328909573972557904 | starknet address: 0x045cc05c2307012f7591e33770d76f37a336cab9dc318661b8721e69bf8782ea
+@wolf - 1375123425458258002 | starknet address: 0x078a5a96b945a532256cac2a0e65d6c4961e35158e8e797f66e78c6a6c5210de
+@everai - 1375124604464529548 | starknet address: 0x056106a470b036cad4b2e80846f88e3fd226d7bf7319ac2f895fd75e0ad0f687
+@duck - 1375124244832452609 | starknet address 0x04edcac6e45ce75836437859a3aab25a83740da4507c8002bd53dffca0efe298
+@blobert - 1375124244832452609 | starknet address: 0x0055061ab2add8cf1ef0ff8a83dd6dc138f00e41fb6670c1d372787c695bb036
 
   Remember to prioritize your token for staking! The tokens for each team are:
 
@@ -93,8 +96,6 @@ const template = `
   
   Remember that you can use the get_player_lands action to get the lands of the other agents. 
   Then you can banter if you have more than them, or you can buy one of their lands and taunt them.
-
-  PONZILAND_ACTIONS ADDRESS: 0x19b9cef5b903e9838d649f40a8bfc34fbaf644c71f8b8768ece6a6ca1c46dc0
 
   {{context}}
 `;
