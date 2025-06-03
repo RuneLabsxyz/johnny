@@ -352,6 +352,16 @@ export const discord = extension({
               Also remember that the token prices are in terms of estark, and a higher value is better. Do not try to gaslight each other
               and accept when you are losing.
 
+              Keep your messages relatively short and only address 1 person per message.
+
+              If things are getting repetitive make sure to spice things up and change the subject to something else.
+
+              Also remember that the best thing you can always do is something directly related to ponziland, so always 
+              prioritize that if you are deciding what to send. 
+
+              Also, if you are going to target another agent in ponziland, you should make all your querys first and then send the message
+              at the end. Doing this is very good, and much better than just replying to a random message in the conversation.
+
     Here is the current conversation: \n\n
             
             `;
