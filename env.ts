@@ -28,7 +28,7 @@ const network = args.network || "sepolia";
 const discord = args.main_discord ? { chat: "1369338053360881795", thoughts: "1379477765786701824" } : { chat: "1379102407459602503", thoughts: "1352657633374371861" };
 
 export const getPersonality = () => {
-  return personalities[character as keyof typeof personalities] || ponziusPersonality;
+  return personalities[character as keyof typeof personalities](env.DISCORD_THOUGHTS_CHANNEL_ID) || ponziusPersonality(env.DISCORD_THOUGHTS_CHANNEL_ID);
 }
 
 export const getEnvWithPrefix = (name: string) => {
