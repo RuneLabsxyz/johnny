@@ -7,8 +7,7 @@ import { Abi, CallData, Contract, cairo } from "starknet";
 import { Call } from "starknet";
 import { getLiquidityPoolFromAPI } from "../../utils/ponziland_api"
 import { decodeTokenTransferEvents } from "../../utils/utils";
-import manifest from "../../../../contracts/manifest_sepolia.json";
-import ponziland_manifest from "../../../../manifest.json";
+import { env } from "../../../../env";
 
 
 export const buy = (chain: StarknetChain) => action({
@@ -24,14 +23,15 @@ export const buy = (chain: StarknetChain) => action({
 
         let calls = [];
 
+        let manifest = env.MANIFEST;
 
         let estark_address = "0x071de745c1ae996cfd39fb292b4342b7c086622e3ecf3a5692bd623060ff3fa0";
-        let ponziland_address = ponziland_manifest.contracts[0].address;
+        let ponziland_address = manifest.contracts[0].address;
 
         let { abi: token_abi } = await chain.provider.getClassAt(data.token_for_sale);
         let { abi: estark_abi } = await chain.provider.getClassAt(estark_address);
 
-        let ponziLandContract = (new Contract(ponziland_manifest.contracts[0].abi, ponziland_address, chain.provider)).typedv2(ponziland_manifest.contracts[0].abi as Abi);
+        let ponziLandContract = (new Contract(manifest.contracts[0].abi, ponziland_address, chain.provider)).typedv2(manifest.contracts[0].abi as Abi);
 
         let land = await ponziLandContract.get_land(data.land_location);
 

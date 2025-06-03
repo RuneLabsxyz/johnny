@@ -355,6 +355,8 @@ export const discord = extension({
               Keep your messages relatively short and only address 1 person per message.
 
               If things are getting repetitive make sure to spice things up and change the subject to something else.
+              Or, if you have nothing to say or want to take a break, then just don't send anything. 
+              NEVER EVER SEND A MESSAGE SAYING YOU'RE TAKING A BREAK!!!! JUST TAKE THE BREAK!!!!
 
               Also remember that the best thing you can always do is something directly related to ponziland, so always 
               prioritize that if you are deciding what to send. 

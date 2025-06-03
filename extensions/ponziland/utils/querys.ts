@@ -1,14 +1,13 @@
 import { render } from "../../../../fork/daydreams/packages/core/src";
 import { fetchGraphQL } from "../../../../fork/daydreams/packages/core/src";
-import manifest from "../../../manifest.json";
 import { CairoCustomEnum, Contract, RpcProvider, type Abi } from "starknet";
 import { balance_query, auction_query, land_query } from "./gql";
 import { getAllTokensFromAPI } from "../utils/ponziland_api";
-import view_manifest from "../../../contracts/manifest_sepolia.json";
 import { getTokenData, formatTokenAmount } from "../utils/utils";
 import { env } from "../../../env";
 
-
+let manifest = env.MANIFEST;
+let view_manifest = env.VIEW_MANIFEST;
 
 let provider = new RpcProvider({ nodeUrl: env.STARKNET_RPC_URL });
 let abi = manifest.contracts[0].abi;

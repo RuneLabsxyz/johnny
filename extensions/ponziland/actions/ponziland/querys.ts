@@ -4,10 +4,13 @@ import { ActionCall } from "../../../../../fork/daydreams/packages/core/src"
 import { Agent } from "../../../../../fork/daydreams/packages/core/src"
 import { z } from "zod"
 import { Abi, Contract } from "starknet"
-import manifest from "../../../../contracts/manifest_release.json"
 import { CONTEXT } from "../../contexts/ponziland-context"
 import { get_auctions_str, get_claims_str, get_lands_str, get_neighbors_str, get_all_lands_str, get_auction_yield_str, get_prices_str } from "../../utils/querys"
 import { env } from "../../../../env"
+import { lookupUserByProvider } from "extensions/ponziland/utils/ponziland_api"
+
+
+let view_manifest = env.VIEW_MANIFEST;
 
 export const get_auctions = (chain: StarknetChain) => action({
     name: "get-auctions",
@@ -150,9 +153,9 @@ export const socialink_lookup = action({
     name: "socialink-lookup",
     description: "Lookup a user's socialink profile using their discord username. This returns their starknet address if they are registered",
     schema: z.object({ username: z.string() }),
-    async handler(data: { usename: string }, ctx: any, agent: Agent) {
+    async handler(data: { username: string }, ctx: any, agent: Agent) {
 
-        let res = await lookupUserByProvider("discord", data.id);
+        let res = await lookupUserByProvider("discord", data.username);
 
         return res;
 

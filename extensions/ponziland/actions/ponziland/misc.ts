@@ -7,10 +7,10 @@ import { Abi, CallData, Contract, cairo } from "starknet";
 import { Call } from "starknet";
 import { getLiquidityPoolFromAPI } from "../../utils/ponziland_api"
 import { decodeTokenTransferEvents } from "../../utils/utils";
-import manifest from "../../../../contracts/manifest_sepolia.json";
-import ponziland_manifest from "../../../../manifest.json";
 import { get_owned_lands } from "../../utils/querys"
+import { env } from "../../../../env";
 
+let manifest = env.MANIFEST;
 
 export const level_up = (chain: StarknetChain) => action({
     name: "level-up",
@@ -24,7 +24,7 @@ export const level_up = (chain: StarknetChain) => action({
 
 
         let estark_address = "0x071de745c1ae996cfd39fb292b4342b7c086622e3ecf3a5692bd623060ff3fa0";
-        let ponziland_address = ponziland_manifest.contracts[0].address;
+        let ponziland_address = manifest.contracts[0].address;
 
         let level_up_call: Call = { contractAddress: ponziland_address, entrypoint: "level_up", calldata: CallData.compile({ land_location: data.land_location }) };
 
@@ -52,7 +52,7 @@ export const increase_stake = (chain: StarknetChain) => action({
         let tokenAmounts: { [tokenAddress: string]: bigint } = {};
 
         let estark_address = "0x071de745c1ae996cfd39fb292b4342b7c086622e3ecf3a5692bd623060ff3fa0";
-        let ponziland_address = ponziland_manifest.contracts[0].address;
+        let ponziland_address = manifest.contracts[0].address;
 
         let lands = await get_owned_lands();
 
@@ -70,7 +70,6 @@ export const increase_stake = (chain: StarknetChain) => action({
 
             // Track total amount needed for each token
             if (!tokenAmounts[token_address]) {
-                throw new Error(`Token address ${token_address} not found in lands`);
                 tokenAmounts[token_address] = BigInt(0);
             }
             tokenAmounts[token_address] += BigInt(call.amount);
@@ -111,7 +110,7 @@ export const increase_price = (chain: StarknetChain) => action({
         let calls = [];
 
         let estark_address = "0x071de745c1ae996cfd39fb292b4342b7c086622e3ecf3a5692bd623060ff3fa0";
-        let ponziland_address = ponziland_manifest.contracts[0].address;
+        let ponziland_address = manifest.contracts[0].address;
 
         let increase_price_call: Call = { contractAddress: ponziland_address, entrypoint: "increase_price", calldata: CallData.compile({ land_location: data.land_location, amount: cairo.uint256(data.amount) }) };
 
