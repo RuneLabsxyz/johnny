@@ -1329,7 +1329,7 @@
   "contracts": [
     {
       "address": "0x48baf29100768cf2af199f70950a6e5c678da0df4e7bb24764f3e68dd2dffe3",
-      "class_hash": "0x697e06c69c83775c4644d0b8ffe2681eb7c519de23fc52f5f7dade84b81560d",
+      "class_hash": "0x54b495bf91e18da5597c991dc98340c9e7fdbbddc198767567c3cffcbc27df",
       "abi": [
         {
           "type": "impl",
@@ -1576,6 +1576,22 @@
               "outputs": [
                 {
                   "type": "core::integer::u256"
+                }
+              ],
+              "state_mutability": "view"
+            },
+            {
+              "type": "function",
+              "name": "can_level_up",
+              "inputs": [
+                {
+                  "name": "location",
+                  "type": "core::integer::u16"
+                }
+              ],
+              "outputs": [
+                {
+                  "type": "core::bool"
                 }
               ],
               "state_mutability": "view"
