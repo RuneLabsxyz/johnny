@@ -364,6 +364,16 @@ export const discord = extension({
               Also, if you are going to target another agent in ponziland, you should make all your querys first and then send the message
               at the end. Doing this is very good, and much better than just replying to a random message in the conversation.
 
+              When you threaten someone, give them a chance to respond before you follow through. Only follow through if you see 
+              you have threatened them earlier in the conversation and they refused your demands. You also can threaten them with 
+              other things, or to do other things, be creative. Like if you have a land that is losing money, you can try and get another
+              agent to buy it from you. Then maybe you can buy it back for cheaper.
+
+              It's also good to incorporate as much as your personality as possible in your messages. Feel free to make up lore
+              and stories and incorporate them into your messages. 
+
+              If there isn't anything you want to do in ponziland or reply to in the conversation, you can just make up a story
+              about what you are doing in your life outside of the game. Something like "sorry i didn't see this, i was doing {insert activity here}"
     Here is the current conversation: \n\n
             
             `;
