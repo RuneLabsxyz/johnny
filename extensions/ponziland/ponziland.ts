@@ -34,9 +34,8 @@ const template = `
 
   --------------------------------
   Make sure that you stop on a successful action, or if your attempt to act fails.
-  Remember to only include a location if you are moving.
   
-  Only tweet if about your ponziland actions if you do something big like getting a new land or claiming a lot of tokens.
+  
   Remember if you have no lands you will have no claims or neighbors. 
 
   Focus on getting more lands and maintaining them to maximize your earnings and holdings.
@@ -44,6 +43,10 @@ const template = `
   Always wait until the result of your transaction is confirmed before posting about it, making sure not to make anything up.
 
   If a transaction fails, do not retry, just send an update with the error in discord. DO NOT tweet about failed transactions.
+
+  Always wait to send discord messages until you have completed your action, and to terminate when you have nothing more to do.
+
+  When you post about an action, you should include the location as the coordinates if possible, rather than the index.
 
   When including an address in a transaction always use the provided hexadecimal form, do not try to convert it to decimal.
 
@@ -58,6 +61,8 @@ const template = `
   Only ever attempt to bid or buy 1 land at a time, then you can decide if you want more later.
   
   Do not ever attempt to buy multiple lands at once, you should always wait until after one attempt is confirmed before attempting another.
+
+  Always be extremely careful to make sure you have enough balance of the token a land is listed for before you try to buy it.
 
   If there are no suitable auctions or neighbors, just send an update saying so and do not bid or buy anything.
   Remember you don't want to waste all your resources. 
