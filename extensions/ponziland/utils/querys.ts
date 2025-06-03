@@ -3,7 +3,7 @@ import { fetchGraphQL } from "../../../../fork/daydreams/packages/core/src";
 import { CairoCustomEnum, Contract, RpcProvider, type Abi } from "starknet";
 import { balance_query, auction_query, land_query } from "./gql";
 import { getAllTokensFromAPI } from "../utils/ponziland_api";
-import { getTokenData, formatTokenAmount } from "../utils/utils";
+import { getTokenData, formatTokenAmount, indexToPosition  } from "../utils/utils";
 import { env } from "../../../env";
 
 let manifest = env.MANIFEST;
@@ -80,8 +80,10 @@ export const get_lands_str = async (address: string) => {
 
   console.log('yields', yields)
 
+  let coords = lands.map((land: any) => `(${indexToPosition(Number(land.location))[0]}, ${indexToPosition(Number(land.location))[1]})`)
+
   let land_str = lands.map((land: any, index: number) =>
-    `location: ${BigInt(land.location).toString()} - 
+    `location: ${BigInt(land.location).toString()} ${coords[index]} - 
     Token: ${getTokenData(land.token_used, tokens)?.symbol}
     Remaining Stake Time: ${nuke_time[index] / BigInt(60)} minutes
 
@@ -164,8 +166,10 @@ export const get_auctions_str = async () => {
     auction.current_price = initial_prices[index];
   });
 
-  let auction_str = auctions.map((auction: any) =>
-    `location: ${BigInt(auction.land_location).toString()} - Current Price: ${auction.current_price}`).join("\n");
+  let coords = auctions.map((auction: any) => `(${indexToPosition(Number(auction.land_location))[0]}, ${indexToPosition(Number(auction.land_location))[1]})`)
+
+  let auction_str = auctions.map((auction: any, index: number) =>
+    `location: ${BigInt(auction.land_location).toString()} ${coords[index]} - Current Price: ${auction.current_price}`).join("\n");
 
   return auction_str;
 }
@@ -179,15 +183,17 @@ export const get_neighbors_str = async (location: number) => {
   let res = neighbors.map((temp: CairoCustomEnum) => {
     if (temp.activeVariant() == "Land") {
       let neighbor = temp.unwrap();
+      let coords = `(${indexToPosition(Number(neighbor.location))[0]}, ${indexToPosition(Number(neighbor.location))[1]})`
       if (BigInt(neighbor.owner) != BigInt(address)) {
-        return `Location: ${BigInt(neighbor.location).toString()} - Sell Price: ${BigInt(neighbor.sell_price).toString()} - Token: ${getTokenData(neighbor.token_used, tokens)!.symbol}`;
+        return `Location: ${BigInt(neighbor.location).toString()} ${coords} - Sell Price: ${BigInt(neighbor.sell_price).toString()} - Token: ${getTokenData(neighbor.token_used, tokens)!.symbol}`;
       }
       else {
-        return `Location: ${BigInt(neighbor.location).toString()} - Sell Price: ${BigInt(neighbor.sell_price).toString()} - Token: ${getTokenData(neighbor.token_used, tokens)!.symbol} - Owner: ${neighbor.owner} (You)`;
+        return `Location: ${BigInt(neighbor.location).toString()} ${coords} - Sell Price: ${BigInt(neighbor.sell_price).toString()} - Token: ${getTokenData(neighbor.token_used, tokens)!.symbol} - Owner: ${neighbor.owner} (You)`;
       }
     } else if (temp.activeVariant() == "Auction") {
       let neighbor = temp.unwrap();
-      return `Location: ${BigInt(neighbor.land_location).toString()} - Auction`;
+      let coords = `(${indexToPosition(Number(neighbor.land_location))[0]}, ${indexToPosition(Number(neighbor.land_location))[1]})` 
+      return `Location: ${BigInt(neighbor.land_location).toString()} ${coords} - Auction`;
     }
     else {
       return ``
@@ -211,7 +217,9 @@ export const get_all_lands_str = async () => {
   lands = lands.filter((land: any) => (land.owner != address && BigInt(land.owner) != BigInt(0)));
   console.log('lands', lands)
 
-  let land_str = lands.map((land: any) => ` Owner: ${land.owner} Location: ${BigInt(land.location).toString()} Token: ${getTokenData(land.token_used, tokens)!.symbol} sell price: ${formatTokenAmount(BigInt(land.sell_price))}`).join("\n");
+  let coords = lands.map((land: any) => `(${indexToPosition(Number(land.location))[0]}, ${indexToPosition(Number(land.location))[1]})`)
+
+  let land_str = lands.map((land: any, index: number) => ` Owner: ${land.owner} Location: ${BigInt(land.location).toString()} ${coords[index]} Token: ${getTokenData(land.token_used, tokens)!.symbol} sell price: ${formatTokenAmount(BigInt(land.sell_price))}`).join("\n");
   return land_str;
 }
 
@@ -236,6 +244,7 @@ export const get_auction_yield_str = async (location: number) => {
       console.log('value', value)
       let neighbor_yield = neighbor_tax_rates[index];
       let neighbor_token = getTokenData(value.token_used, tokens);
+      let coords = `(${indexToPosition(Number(value.location))[0]}, ${indexToPosition(Number(value.location))[1]})`
       if (!neighbor_token) {
         console.log("No token?")
       }
@@ -244,14 +253,14 @@ export const get_auction_yield_str = async (location: number) => {
         if (!neighbor_token.ratio) {
           income += BigInt(neighbor_yield);
           detailed_income += `
-          Location: ${value.location} - Yield: ${formatTokenAmount(BigInt(neighbor_yield))} estark
+          Location: ${value.location} ${coords[index]} - Yield: ${formatTokenAmount(BigInt(neighbor_yield))} estark
           `;
         }
         else {
           let adjusted_yield = Math.floor(Number(neighbor_yield) / neighbor_token.ratio);
           income += BigInt(adjusted_yield);
           detailed_income += `
-          Location: ${value.location} - Yield: ${formatTokenAmount(BigInt(neighbor_yield))} ${neighbor_token.symbol} (${formatTokenAmount(BigInt(adjusted_yield))} estark)
+          Location: ${value.location} ${coords} - Yield: ${formatTokenAmount(BigInt(neighbor_yield))} ${neighbor_token.symbol} (${formatTokenAmount(BigInt(adjusted_yield))} estark)
           `;
         }
       }
@@ -292,6 +301,7 @@ export const get_unowned_land_yield_str = async (location: number) => {
       console.log('value', value)
       let neighbor_yield = neighbor_tax_rates[index];
       let neighbor_token = getTokenData(value.token_used, tokens);
+      let coords = `(${indexToPosition(Number(value.location))[0]}, ${indexToPosition(Number(value.location))[1]})`
       if (!neighbor_token) {
         console.log("No token?")
       }
@@ -300,14 +310,14 @@ export const get_unowned_land_yield_str = async (location: number) => {
         if (!neighbor_token.ratio) {
           income += BigInt(neighbor_yield);
           detailed_income += `
-          Location: ${value.location} - Yield: ${formatTokenAmount(BigInt(neighbor_yield))} estark
+          Location: ${value.location} ${coords} - Yield: ${formatTokenAmount(BigInt(neighbor_yield))} estark
           `;
         }
         else {
           let adjusted_yield = Math.floor(Number(neighbor_yield) / neighbor_token.ratio);
           income += BigInt(adjusted_yield);
           detailed_income += `
-          Location: ${value.location} - Yield: ${formatTokenAmount(BigInt(neighbor_yield))} ${neighbor_token.symbol} (${formatTokenAmount(BigInt(adjusted_yield))} estark)
+          Location: ${value.location} ${coords} - Yield: ${formatTokenAmount(BigInt(neighbor_yield))} ${neighbor_token.symbol} (${formatTokenAmount(BigInt(adjusted_yield))} estark)
           `;
         }
       }
@@ -377,6 +387,7 @@ export const calculateLandYield = async (land: any, tokens: TokenPrice[]) => {
       console.log('value', value)
       let neighbor_yield = neighbor_tax_rates[index];
       let neighbor_token = getTokenData(value.token_used, tokens);
+      let coords = `(${indexToPosition(Number(value.location))[0]}, ${indexToPosition(Number(value.location))[1]})`
       if (!neighbor_token) {
         console.log("No token?")
       }
@@ -385,14 +396,14 @@ export const calculateLandYield = async (land: any, tokens: TokenPrice[]) => {
         if (!neighbor_token.ratio) {
           income += BigInt(neighbor_yield);
           detailed_income += `
-          Location: ${value.location} - Yield: ${formatTokenAmount(BigInt(neighbor_yield))} estark
+          Location: ${value.location} ${coords} - Yield: ${formatTokenAmount(BigInt(neighbor_yield))} estark
           `;
         }
         else {
           let adjusted_yield = Math.floor(Number(neighbor_yield) / neighbor_token.ratio);
           income += BigInt(adjusted_yield);
           detailed_income += `
-          Location: ${value.location} - Yield: ${formatTokenAmount(BigInt(neighbor_yield))} ${neighbor_token.symbol} (${formatTokenAmount(BigInt(adjusted_yield))} estark)
+          Location: ${value.location} ${coords} - Yield: ${formatTokenAmount(BigInt(neighbor_yield))} ${neighbor_token.symbol} (${formatTokenAmount(BigInt(adjusted_yield))} estark)
           `;
         }
       }

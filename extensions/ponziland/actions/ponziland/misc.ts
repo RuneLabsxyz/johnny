@@ -6,7 +6,7 @@ import { z } from "zod"
 import { Abi, CallData, Contract, cairo } from "starknet";
 import { Call } from "starknet";
 import { getLiquidityPoolFromAPI } from "../../utils/ponziland_api"
-import { decodeTokenTransferEvents } from "../../utils/utils";
+import { decodeTokenTransferEvents, indexToPosition } from "../../utils/utils";
 import { get_owned_lands } from "../../utils/querys"
 import { env } from "../../../../env";
 
@@ -33,7 +33,7 @@ export const level_up = (chain: StarknetChain) => action({
 
         let res = await chain.write(calls);
 
-        return res;
+        return {res, str: "Leveled up land " + Number(data.land_location) + " at " + indexToPosition(Number(data.land_location))[0] + "," + indexToPosition(Number(data.land_location))[1] };
     }
 })
 
@@ -91,7 +91,9 @@ export const increase_stake = (chain: StarknetChain) => action({
         let res = await chain.write(calls);
         console.log('res', res)
 
-        return res;
+        let str = "Increased stake on lands " + data.calls.map(c => indexToPosition(Number(c.land_location))[0] + "," + indexToPosition(Number(c.land_location))[1]).join(", ");
+
+        return {res, str};
 
 
     }
@@ -116,7 +118,7 @@ export const increase_price = (chain: StarknetChain) => action({
 
         let res = await chain.write(calls);
 
-        return res;
+        return {res, str: "Increased price on land " + Number(data.land_location) + " at " + indexToPosition(Number(data.land_location))[0] + "," + indexToPosition(Number(data.land_location))[1] };
     }
 })
 

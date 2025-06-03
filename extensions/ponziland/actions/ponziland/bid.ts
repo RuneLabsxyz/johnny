@@ -6,6 +6,7 @@ import { type Call } from "starknet";
 import { getLiquidityPoolFromAPI } from "../../utils/ponziland_api"
 import { decodeTokenTransferEvents } from "../../utils/utils";
 import { env } from "../../../../env";
+import { indexToPosition } from "../../utils/utils";
 
 
 export const bid = (chain: StarknetChain) => action({
@@ -51,6 +52,6 @@ export const bid = (chain: StarknetChain) => action({
 
         let res = await chain.write(calls);
 
-        return res;
+        return {res, str: "Bid on land " + Number(data.land_location) + " at " + indexToPosition(Number(data.land_location))[0] + "," + indexToPosition(Number(data.land_location))[1] };
     }
 })
