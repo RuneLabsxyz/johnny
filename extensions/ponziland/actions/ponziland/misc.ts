@@ -103,7 +103,7 @@ export const increase_price = (chain: StarknetChain) => action({
     name: "increase-price",
     description: "Increase the price of a land",
     schema: z.object({
-        land_location: z.string().describe("Location of the land to increase price on"),
+        land_location: z.string().describe("Location of the land to increase price on. Make sure this is a land you own."),
         amount: z.string().describe("The new price amount (in wei, so x10^18)"),
     }),
     async handler(data, ctx, agent) {
