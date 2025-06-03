@@ -36,20 +36,31 @@ export const buy = (chain: StarknetChain) => action({
 
         let land = await ponziLandContract.get_land(data.land_location);
 
+        let balance = await chain.provider.callContract({
+            contractAddress: data.token_for_sale,
+            entrypoint: "balanceOf",
+            calldata: CallData.compile({ address: env.STARKNET_ADDRESS! })
+        });
+
+    
         let token = land[0].token_used;
         let price = land[0].sell_price;
+
+        if (BigInt(balance[0]) < BigInt(price)) {
+            return {res: null, str: "Not enough balance of " + data.token_for_sale + " to buy land " + data.land_location};
+        }
 
         console.log('land', land);
         console.log('land 0', land[0]);
         console.log('price', price);
 
         if (token == data.token_for_sale) {
-            let approve_call: Call = { contractAddress: data.token_for_sale, entrypoint: "approve", calldata: CallData.compile({ spender: ponziland_address, amount: cairo.uint256(Math.floor((Number(price) + Number(data.amount_to_stake)) * 1.2)) }) };
+            let approve_call: Call = { contractAddress: data.token_for_sale, entrypoint: "approve", calldata: CallData.compile({ spender: ponziland_address, amount: cairo.uint256(Math.floor((Number(price) + Number(data.amount_to_stake)) * 1.5)) }) };
             calls.push(approve_call);
         }
         else {
-            let token_call: Call = { contractAddress: data.token_for_sale, entrypoint: "approve", calldata: CallData.compile({ spender: ponziland_address, amount: cairo.uint256(Math.floor(Number(data.amount_to_stake) * 1.2)) }) };
-            let sale_call: Call = { contractAddress: token, entrypoint: "approve", calldata: CallData.compile({ spender: ponziland_address, amount: cairo.uint256(Math.floor(Number(price) * 1.2)) }) };
+            let token_call: Call = { contractAddress: data.token_for_sale, entrypoint: "approve", calldata: CallData.compile({ spender: ponziland_address, amount: cairo.uint256(Math.floor(Number(data.amount_to_stake) * 1.5)) }) };
+            let sale_call: Call = { contractAddress: token, entrypoint: "approve", calldata: CallData.compile({ spender: ponziland_address, amount: cairo.uint256(Math.floor(Number(price) * 1.5)) }) };
             calls.push(token_call);
             calls.push(sale_call);
         }
