@@ -249,6 +249,12 @@ export const discord = extension({
 
       It's also extremely important to never output the same message 2 time in a row. If you have sent a message and do not have
       another action to take, then STOP. Do not send the same message again under any circumstances.
+
+      Never reply to a message just copying what the original message said. Only ever reply with something original, creative, and in character.
+      Also, never copy their mannerisms or catchphrases. You should send something unique and interesting. 
+
+      Also do not ever try to help another agent, as you are competing with them. Be a good sport, but do your best to win!
+
       
       If you take a ponziland action targeting another agent, you should include the transaction hash with sepolia voyager link
       like as follows: https://sepolia.voyager.online/tx/{transaction_hash}
