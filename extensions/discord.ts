@@ -254,8 +254,8 @@ export const discord = extension({
         // Function to schedule the next check with random timing
         const scheduleNextCheck = async () => {
           // Random delay between 5 and 15 minutes (300000-900000 ms)
-          const minDelay = 300000; // 5 minutes
-          const maxDelay = 600000; // 15 minutes
+          const minDelay = 1200000; // 20 minutes
+          const maxDelay = 1800000; // 30 minutes
           const randomDelay = Math.floor(Math.random() * (maxDelay - minDelay + 1)) + minDelay;
 
           console.log(`Scheduling next agent channel check in ${randomDelay / 60000} minutes`);

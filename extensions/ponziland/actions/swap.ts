@@ -6,7 +6,7 @@ import { get_balances_str } from "../utils/querys"
 import {
     executeSwap as executeAvnuSwap,
     fetchQuotes
-  } from "@avnu/avnu-sdk";
+} from "@avnu/avnu-sdk";
 
 import { env } from "../../../env"
 import { getAllTokensFromAPI } from "../utils/ponziland_api"
@@ -57,9 +57,10 @@ export const swap = (chain: StarknetChain) => action({
 
             console.log('Fetching quotes with params:', quoteParams);
 
+            let baseUrl = env.AVNU_BASE_URL;
             // Fetch quotes from AVNU
-            const quotes = await fetch(`https://sepolia.api.avnu.fi/swap/v2/quotes?sellTokenAddress=${quoteParams.sellTokenAddress}&buyTokenAddress=${quoteParams.buyTokenAddress}&sellAmount=${quoteParams.sellAmount}`);
-            
+            const quotes = await fetch(`${baseUrl}/swap/v2/quotes?sellTokenAddress=${quoteParams.sellTokenAddress}&buyTokenAddress=${quoteParams.buyTokenAddress}&sellAmount=${quoteParams.sellAmount}`);
+
             let res = await quotes.json();
             console.log('quotes', res);
 
@@ -72,7 +73,7 @@ export const swap = (chain: StarknetChain) => action({
             console.log('bestQuote', bestQuote);
 
             // Execute the swap using AVNU SDK with the chain's account
-            const swapResult = await executeAvnuSwap(chain.account, bestQuote, {}, {baseUrl: "https://sepolia.api.avnu.fi"});
+            const swapResult = await executeAvnuSwap(chain.account, bestQuote, {}, { baseUrl: baseUrl });
 
             console.log('Swap executed successfully:', swapResult);
 

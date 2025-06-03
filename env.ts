@@ -44,7 +44,9 @@ export const getEnvWithPrefix = (name: string) => {
     GOOGLE_API_KEY: process.env.GOOGLE_API_KEY,
     WEBSOCKET_URL: process.env.WEBSOCKET_URL || "ws://localhost:8080",
     SOCIALINK_API_KEY: process.env.SOCIALINK_API_KEY,
-    DRY_RUN: process.env.DRY_RUN === "1" || process.env.DRY_RUN === "true"
+    DRY_RUN: process.env.DRY_RUN === "1" || process.env.DRY_RUN === "true",
+    AVNU_API_KEY: process.env.AVNU_API_KEY,
+    AVNU_BASE_URL: network.toLowerCase() === "sepolia" ? "https://sepolia.api.avnu.fi" : "https://api.avnu.fi",
   };
 }
 
