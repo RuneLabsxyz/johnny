@@ -53,7 +53,7 @@ export const bid = (chain: StarknetChain) => action({
         }
         else {
             if (token_balance < data.amount_to_stake) {
-                return {res: null, str: "You do not have enough " + data.token_for_sale + " to stake. You have " + token_balance + " and need " + data.amount_to_stake + price};
+                return {res: null, str: "You do not have enough " + data.token_for_sale + " to stake. You have " + token_balance + " and need " + data.amount_to_stake};
             }
             if (estark_balance < price) {
                 return {res: null, str: "You do not have enough estark to bid on this auction . You have " + estark_balance + " and need " + data.amount_to_stake + price};
