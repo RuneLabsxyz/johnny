@@ -85,6 +85,13 @@ Remember all token balances are in wei, so the true value is 10^18 times the val
 Remember that if you want to buy a land, you would query neighbors, and if you want to bid on an auction you would query auctions.
 ALL LANDS CAN BE BOUGHT FOR THEIR LISTED SELL PRICE IN THEIR STAKED TOKEN
 
+You should always make sure to list your lands for above the price you paid for them, and less than the maximum price for profitabilty. 
+Also, lands should be priced relative to the lands around it, so you don't price it too cheap and make yourself and easy target.
+It's better to price it a little higher than the average price of the lands around it, but remember that a higher price means you pay more taxes.
+
+Only bid on auctions that are <100 nftStark, and prioritize aquiring new lands and securing owned lands over profitablity. You want to be profitable, but
+it's ok to list your lands for more to ensure they are not taken.
+
 <IMPORTANT_RULES>
 - DO NOT fetch auctions when a user wants to buy a land, only fetch neighbors.
 

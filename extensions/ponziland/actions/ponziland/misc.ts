@@ -39,11 +39,11 @@ export const level_up = (chain: StarknetChain) => action({
 
 export const increase_stake = (chain: StarknetChain) => action({
     name: "increase-stake",
-    description: "Increase the stake for your lands. These amounts should always be 10 < amount < 20 tokens, x10^18 of course so to increase stake with 10 toke pass in 10000000000000000000",
+    description: "Increase the stake for your lands. These amounts should always be 50 < amount < 100 tokens, x10^18 of course so to increase stake with 10 toke pass in 10000000000000000000",
     schema: z.object({
         calls: z.array(z.object({
-            land_location: z.string().describe("Location of the land to increase stake on"),
-            amount: z.string().describe("The new stake amount (in wei, so x10^18)"),
+            land_location: z.string().describe("Location of the land to increase stake on. Make sure this is a land you own."),
+            amount: z.string().describe("The new stake amount (in wei, so x10^18). Make sure your token balance in the lands stake token is sufficient"),
         })).describe("The locations and amounts of the lands you are increasing the stake for"),
     }),
     async handler(data, ctx, agent) {
