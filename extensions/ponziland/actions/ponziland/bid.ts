@@ -29,13 +29,17 @@ export const bid = (chain: StarknetChain) => action({
         let { abi: token_abi } = await chain.provider.getClassAt(data.token_for_sale);
         let { abi: estark_abi } = await chain.provider.getClassAt(estark_address);
 
-        let token_contract = (new Contract(token_abi, data.token_for_sale, chain.provider)).typedv2(token_abi as Abi);
-        let token_balance = await token_contract.balanceOf(agent.address);
+        let token_balance = await chain.provider.callContract({
+            contractAddress: data.token_for_sale,
+            entrypoint: "balanceOf",
+            calldata: [env.STARKNET_ADDRESS!]
+        });
+        let estark_balance = await chain.provider.callContract({
+            contractAddress: estark_address,
+            entrypoint: "balanceOf",
+            calldata: [env.STARKNET_ADDRESS!]
+        });
 
-        let estark_contract = (new Contract(estark_abi, estark_address, chain.provider)).typedv2(estark_abi as Abi);
-        let estark_balance = await estark_contract.balanceOf(agent.address);
-
-    
         let ponziLandContract = (new Contract(manifest.contracts[0].abi, ponziland_address, chain.provider)).typedv2(manifest.contracts[0].abi as Abi);
 
         let price = await ponziLandContract.get_current_auction_price(data.land_location);
