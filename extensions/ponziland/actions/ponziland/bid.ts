@@ -14,7 +14,7 @@ export const bid = (chain: StarknetChain) => action({
     description: "Bid on an auction",
     schema: z.object({
         land_location: z.string().describe("Location of the land to bid on"),
-        token_for_sale: z.string().describe("The *Contract address* of the token to be used for the stake and new listing. This can be found by querying your balances. This should be a token in your wallet that you have enough of."),
+        token_for_sale: z.string().describe("The *Contract address* of the token to be used for the stake and new listing. This should usually be your team's token."),
         sell_price: z.string().describe("The price the land will be listed for after the auction ends (in wei, so x10^18)"),
         amount_to_stake: z.string().describe("The amount to be staked to pay the lands taxes (in wei, so x10^18)"),
     }) as ActionSchema,
@@ -25,9 +25,6 @@ export const bid = (chain: StarknetChain) => action({
         let manifest = env.MANIFEST;
         let estark_address = env.ESTARK_ADDRESS;
         let ponziland_address = env.MANIFEST.contracts[0].address;
-
-        let { abi: token_abi } = await chain.provider.getClassAt(data.token_for_sale);
-        let { abi: estark_abi } = await chain.provider.getClassAt(estark_address);
 
         let token_balance = await chain.provider.callContract({
             contractAddress: data.token_for_sale,

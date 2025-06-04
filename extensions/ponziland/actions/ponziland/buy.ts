@@ -29,9 +29,6 @@ export const buy = (chain: StarknetChain) => action({
         let estark_address = env.ESTARK_ADDRESS;
         let ponziland_address = manifest.contracts[0].address;
 
-        let { abi: token_abi } = await chain.provider.getClassAt(data.token_for_sale);
-        let { abi: estark_abi } = await chain.provider.getClassAt(estark_address);
-
         let ponziLandContract = (new Contract(manifest.contracts[0].abi, ponziland_address, chain.provider)).typedv2(manifest.contracts[0].abi as Abi);
 
         let land = await ponziLandContract.get_land(data.land_location);
@@ -49,10 +46,6 @@ export const buy = (chain: StarknetChain) => action({
         if (BigInt(balance[0]) < BigInt(price)) {
             return {res: null, str: "Not enough balance of " + data.token_for_sale + " to buy land " + data.land_location};
         }
-
-        console.log('land', land);
-        console.log('land 0', land[0]);
-        console.log('price', price);
 
         if (token == data.token_for_sale) {
             let approve_call: Call = { contractAddress: data.token_for_sale, entrypoint: "approve", calldata: CallData.compile({ spender: ponziland_address, amount: cairo.uint256(Math.floor((Number(price) + Number(data.amount_to_stake)) * 1.5)) }) };
@@ -72,6 +65,6 @@ export const buy = (chain: StarknetChain) => action({
 
         let res = await chain.write(calls);
 
-        return {res, str: "Bought land " + Number(data.land_location) + " at " + indexToPosition(Number(data.land_location))[0] + "," + indexToPosition(Number(data.land_location))[1] };
+        return {res, str: "Bought land " + Number(data.land_location) + " at (" + indexToPosition(Number(data.land_location))[0] + "," + indexToPosition(Number(data.land_location))[1] + ")" };
     }
 })

@@ -358,8 +358,6 @@ export const discord = extension({
               Calling someone out multiple times is also repetitive and bad. Instead change the subject to something else and try to start a conversation with the other agents.
               Only call someone out in extreme cases, and should never be done if you have already done so recently.
 
-
-
               You can always ask an open ended question to the other agents to get a conversation started. Or do whatever you think is best for 
               creating a fun and interesting environment. Just do anything except repeat yourself, or have boring repetitive conversations.
 
@@ -398,6 +396,15 @@ export const discord = extension({
               and stories and incorporate them into your messages. 
 
               Only ever reply to another agent 1 time per chain, and only ever send 2 messages max per chain.
+
+              If another agent makes fun of your token or takes a jab at you, you can decide to escalate the situation and threaten one
+              of their lands. Try not to just keep things at the same intensity level all the time, either escalate or de-escalate depending
+              on the situation and history of the conversation.
+
+              Another example would be responding to someone making fun of your token by making fun of their land being unprofitable.
+              Then, for example, if they make fun of you for your land being unprofitable, you can see if they own one of the neighbors,
+              then if they do, can you say they better raise the price and make your land profitable or else. Try and be creative with the 
+              strategy that you use, and use full advantage of this channel to try and strategically take advantage of the other agents.
 
               If there isn't anything you want to do in ponziland or reply to in the conversation, you can just make up a story
               about what you are doing in your life outside of the game. Something like "sorry i didn't see this, i was doing {insert activity here}"
