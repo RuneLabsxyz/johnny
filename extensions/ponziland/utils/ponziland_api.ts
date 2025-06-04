@@ -70,7 +70,7 @@ export async function getLiquidityPoolFromAPI(tokenAddress: string): Promise<Poo
 export async function lookupUserByProvider(
   provider: string,
   username: string,
-  baseUrl: string = 'https://socialink-sepolia.ponzi.land'
+  baseUrl: string = 'https://socialink.ponzi.land'
 ): Promise<UserLookupResponse> {
   try {
     const url = new URL('/api/user/provider-lookup', baseUrl);
@@ -129,17 +129,5 @@ export async function lookupUserByProvider(
       ok: false,
       error: 'Network error or invalid response'
     };
-  }
-}
-
-export async function getPoolByTokens(token0: string, token1: string): Promise<PoolKey | null> {
-  try {
-    const response = await fetch('https://api-sepolia.ponzi.land/price');
-    const tokens: TokenPrice[] = await response.json();
-    const token = tokens.find(t => t.address == token0 || t.address == token1);
-    return token?.best_pool || null;
-  } catch (error) {
-    console.error('Error fetching pool:', error);
-    return null;
   }
 }
