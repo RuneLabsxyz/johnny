@@ -1,7 +1,7 @@
 import { render } from "../../../../fork/daydreams/packages/core/src";
 import { fetchGraphQL } from "../../../../fork/daydreams/packages/core/src";
 import { CairoCustomEnum, Contract, RpcProvider, type Abi } from "starknet";
-import { balance_query, auction_query, land_query } from "./gql";
+import { balance_query, auction_query, land_query, query_lands_under_price } from "./gql";
 import { getAllTokensFromAPI } from "../utils/ponziland_api";
 import { getTokenData, formatTokenAmount, indexToPosition  } from "../utils/utils";
 import { env } from "../../../env";
@@ -451,7 +451,13 @@ export const get_prices_str = async () => {
 export const query_lands_under_price_str = async (price: number, token: string) => {
   let lands = await fetchGraphQL(
     env.GRAPHQL_URL + "/graphql",
-    land_query(address),
+    query_lands_under_price(price, token),
     {}
   ).then((res: any) => res?.ponziLandLandModels?.edges?.map((edge: any) => edge?.node));
+
+  let res = lands.map((land: any) => `
+  Location: ${BigInt(land.location).toString()} Owner: ${land.owner} - Token: ${getTokenData(land.token_used, tokens)!.symbol} - Sell Price: ${formatTokenAmount(BigInt(land.sell_price))}
+  `).join("\n");
+
+  return res;
 }
