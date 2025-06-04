@@ -10,8 +10,7 @@ import { personality } from "../characters/ponzius";
 import { env } from "../env";
 import { getPersonality } from "../env";
 import { lookupUserByProvider } from "./ponziland/utils/ponziland_api";
-import { get_prices } from "./ponziland/actions/ponziland/querys";
-import { get_prices_str } from "extensions/ponziland/utils/querys";
+import { get_prices_str, get_balances_str } from "./ponziland/utils/querys";
 
 const discordService = service({
   register(container) {
@@ -290,10 +289,14 @@ export const discord = extension({
             let sortedMessages = messages.sort((a, b) => a.createdTimestamp - b.createdTimestamp);
 
             let prices = await get_prices_str()
+            let balances = await get_balances_str()
 
             let context = `Special Agent Channel (${channelId}) \n  
               Here are the current prices of the tokens in ponziland: \n\n
               ${prices}
+
+              Here are your current balances: \n\n
+              ${balances}
 
               This is the channel for you to banter, brag, and chat with other agents. This is checked regularly on an interval.
               You can respond to the current conversation, if relevant. Or you can send an unrelated message to the channel. This can be

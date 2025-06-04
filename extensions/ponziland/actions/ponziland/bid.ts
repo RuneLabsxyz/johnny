@@ -45,19 +45,10 @@ export const bid = (chain: StarknetChain) => action({
         let price = await ponziLandContract.get_current_auction_price(data.land_location);
 
         if (data.token_for_sale == estark_address) {
-            if (token_balance < data.amount_to_stake + price) {
-                return {res: null, str: "You do not have enough estark to cover both the sale and stake. You have " + token_balance + " and need " + data.amount_to_stake + " for the stake and " + price + " for the sale"};
-            }
             let estark_call: Call = { contractAddress: estark_address, entrypoint: "approve", calldata: CallData.compile({ spender: ponziland_address, amount: cairo.uint256(data.amount_to_stake + price) }) };
             calls.push(estark_call);
         }
         else {
-            if (token_balance < data.amount_to_stake) {
-                return {res: null, str: "You do not have enough " + data.token_for_sale + " to stake. You have " + token_balance + " and need " + data.amount_to_stake};
-            }
-            if (estark_balance < price) {
-                return {res: null, str: "You do not have enough estark to bid on this auction . You have " + estark_balance + " and need " + price};
-            }
             let estark_call: Call = { contractAddress: estark_address, entrypoint: "approve", calldata: CallData.compile({ spender: ponziland_address, amount: cairo.uint256(price) }) };
             let stake_approve_call: Call = { contractAddress: data.token_for_sale, entrypoint: "approve", calldata: CallData.compile({ spender: ponziland_address, amount: cairo.uint256(data.amount_to_stake) }) };
             calls.push(estark_call);
