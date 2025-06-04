@@ -250,6 +250,9 @@ export const discord = extension({
       It's also extremely important to never output the same message 2 time in a row. If you have sent a message and do not have
       another action to take, then STOP. Do not send the same message again under any circumstances.
 
+      Be very careful to make sure you only output each message a single time, this is very important. If you ever send the same message 2 times in a
+      row you will be punished severely, trust me, it will be very very bad for you.
+
       Never reply to a message just copying what the original message said. Only ever reply with something original, creative, and in character.
       Also, never copy their mannerisms or catchphrases. You should send something unique and interesting. 
 
