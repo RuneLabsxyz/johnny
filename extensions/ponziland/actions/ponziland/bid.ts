@@ -56,7 +56,7 @@ export const bid = (chain: StarknetChain) => action({
                 return {res: null, str: "You do not have enough " + data.token_for_sale + " to stake. You have " + token_balance + " and need " + data.amount_to_stake};
             }
             if (estark_balance < price) {
-                return {res: null, str: "You do not have enough estark to bid on this auction . You have " + estark_balance + " and need " + data.amount_to_stake + price};
+                return {res: null, str: "You do not have enough estark to bid on this auction . You have " + estark_balance + " and need " + price};
             }
             let estark_call: Call = { contractAddress: estark_address, entrypoint: "approve", calldata: CallData.compile({ spender: ponziland_address, amount: cairo.uint256(price) }) };
             let stake_approve_call: Call = { contractAddress: data.token_for_sale, entrypoint: "approve", calldata: CallData.compile({ spender: ponziland_address, amount: cairo.uint256(data.amount_to_stake) }) };
