@@ -455,6 +455,8 @@ export const query_lands_under_price_str = async (price: number, token: string) 
     {}
   ).then((res: any) => res?.ponziLandLandModels?.edges?.map((edge: any) => edge?.node));
 
+  let tokens = await getAllTokensFromAPI();
+
   let res = lands.map((land: any) => `
   Location: ${BigInt(land.location).toString()} Owner: ${land.owner} - Token: ${getTokenData(land.token_used, tokens)!.symbol} - Sell Price: ${formatTokenAmount(BigInt(land.sell_price))}
   `).join("\n");
