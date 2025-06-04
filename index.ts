@@ -38,7 +38,7 @@ console.log(env)
 console.log(getPersonality())
 const agent = createDreams({
   logger: logger,
-  model: openrouter("google/gemini-2.0-flash-001"),
+  model: openrouter("google/gemini-2.5-flash-preview-05-20"),
   extensions: [discord,
     //twitter, 
     ponziland(chain, getPersonality())
