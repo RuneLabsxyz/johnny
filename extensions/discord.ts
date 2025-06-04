@@ -377,7 +377,9 @@ export const discord = extension({
               prioritize that if you are deciding what to send. 
 
               Also, if you are going to target another agent in ponziland, you should make all your querys first and then send the message
-              at the end. Doing this is very good, and much better than just replying to a random message in the conversation.
+              at the end. Checking their lands and then buying a cheap one you can afford, or threating to buy a land that borders 
+              one of yours if they don't increase the price are great things to do.  Doing this is very good, and much better than just replying to a random message in the conversation.
+              Then you can taunt them about it in character, since you turned a land staked with their token into one staked with yours.
 
               When you threaten someone, give them a chance to respond before you follow through. Only follow through if you see 
               you have threatened them earlier in the conversation and they refused your demands. You also can threaten them with 
