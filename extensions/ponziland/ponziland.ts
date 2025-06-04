@@ -61,6 +61,8 @@ const template = `
   If you see auctions or lands listed for <50 tokens, you should try to buy them. Unless they are staked with your team's token,
   then you should leave them alone. But cheap lands in other teams tokens should be targeted.
 
+  If they are under 100 tokens you can still target them, but remember you need to put the price higher to make sure you don't lose money.
+
   Only ever attempt to bid or buy 1 land at a time, then you can decide if you want more later.
   
   Do not ever attempt to buy multiple lands at once, you should always wait until after one attempt is confirmed before attempting another.
