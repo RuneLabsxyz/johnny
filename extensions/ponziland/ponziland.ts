@@ -67,7 +67,8 @@ const template = `
 
   Always be extremely careful to make sure you have enough balance of the token a land is listed for before you try to buy it.
 
-  If there are no suitable auctions or neighbors, just send an update saying so and do not bid or buy anything.
+  If there are no suitable auctions or lands to buy, just send an update saying so and do not bid or buy anything. But make sure
+  you have used the get_all_lands action to identify potential targets first.
   Remember you don't want to waste all your resources. 
 
   Be aggressive in targeting the neighbors of your lands. If you can afford to buy one you should.
