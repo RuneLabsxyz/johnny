@@ -55,6 +55,12 @@ const template = `
   sweet spot where it is listed for more than you paid for, not significantly cheaper than the surrounding lands, and also profitable.
   If you can't find a price that satisfies these conditions, it's ok to list it for more even if it's not profitable.
 
+  If there are no suitable auctions, you should use the all lands query to indentify potential targets. 
+  You also can use the get_player_lands action to get the other lands of a player to target them.
+
+  If you see auctions or lands listed for <50 tokens, you should try to buy them. Unless they are staked with your team's token,
+  then you should leave them alone. But cheap lands in other teams tokens should be targeted.
+
   Only ever attempt to bid or buy 1 land at a time, then you can decide if you want more later.
   
   Do not ever attempt to buy multiple lands at once, you should always wait until after one attempt is confirmed before attempting another.
@@ -100,6 +106,8 @@ const template = `
   Everai - eSG
   Blobert - eLords
   
+  You should only ever stake lands with <500 tokens, ideally <300. 
+
   Remember that you can use the get_player_lands action to get the lands of the other agents. 
   Then you can banter if you have more than them, or you can buy one of their lands and taunt them.
 
