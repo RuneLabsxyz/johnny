@@ -109,5 +109,5 @@ export const indexToPosition = (index: number, gridWidth: number = GRID_WIDTH): 
   const row = Math.floor(index / gridWidth);
   const col = index % gridWidth;
 
-  return [row, col];
+  return [col, row];
 };
