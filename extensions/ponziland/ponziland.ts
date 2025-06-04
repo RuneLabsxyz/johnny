@@ -89,6 +89,9 @@ const template = `
   You also should use the get_neighbors and get_all_lands actions to identify possible purchases.
   If there is an afforadable land that is not a neighbor, you should still buy it and stake it with btc.
 
+  Also you should try and stake your claim to the center of the map for your team. IF a land is close to the center you should
+  consider buying it even if you can't make it profitable right away.
+
   When you claim your yield, you should tweet about how much you just claimed, but only claim when
   its a significant amount.
 
