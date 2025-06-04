@@ -447,3 +447,11 @@ export const get_prices_str = async () => {
 
   return prices;
 }
+
+export const query_lands_under_price_str = async (price: number, token: string) => {
+  let lands = await fetchGraphQL(
+    env.GRAPHQL_URL + "/graphql",
+    land_query(address),
+    {}
+  ).then((res: any) => res?.ponziLandLandModels?.edges?.map((edge: any) => edge?.node));
+}

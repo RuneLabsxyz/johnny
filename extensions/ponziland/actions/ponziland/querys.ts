@@ -5,7 +5,7 @@ import { Agent } from "../../../../../fork/daydreams/packages/core/src"
 import { z } from "zod"
 import { Abi, Contract } from "starknet"
 import { CONTEXT } from "../../contexts/ponziland-context"
-import { get_auctions_str, get_claims_str, get_lands_str, get_neighbors_str, get_all_lands_str, get_auction_yield_str, get_prices_str } from "../../utils/querys"
+import { get_auctions_str, get_claims_str, get_lands_str, get_neighbors_str, get_all_lands_str, get_auction_yield_str, get_prices_str, query_lands_under_price_str } from "../../utils/querys"
 import { env } from "../../../../env"
 import { lookupUserByProvider } from "extensions/ponziland/utils/ponziland_api"
 
@@ -145,6 +145,19 @@ export const get_player_lands = (chain: StarknetChain) => action({
 
         return res;
 
+
+    }
+})
+
+export const query_lands_under_price = action({
+    name: "query-lands-under-price",
+    description: "Query all lands listed in a given token under a certain price. This expects a price and token argument",
+    schema: z.object({ price: z.number(), token: z.string() }),
+    async handler(data: { price: number, token: string }, ctx: any, agent: Agent) {
+
+        let res = await query_lands_under_price_str(data.price, data.token);
+
+        return res;
 
     }
 })

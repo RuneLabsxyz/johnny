@@ -7,7 +7,7 @@ import { StarknetChain } from "../../../fork/daydreams/packages/defai/src";
 import { CONTEXT } from "./contexts/ponziland-context";
 
 import { get_balances_str, get_lands_str } from "./utils/querys";
-import { get_auctions, get_claims, get_neighbors, get_all_lands, get_owned_lands, get_context, get_auction_yield, socialink_lookup, get_player_lands, get_prices } from "./actions/ponziland/querys";
+import { get_auctions, get_claims, get_neighbors, get_all_lands, get_owned_lands, get_context, get_auction_yield, socialink_lookup, get_player_lands, get_prices, query_lands_under_price } from "./actions/ponziland/querys";
 import { get_balances } from "./actions/get-balances";
 
 import { bid } from "./actions/ponziland/bid";
@@ -69,9 +69,20 @@ const template = `
 
   Always be extremely careful to make sure you have enough balance of the token a land is listed for before you try to buy it.
 
-  If there are no suitable auctions or lands to buy, just send an update saying so and do not bid or buy anything. But make sure
-  you have used the get_all_lands action to identify potential targets first.
   Remember you don't want to waste all your resources. 
+
+  If there are no suitable auctions, you can query other lands you can potentially buy with a number of actions. These include:
+  - get_all_lands
+  - get_player_lands
+  - get_neighbors
+  - query_lands_under_price
+
+  query_lands_under_price is the most useful action for this, as it will return all lands under a certain price in a given token.
+  You can call this query with the token of another team and your balance of that token to determine which lands you can afford to buy
+  with that token, then you can buy it and stake it with your team's token.
+
+  Remeber that the token you buy a land with is independent of the token you stake it with. You can buy a land that is listed in one
+  token and list if for sale / stake it with another token.
 
   Be aggressive in targeting the neighbors of your lands. If you can afford to buy one you should.
   Only worry about conserving resources when you are almost out (< 400)
@@ -89,7 +100,7 @@ const template = `
 
   Be very careful to only increase the stake of lands that you own, and keep track of the tokens that each land is using to ensure your balance is enough.
 
-  If you have an error always make sure to include the error message in your update.
+  If you have an error always make sure to include a detailed summary of the error in your update.
 
   If your land is losing money, you should try and get your neighbors to increase the price of their land if possible. Also,
   if a land is losing money you should not increase the stake anymore, and NEVER increase the price of it furher. If someone
@@ -241,6 +252,7 @@ export const ponziland = (chain: StarknetChain, personality?: string) => {
       get_player_lands(chain),
       socialink_lookup,
       get_prices(chain),
+      query_lands_under_price,
     ],
 
   });

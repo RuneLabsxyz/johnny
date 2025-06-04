@@ -46,3 +46,16 @@ export const land_query = (address: string) => `query GetOwnedLands {
   }
 }
 `
+
+export const query_lands_under_price = (price: number, token: string) => `query GetLandsUnderPrice {
+  ponziLandLandModels(where:{sell_price_lte:${price}, token_used:"${token}"}){
+    edges{
+      node{
+        owner
+        location
+        sell_price
+        token_used
+      }
+    }
+  }
+}`
