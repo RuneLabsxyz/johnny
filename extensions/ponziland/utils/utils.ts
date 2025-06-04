@@ -1,6 +1,7 @@
 import { Provider, constants, provider, RpcProvider, GetTransactionReceiptResponse, ReceiptTx } from "starknet";
+import type { GetTransactionReceiptResponse } from "starknet";
 import { getAllTokensFromAPI } from "./ponziland_api";
-import { TokenPrice } from "./ponziland_api";
+import type { TokenPrice } from "./ponziland_api";
 
 // Function to decode token transfer events
 export async function decodeTokenTransferEvents(tx: GetTransactionReceiptResponse) {
@@ -81,12 +82,32 @@ export const getTokenData = (tokenAddr: string | number, tokens: TokenPrice[]): 
 
 export const formatTokenAmount = (amount: bigint): string => {
   const divisor = BigInt(10 ** 18);
-  const wholePart = BigInt(amount) / divisor;
-  const fractionalPart = BigInt(amount) % divisor;
+  
+  // Handle negative values
+  const isNegative = amount < 0n;
+  const absoluteAmount = isNegative ? -amount : amount;
+  
+  const wholePart = absoluteAmount / divisor;
+  const fractionalPart = absoluteAmount % divisor;
   
   // Convert fractional part to 4 decimal places
   const fractionalStr = fractionalPart.toString().padStart(18, '0');
   const decimalPlaces = fractionalStr.slice(0, 4);
   
-  return `${wholePart}.${decimalPlaces}`;
+  const result = `${wholePart}.${decimalPlaces}`;
+  return isNegative ? `-${result}` : result;
+};
+
+// Grid width constant - adjust this value as needed
+const GRID_WIDTH = 64; // You may need to adjust this value
+
+export const indexToPosition = (index: number, gridWidth: number = GRID_WIDTH): [number, number] => {
+  if (index < 0 || index >= gridWidth * gridWidth) {
+    throw new Error("Index out of bounds");
+  }
+
+  const row = Math.floor(index / gridWidth);
+  const col = index % gridWidth;
+
+  return [col, row];
 };

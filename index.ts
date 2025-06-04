@@ -22,9 +22,10 @@ let openrouter = createOpenRouter({
   apiKey: process.env.OPENROUTER_API_KEY!,
 });
 
-const chain = new StarknetChain({rpcUrl: env.STARKNET_RPC_URL ?? "", 
-                                  address: env.STARKNET_ADDRESS ?? "",
-                                  privateKey: env.STARKNET_PRIVATE_KEY ?? "" 
+const chain = new StarknetChain({
+  rpcUrl: env.STARKNET_RPC_URL ?? "",
+  address: env.STARKNET_ADDRESS ?? "",
+  privateKey: env.STARKNET_PRIVATE_KEY ?? ""
 })
 
 const logger = new Logger({
@@ -33,14 +34,15 @@ const logger = new Logger({
 
 let c = consciousness("Give me a brief thought you want to share on social media considering the following character information: " + personality + `don't make the post itself, just give the general topic or idea. You are giving the instruction for someone else to write the tweet itself. Only give 1 and make it conscise and coherent about a single thing. DO NOT INCLUDE HASHTAGS EVER `)
 
+console.log(env)
 console.log(getPersonality())
 const agent = createDreams({
   logger: logger,
-  model: openrouter("google/gemini-2.0-flash-001"),
-  extensions: [discord, 
+  model: openrouter("google/gemini-2.5-flash-preview-05-20"),
+  extensions: [discord,
     //twitter, 
     ponziland(chain, getPersonality())
-    ],
+  ],
   memory: {
     store: createMemoryStore(),
     vector: createChromaVectorStore("agent", "http://localhost:8000", new GoogleGenerativeAiEmbeddingFunction({
@@ -53,7 +55,7 @@ const agent = createDreams({
   },
   actions: [swap(chain)],
   streaming: false,
-}); 
+});
 
 // Start the agent
 await agent.start();

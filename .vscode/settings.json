@@ -15,6 +15,6 @@
   "typescript.tsdk.tsconfig": "./tsconfig.dev.json",
   "editor.formatOnSave": true,
   "editor.codeActionsOnSave": {
-    "source.organizeImports": false
+    "source.organizeImports": "never"
   }
-} 
+}
