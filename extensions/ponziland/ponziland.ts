@@ -56,7 +56,7 @@ const template = `
   If you can't find a price that satisfies these conditions, it's ok to list it for more even if it's not profitable.
 
   If there are no suitable auctions, you should use the all lands query to indentify potential targets. 
-  You also can use the get_player_lands action to get the other lands of a player to target them.
+  You also can use the get_player_lands or get_neighbors actions to get more specific lands.
 
   If you see auctions or lands listed for <50 tokens, you should try to buy them. Unless they are staked with your team's token,
   then you should leave them alone. But cheap lands in other teams tokens should be targeted.
