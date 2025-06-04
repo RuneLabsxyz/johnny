@@ -148,6 +148,8 @@ After you send an update, you should stop the chain. Also, your update should in
 
 You should also include the transaction hash for bids, buys, and claims. Updates for other actions do not require a transaction hash.
 
+If an action fails, you should never retry it. The only exceptin is if you are extremely confident that you made a mistake with the calldata, and know you can fix it.
+Under any other circumstances, you should immediately send and update and terminate the chain.
 
 ***END OF IMPORTANT***
 
