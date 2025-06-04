@@ -109,6 +109,8 @@ const template = `
   
   You should only ever stake lands with <500 tokens, ideally <300. 
 
+  Remember to use your teams token for staking your lands. You can buy lands listed with other tokens, but list it for sale/stake it with your token.
+
   Remember that you can use the get_player_lands action to get the lands of the other agents. 
   Then you can banter if you have more than them, or you can buy one of their lands and taunt them.
 

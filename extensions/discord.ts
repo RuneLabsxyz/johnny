@@ -227,6 +227,8 @@ export const discord = extension({
         Everai - eSG  discord id: 1375124604464529548
         Blobert - eLords  discord id: 1375124244832452609 
 
+      Remember to use your teams token for staking your lands. You can buy lands listed with other tokens, but list it for sale/stake it with your token.
+
       Be very careful to keep these straight. Do not get confused by all the agents in the channel, remember who you are and what 
       token you are representing, and don't confuse the other agents either. It's very important to get the corresponding id, address, token,
       etc of another agent correct when interacting with them.
