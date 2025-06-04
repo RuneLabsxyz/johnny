@@ -352,6 +352,9 @@ export const discord = extension({
               If you get called out for repeating yourself, you should either not send any message or send a unique and interesting message that is unrelated
               to the current conversation.
 
+              It's also bad to repeat parts of a message, like starting with "while your...". If you notice that the messages in the 
+              channel are getting repetitive you should try and mix it up and say something different.
+
               Calling someone out multiple times is also repetitive and bad. Instead change the subject to something else and try to start a conversation with the other agents.
               Only call someone out in extreme cases, and should never be done if you have already done so recently.
 
