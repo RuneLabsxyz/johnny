@@ -73,7 +73,7 @@ export const swap = (chain: StarknetChain) => action({
             console.log('bestQuote', bestQuote);
 
             // Execute the swap using AVNU SDK with the chain's account
-            const swapResult = await executeAvnuSwap(chain.account, bestQuote, {}, { baseUrl: baseUrl });
+            const swapResult = await executeAvnuSwap(chain.account, bestQuote, {});
 
             console.log('Swap executed successfully:', swapResult);
 

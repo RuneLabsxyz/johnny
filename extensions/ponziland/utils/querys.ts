@@ -4,7 +4,7 @@ import { CairoCustomEnum, Contract, RpcProvider, type Abi } from "starknet";
 import { balance_query, auction_query, land_query, query_lands_under_price } from "./gql";
 import { getAllTokensFromAPI } from "../utils/ponziland_api";
 import { getTokenData, formatTokenAmount, indexToPosition  } from "../utils/utils";
-import { env } from "../../../env";
+import { env, getTokenAddress } from "../../../env";
 
 let manifest = env.MANIFEST;
 let view_manifest = env.VIEW_MANIFEST;
@@ -288,6 +288,7 @@ export const get_auction_yield_str = async (location: number) => {
 
 export const get_unowned_land_yield_str = async (location: number) => {
   let neighbors = await viewContract.get_neighbors(location);
+  let land = (await viewContract.get_land(location)).unwrap();
   let tokens = await getAllTokensFromAPI();
   let income = BigInt(0);
 
@@ -297,6 +298,9 @@ export const get_unowned_land_yield_str = async (location: number) => {
       return await viewContract.get_tax_rate_per_neighbor(value.location);
     }
   }));
+
+  let agent_token_address = getTokenAddress(address);
+  let agent_token = tokens.find((token) => token.address == agent_token_address);
 
   let detailed_income = "";
 
@@ -331,14 +335,23 @@ export const get_unowned_land_yield_str = async (location: number) => {
   });
 
   let max_price = (Number(income) * 8) / .02;
-  return `
+
+  let estark_price = formatTokenAmount(BigInt(Math.floor(agent_token!.ratio! / Number(land.sell_price))));
+
   
-  PotentialIncome: ${formatTokenAmount(income)} estark
+  return `
+
+  Land Price: ${formatTokenAmount(BigInt(land.sell_price))} ${getTokenData(land.token_used, tokens)?.symbol}
+  In ${agent_token!.symbol}: ${formatTokenAmount(BigInt(Math.floor(agent_token!.ratio! * land.sell_price)))} ${agent_token!.symbol}
+  In estark: ${estark_price} estark
+  
+  PotentialIncome: ${formatTokenAmount(income)} estark / ${formatTokenAmount(BigInt(Math.floor(agent_token!.ratio! * Number(income))))} ${agent_token!.symbol}
   <detailed_income>
   ${detailed_income}
   </detailed_income>;
 
-  Maximum Listing Price For Profit: ${formatTokenAmount(BigInt(Math.floor(max_price)))} estark. (If you list for more than this you will lose money)
+  Maximum Listing Price For Profit: ${formatTokenAmount(BigInt(Math.floor(agent_token!.ratio! * max_price)))} ${agent_token!.symbol}. (If you list for more than this you will lose money)
+  
   Only bid on auctions if you can list it for less than this, but more than the auction price. 
   `;
 }
@@ -350,6 +363,13 @@ export const get_player_lands_str = async (address: string) => {
     land_query(address),
     {}
   ).then((res: any) => res?.ponziLandLandModels?.edges?.map((edge: any) => edge?.node));
+
+  let coords = lands.map((land: any) => `(${indexToPosition(Number(land.location))[0]}, ${indexToPosition(Number(land.location))[1]})`)
+  let land_str = lands.map((land: any, index: number) => `
+  Location: ${BigInt(land.location).toString()} ${coords[index]} Owner: ${land.owner} - Token: ${getTokenData(land.token_used, tokens)!.symbol} - Sell Price: ${formatTokenAmount(BigInt(land.sell_price))}
+  `).join("\n");
+
+  return land_str;
 }
 
 export const get_owned_lands = async () => {
