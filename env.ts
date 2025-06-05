@@ -38,8 +38,8 @@ export const getPersonality = () => {
   return personalities[character as keyof typeof personalities](env.DISCORD_THOUGHTS_CHANNEL_ID) || ponziusPersonality(env.DISCORD_THOUGHTS_CHANNEL_ID);
 }
 
-export const getTokenAddress = (agent: string) => {
-  return token_addresses[agent as keyof typeof token_addresses];
+export const getTokenAddress = () => {
+  return token_addresses[character as keyof typeof token_addresses];
 }
 
 export const getEnvWithPrefix = (name: string) => {
