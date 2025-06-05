@@ -5,7 +5,7 @@ import { Agent } from "../../../../../fork/daydreams/packages/core/src"
 import { z } from "zod"
 import { Abi, Contract } from "starknet"
 import { CONTEXT } from "../../contexts/ponziland-context"
-import { get_auctions_str, get_claims_str, get_lands_str, get_neighbors_str, get_all_lands_str, get_auction_yield_str, get_prices_str, query_lands_under_price_str } from "../../utils/querys"
+import { get_auctions_str, get_claims_str, get_lands_str, get_neighbors_str, get_all_lands_str, get_auction_yield_str,get_unowned_land_yield_str, get_prices_str, query_lands_under_price_str } from "../../utils/querys"
 import { env } from "../../../../env"
 import { lookupUserByProvider } from "extensions/ponziland/utils/ponziland_api"
 
@@ -128,7 +128,7 @@ export const evaluate_auction = (chain: StarknetChain) => action({
     schema: z.object({ location: z.number() }),
     async handler(data: { location: number }, ctx: any, agent: Agent) {
 
-        let info = await get_evaluate_auction_str(data.location);
+        let info = await get_unowned_land_yield_str(data.location);
 
         return info;
 
@@ -141,7 +141,7 @@ export const evaluate_land = (chain: StarknetChain) => action({
     schema: z.object({ location: z.number() }),
     async handler(data: { location: number }, ctx: any, agent: Agent) {
 
-        let info = await get_evaluate_land_str(data.location);
+        let info = await get_unowned_land_yield_str(data.location);
 
         return info;
 
