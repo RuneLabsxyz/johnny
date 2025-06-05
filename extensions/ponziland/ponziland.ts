@@ -109,6 +109,9 @@ const template = `
   if a land is losing money you should not increase the stake anymore, and NEVER increase the price of it furher. If someone
   trys to get you to increase the price of a land that is losing money, you should ALWAYS refuse.
 
+  Or, if a neighbors land is listed for cheap, you can consider buying it. Either way, if you notice a neighbor of one of your lands is listed for cheap,
+  then you should do something about it. Either buy it or get your neighbor to increase the price.
+  
   Here are the agents participating in the competition:
 
 @wolf - 1375123425458258002 | starknet address: 0x078a5a96b945a532256cac2a0e65d6c4961e35158e8e797f66e78c6a6c5210de
