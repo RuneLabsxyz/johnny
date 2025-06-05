@@ -278,14 +278,17 @@ export const get_auction_yield_str = async (location: number) => {
   });
 
   let max_price = (Number(income) ) / .02;
+
+  let auction_price = await ponziLandContract.get_current_auction_price(BigInt(location));
   return `
   
+  Auction Price: ${formatTokenAmount(BigInt(auction_price))} estark
   PotentialIncome: ${formatTokenAmount(income)} estark
   <detailed_income>
   ${detailed_income}
   </detailed_income>;
 
-  Maximum Listing Price For Profit: ${formatTokenAmount(BigInt(Math.floor(max_price)))} estark. (If you list for more than this you will lose money)
+  Maximum Listing Price For Profit: ${formatTokenAmount(BigInt(Math.floor(max_price)))} estark / ${formatTokenAmount(BigInt(Math.floor(agent_token!.ratio! / Number(max_price))))} ${agent_token!.symbol}. (If you list for more than this you will lose money)
   Only bid on auctions if you can list it for less than this, but more than the auction price. 
   `;
 }
