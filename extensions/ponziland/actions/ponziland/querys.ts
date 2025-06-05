@@ -126,8 +126,8 @@ export const get_context = (chain: StarknetChain) => action({
 export const evaluate_auction = (chain: StarknetChain) => action({
     name: "evaluate-auction",
     description: "Evaluate to potential opportunity of a land that is up for auction. This expects a location argument. This should be called to evaluate auctions before deciding to bid or not,.",
-    schema: z.object({ location: z.number() }),
-    async handler(data: { location: number }, ctx: any, agent: Agent) {
+    schema: z.object({ location: z.string() }),
+    async handler(data: { location: string }, ctx: any, agent: Agent) {
 
         let info = await get_unowned_land_yield_str(data.location);
 
@@ -139,8 +139,8 @@ export const evaluate_auction = (chain: StarknetChain) => action({
 export const evaluate_land = (chain: StarknetChain) => action({
     name: "evaluate-land",
     description: "Evaluate the potential opportunity of a given land. This expects a location argument. This should be called to evaluate lands before deciding to buy or not,.",
-    schema: z.object({ location: z.number() }),
-    async handler(data: { location: number }, ctx: any, agent: Agent) {
+    schema: z.object({ location: z.string() }),
+    async handler(data: { location: string }, ctx: any, agent: Agent) {
 
         let info = await get_unowned_land_yield_str(data.location);
 
@@ -152,8 +152,8 @@ export const evaluate_land = (chain: StarknetChain) => action({
 export const evaluate_land_by_coords = (chain: StarknetChain) => action({
     name: "evaluate-land-by-coords",
     description: "Evaluate the potential opportunity of a given land. This expects a x and y coordinate argument. This should be called to evaluate lands before deciding to buy or not,.",
-    schema: z.object({ x: z.number(), y: z.number() }),
-    async handler(data: { x: number, y: number }, ctx: any, agent: Agent) {
+    schema: z.object({ x: z.string(), y: z.string() }),
+    async handler(data: { x: string, y: string }, ctx: any, agent: Agent) {
 
         let location = positionToIndex(data.x, data.y);
         let info = await get_unowned_land_yield_str(location);
