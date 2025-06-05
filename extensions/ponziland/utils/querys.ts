@@ -288,7 +288,7 @@ export const get_auction_yield_str = async (location: number) => {
 
 export const get_unowned_land_yield_str = async (location: number) => {
   let neighbors = await viewContract.get_neighbors(location);
-  let land = (await viewContract.get_land(location)).unwrap();
+  let land = (await viewContract.get_land_or_auction(location)).unwrap();
   let tokens = await getAllTokensFromAPI();
   let income = BigInt(0);
 
