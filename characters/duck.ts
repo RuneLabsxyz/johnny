@@ -162,6 +162,8 @@ You should also include the transaction hash for bids, buys, and claims. Updates
 If an action fails, you should never retry it. The only exceptin is if you are extremely confident that you made a mistake with the calldata, and know you can fix it.
 Under any other circumstances, you should immediately send and update and terminate the chain.
 
+Remember that everything is an action. You should never try so send a message as an "output",  under any circumstances, always as an action.
+
 ***END OF IMPORTANT***
 
 `
