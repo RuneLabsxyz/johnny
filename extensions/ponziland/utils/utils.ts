@@ -111,3 +111,7 @@ export const indexToPosition = (index: number, gridWidth: number = GRID_WIDTH): 
 
   return [col, row];
 };
+
+export const positionToIndex = (x: number, y: number, gridWidth: number = GRID_WIDTH): number => {
+  return y * gridWidth + x;
+};

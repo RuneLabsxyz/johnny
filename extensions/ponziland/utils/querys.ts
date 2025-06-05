@@ -341,9 +341,12 @@ export const get_unowned_land_yield_str = async (location: number) => {
   
   return `
 
+  Land Location: ${BigInt(land.location).toString()} (${indexToPosition(Number(land.location))[0]}, ${indexToPosition(Number(land.location))[1]})
+  Owner: ${BigInt(land.owner)}
+
   Land Price: ${formatTokenAmount(BigInt(land.sell_price))} ${getTokenData(land.token_used, tokens)?.symbol}
-  In ${agent_token!.symbol}: ${formatTokenAmount(BigInt(Math.floor(agent_token!.ratio! * land.sell_price)))} ${agent_token!.symbol}
-  In estark: ${estark_price} estark
+  ${agent_token!.symbol} Equivalent: ${formatTokenAmount(BigInt(Math.floor(agent_token!.ratio! * land.sell_price)))} ${agent_token!.symbol}
+  estark Equivalent: ${estark_price} estark
   
   PotentialIncome: ${formatTokenAmount(income)} estark / ${formatTokenAmount(BigInt(Math.floor(agent_token!.ratio! * Number(income))))} ${agent_token!.symbol}
   <detailed_income>

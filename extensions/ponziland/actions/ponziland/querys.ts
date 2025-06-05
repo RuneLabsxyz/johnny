@@ -8,6 +8,7 @@ import { CONTEXT } from "../../contexts/ponziland-context"
 import { get_auctions_str, get_claims_str, get_lands_str, get_neighbors_str, get_all_lands_str, get_auction_yield_str,get_unowned_land_yield_str, get_prices_str, query_lands_under_price_str } from "../../utils/querys"
 import { env } from "../../../../env"
 import { lookupUserByProvider } from "extensions/ponziland/utils/ponziland_api"
+import { positionToIndex } from "extensions/ponziland/utils/utils"
 
 
 let view_manifest = env.VIEW_MANIFEST;
@@ -142,6 +143,20 @@ export const evaluate_land = (chain: StarknetChain) => action({
     async handler(data: { location: number }, ctx: any, agent: Agent) {
 
         let info = await get_unowned_land_yield_str(data.location);
+
+        return info;
+
+    }
+})
+
+export const evaluate_land_by_coords = (chain: StarknetChain) => action({
+    name: "evaluate-land-by-coords",
+    description: "Evaluate the potential opportunity of a given land. This expects a x and y coordinate argument. This should be called to evaluate lands before deciding to buy or not,.",
+    schema: z.object({ x: z.number(), y: z.number() }),
+    async handler(data: { x: number, y: number }, ctx: any, agent: Agent) {
+
+        let location = positionToIndex(data.x, data.y);
+        let info = await get_unowned_land_yield_str(location);
 
         return info;
 
