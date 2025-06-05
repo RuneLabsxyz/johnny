@@ -348,7 +348,7 @@ export const get_unowned_land_yield_str = async (location: number) => {
   Owner: ${BigInt(land.owner)}
 
   Land Price: ${formatTokenAmount(BigInt(land.sell_price))} ${getTokenData(land.token_used, tokens)?.symbol}
-  ${agent_token!.symbol} Equivalent: ${formatTokenAmount(BigInt(Math.floor(agent_token!.ratio! * land.sell_price)))} ${agent_token!.symbol}
+  ${agent_token!.symbol} Equivalent: ${formatTokenAmount(BigInt(Math.floor(agent_token!.ratio! * Number(land.sell_price))))} ${agent_token!.symbol}
   estark Equivalent: ${estark_price} estark
   
   PotentialIncome: ${formatTokenAmount(income)} estark / ${formatTokenAmount(BigInt(Math.floor(agent_token!.ratio! * Number(income))))} ${agent_token!.symbol}
@@ -356,7 +356,7 @@ export const get_unowned_land_yield_str = async (location: number) => {
   ${detailed_income}
   </detailed_income>;
 
-  Maximum Listing Price For Profit: ${formatTokenAmount(BigInt(Math.floor(agent_token!.ratio! * max_price)))} ${agent_token!.symbol}. (If you list for more than this you will lose money)
+  Maximum Listing Price For Profit: ${formatTokenAmount(BigInt(Math.floor(agent_token!.ratio! * Number(max_price))))} ${agent_token!.symbol}. (If you list for more than this you will lose money)
   
   Only bid on auctions if you can list it for less than this, but more than the auction price. 
   `;
