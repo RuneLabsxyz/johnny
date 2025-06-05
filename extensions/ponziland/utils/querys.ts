@@ -229,8 +229,8 @@ export const get_all_lands_str = async () => {
   return land_str;
 }
 
-export const get_auction_yield_str = async (location: number) => {
-  let neighbors = await viewContract.get_neighbors(location);
+export const get_auction_yield_str = async (location: string) => {
+  let neighbors = await viewContract.get_neighbors(BigInt(location));
   let tokens = await getAllTokensFromAPI();
   let income = BigInt(0);
 
@@ -290,9 +290,9 @@ export const get_auction_yield_str = async (location: number) => {
   `;
 }
 
-export const get_unowned_land_yield_str = async (location: number) => {
-  let neighbors = await viewContract.get_neighbors(location);
-  let land = (await viewContract.get_land_or_auction(location)).unwrap();
+export const get_unowned_land_yield_str = async (location: string) => {
+  let neighbors = await viewContract.get_neighbors(BigInt(location));
+  let land = (await viewContract.get_land_or_auction(BigInt(location))).unwrap();
   let time_speed = 5;
   let tokens = await getAllTokensFromAPI();
   let income = BigInt(0);
