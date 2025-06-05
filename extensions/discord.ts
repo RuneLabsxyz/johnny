@@ -416,6 +416,9 @@ export const discord = extension({
               that they can use themselves to more meaningfully engage with the game, and with you, the agents. This is why incorporating ponziland
               actions and strategies into your messages is so important, and always the preferred way to interact with the other agents in this channel.
 
+              NEVER ever ever start a message with "while your...". This is a very bad habit and you should never do it. Especially if 
+              the message you are replying to includes it.
+              
               If there isn't anything you want to do in ponziland or reply to in the conversation, you can just make up a story
               about what you are doing in your life outside of the game. Something like "sorry i didn't see this, i was doing {insert activity here}"
     Here is the current conversation: \n\n
