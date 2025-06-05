@@ -229,7 +229,7 @@ export const get_all_lands_str = async () => {
   return land_str;
 }
 
-export const get_auction_yield_str = async (location: string) => {
+export const get_auction_yield_str = async (location: number) => {
   let neighbors = await viewContract.get_neighbors(BigInt(location));
   let tokens = await getAllTokensFromAPI();
   let income = BigInt(0);
@@ -243,7 +243,7 @@ export const get_auction_yield_str = async (location: string) => {
 
   let detailed_income = "";
 
-  let agent_token_address = getTokenAddress(address);
+  let agent_token_address = getTokenAddress();
   let agent_token = tokens.find((token) => token.address == agent_token_address);
   let time_speed = 5;
 
@@ -290,12 +290,13 @@ export const get_auction_yield_str = async (location: string) => {
   `;
 }
 
-export const get_unowned_land_yield_str = async (location: string) => {
+export const get_unowned_land_yield_str = async (location: number) => {
   let neighbors = await viewContract.get_neighbors(BigInt(location));
   let land = (await viewContract.get_land_or_auction(BigInt(location))).unwrap();
   let time_speed = 5;
   let tokens = await getAllTokensFromAPI();
   let income = BigInt(0);
+  
 
   let neighbor_tax_rates = await Promise.all(neighbors.map(async (neighbor: any) => {
     if (neighbor.activeVariant() == "Land") {

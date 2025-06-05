@@ -126,10 +126,10 @@ export const get_context = (chain: StarknetChain) => action({
 export const evaluate_auction = (chain: StarknetChain) => action({
     name: "evaluate-auction",
     description: "Evaluate to potential opportunity of a land that is up for auction. This expects a location argument. This should be called to evaluate auctions before deciding to bid or not,.",
-    schema: z.object({ location: z.string() }),
-    async handler(data: { location: string }, ctx: any, agent: Agent) {
+    schema: z.object({ location: z.number().describe("The location of the land to evaluate. This should always be an integer") }),
+    async handler(data: { location: number }, ctx: any, agent: Agent) {
 
-        let info = await get_unowned_land_yield_str(data.location);
+        let info = await get_auction_yield_str(data.location);
 
         return info;
 
@@ -139,8 +139,8 @@ export const evaluate_auction = (chain: StarknetChain) => action({
 export const evaluate_land = (chain: StarknetChain) => action({
     name: "evaluate-land",
     description: "Evaluate the potential opportunity of a given land. This expects a location argument. This should be called to evaluate lands before deciding to buy or not,.",
-    schema: z.object({ location: z.string() }),
-    async handler(data: { location: string }, ctx: any, agent: Agent) {
+    schema: z.object({ location: z.number().describe("The location of the land to evaluate. This should always be an integer") }),
+    async handler(data: { location: number }, ctx: any, agent: Agent) {
 
         let info = await get_unowned_land_yield_str(data.location);
 
