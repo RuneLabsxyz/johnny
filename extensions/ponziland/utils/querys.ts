@@ -245,6 +245,7 @@ export const get_auction_yield_str = async (location: number) => {
 
   let agent_token_address = getTokenAddress(address);
   let agent_token = tokens.find((token) => token.address == agent_token_address);
+  let time_speed = 5;
 
   neighbors.forEach((neighbor: any, index: number) => {
     if (neighbor.activeVariant() == "Land") {
@@ -262,14 +263,14 @@ export const get_auction_yield_str = async (location: number) => {
         if (!neighbor_token.ratio) {
           income += BigInt(neighbor_yield);
           detailed_income += `
-          Location: ${value.location} ${coords[index]} - Yield: ${formatTokenAmount(BigInt(neighbor_yield))} estark
+          Location: ${value.location} ${coords[index]} - Yield: ${formatTokenAmount(BigInt(neighbor_yield))} estark / ${10 / Number(time_speed)} minutes
           `;
         }
         else {
           let adjusted_yield = Math.floor(Number(neighbor_yield) / neighbor_token.ratio);
           income += BigInt(adjusted_yield);
           detailed_income += `
-          Location: ${value.location} ${coords} - Yield: ${formatTokenAmount(BigInt(neighbor_yield))} ${neighbor_token.symbol} (${formatTokenAmount(BigInt(adjusted_yield))} estark)
+          Location: ${value.location} ${coords} - Yield: ${formatTokenAmount(BigInt(neighbor_yield))} ${neighbor_token.symbol} (${formatTokenAmount(BigInt(adjusted_yield))} estark / ${10 / Number(time_speed)} minutes)
           `;
         }
       }
@@ -292,7 +293,7 @@ export const get_auction_yield_str = async (location: number) => {
 export const get_unowned_land_yield_str = async (location: number) => {
   let neighbors = await viewContract.get_neighbors(location);
   let land = (await viewContract.get_land_or_auction(location)).unwrap();
-  let time_speed = await ponziLandContract.get_time_speed();
+  let time_speed = 5;
   let tokens = await getAllTokensFromAPI();
   let income = BigInt(0);
 
