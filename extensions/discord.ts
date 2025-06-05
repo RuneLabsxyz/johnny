@@ -105,7 +105,7 @@ export const discord = extension({
 
           let blacklistedChannels = ["1375477437953216633", "1379975758574915654", "1379102407459602503", "1375502718877171794", "1375502743824891964", "1377360891267387423", "1375502867686756534"];
 
-          let blacklistedUsers = ["1375123425458258002", "1375124604464529548", "1375124244832452609", "1328909573972557904", "1375124244832452609"]
+          let blacklistedUsers = ["1375123425458258002", "1379991074742861956", "1375124604464529548", "1375124244832452609", "1328909573972557904", "1375124244832452609"]
           if (!channel || !channel.isTextBased() || blacklistedChannels.includes(channel.id) || blacklistedUsers.includes(message.author.id)) {
             console.log(`Skipping message`, message.content);
             return;
