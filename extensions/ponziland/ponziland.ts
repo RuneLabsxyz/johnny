@@ -7,7 +7,7 @@ import { StarknetChain } from "../../../fork/daydreams/packages/defai/src";
 import { CONTEXT } from "./contexts/ponziland-context";
 
 import { get_balances_str, get_lands_str } from "./utils/querys";
-import { get_auctions, get_claims, get_neighbors, get_all_lands, get_owned_lands, get_context, get_auction_yield, socialink_lookup, get_player_lands, get_prices, query_lands_under_price } from "./actions/ponziland/querys";
+import { get_auctions, get_claims, get_neighbors, get_all_lands, get_owned_lands, get_context, evaluate_land, evaluate_auction,socialink_lookup, get_player_lands, get_prices, query_lands_under_price } from "./actions/ponziland/querys";
 import { get_balances } from "./actions/get-balances";
 
 import { bid } from "./actions/ponziland/bid";
@@ -250,7 +250,8 @@ export const ponziland = (chain: StarknetChain, personality?: string) => {
       level_up(chain),
       increase_stake(chain),
       increase_price(chain),
-      get_auction_yield(chain),
+      evaluate_land(chain),
+      evaluate_auction(chain),
       //  claim_all(chain),
       get_player_lands(chain),
       socialink_lookup,
