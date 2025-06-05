@@ -155,7 +155,7 @@ export const evaluate_land_by_coords = (chain: StarknetChain) => action({
     schema: z.object({ x: z.string(), y: z.string() }),
     async handler(data: { x: string, y: string }, ctx: any, agent: Agent) {
 
-        let location = positionToIndex(data.x, data.y);
+        let location = positionToIndex(Number(data.x), Number(data.y));
         let info = await get_unowned_land_yield_str(location);
 
         return info;
