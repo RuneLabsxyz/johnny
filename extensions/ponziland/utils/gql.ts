@@ -2,6 +2,12 @@ import { env } from '../../../env';
 
 const address = env.STARKNET_ADDRESS;
 
+// Utility function to trim leading zeros from hex addresses
+const trimLeadingZeros = (hexString: string): string => {
+  if (!hexString.startsWith('0x')) return hexString;
+  const trimmed = hexString.slice(2).replace(/^0+/, '') || '0';
+  return '0x' + trimmed;
+};
 
 export const balance_query = `query GetTokenBalances {
     tokenBalances(accountAddress:"${address}"){
@@ -35,7 +41,7 @@ export const auction_query = `query GetActiveAuctions {
   }`
   
 export const land_query = (address: string) => `query GetOwnedLands {
-  ponziLandLandModels(where:{owner:"${address}"}){
+  ponziLandLandModels(where:{owner:"${trimLeadingZeros(address)}"}){
     edges{
       node{
         location
@@ -47,8 +53,10 @@ export const land_query = (address: string) => `query GetOwnedLands {
 }
 `
 
-export const query_lands_under_price = (price: number, token: string) => `query GetLandsUnderPrice {
-  ponziLandLandModels(where:{sell_price_lte:${price}, token_used:"${token}"}){
+export const query_lands_under_price = (price: number, token: string) => {
+  
+  return `query GetLandsUnderPrice {
+  ponziLandLandModels(where:{sell_price_lte:${price}, token_used:"${trimLeadingZeros(token)}"}){
     edges{
       node{
         owner
@@ -59,3 +67,4 @@ export const query_lands_under_price = (price: number, token: string) => `query 
     }
   }
 }`
+}
