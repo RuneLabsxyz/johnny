@@ -55,8 +55,8 @@ export const land_query = (address: string) => `query GetOwnedLands {
 
 export const query_lands_under_price = (price: number, token: string) => {
   let price_str = (BigInt(price) * BigInt(10 ** 18)).toString();
-  return `query GetLandsUnderPrice {
-  ponziLandLandModels(where:{sell_priceLT:"${price_str}", token_used:"${trimLeadingZeros(token)}"}){
+  let query = `query GetLandsUnderPrice {
+  ponziLandLandModels(where:{sell_priceLT:"${price_str}", token_used:"${trimLeadingZeros(token)}"}, first: 1000){
     edges{
       node{
         owner
@@ -66,5 +66,9 @@ export const query_lands_under_price = (price: number, token: string) => {
       }
     }
   }
-}`
+}`;
+
+  console.log('query', query);
+
+  return query;
 }
