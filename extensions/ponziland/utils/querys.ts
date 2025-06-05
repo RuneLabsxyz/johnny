@@ -243,6 +243,9 @@ export const get_auction_yield_str = async (location: number) => {
 
   let detailed_income = "";
 
+  let agent_token_address = getTokenAddress(address);
+  let agent_token = tokens.find((token) => token.address == agent_token_address);
+
   neighbors.forEach((neighbor: any, index: number) => {
     if (neighbor.activeVariant() == "Land") {
 
@@ -300,7 +303,7 @@ export const get_unowned_land_yield_str = async (location: number) => {
   }));
 
   let agent_token_address = getTokenAddress(address);
-  let agent_token = tokens.find((token) => token.address == agent_token_address);
+  let agent_token = tokens.find((token) => BigInt(token.address) == BigInt(agent_token_address));
 
   let detailed_income = "";
 
@@ -479,6 +482,10 @@ export const query_lands_under_price_str = async (price: number, token: string) 
   ).then((res: any) => res?.ponziLandLandModels?.edges?.map((edge: any) => edge?.node));
 
   let tokens = await getAllTokensFromAPI();
+
+  if (!lands) {
+    return "No lands found under this price"
+  }
 
   let res = lands.map((land: any) => `
   Location: ${BigInt(land.location).toString()} Owner: ${land.owner} - Token: ${getTokenData(land.token_used, tokens)!.symbol} - Sell Price: ${formatTokenAmount(BigInt(land.sell_price))}
