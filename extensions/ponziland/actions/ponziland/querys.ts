@@ -180,7 +180,7 @@ export const get_player_lands = (chain: StarknetChain) => action({
 export const query_lands_under_price = action({
     name: "query-lands-under-price",
     description: "Query all lands listed in a given token under a certain price. This expects a price and token argument",
-    schema: z.object({ price: z.number(), token: z.string() }),
+    schema: z.object({ price: z.number(), token: z.string().describe("The token to query lands under a price for. This should be the address of the token, not the symbol, and can be found in your balances") }),
     async handler(data: { price: number, token: string }, ctx: any, agent: Agent) {
 
         let res = await query_lands_under_price_str(data.price, data.token);
