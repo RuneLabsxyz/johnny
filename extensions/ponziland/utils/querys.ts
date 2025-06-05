@@ -493,8 +493,12 @@ export const query_lands_under_price_str = async (price: number, token: string) 
     return "No lands found under this price"
   }
 
-  let res = lands.map((land: any) => `
-  Location: ${BigInt(land.location).toString()} Owner: ${land.owner} - Token: ${getTokenData(land.token_used, tokens)!.symbol} - Sell Price: ${formatTokenAmount(BigInt(land.sell_price))}
+  lands.slice(0, 10);
+
+  let coords = lands.map((land: any) => `(${indexToPosition(Number(land.location))[0]}, ${indexToPosition(Number(land.location))[1]})`)
+
+  let res = lands.map((land: any, index: number) => `
+  Location: ${BigInt(land.location).toString()} ${coords[index]} Owner: ${land.owner} - Token: ${getTokenData(land.token_used, tokens)!.symbol} - Sell Price: ${formatTokenAmount(BigInt(land.sell_price))}
   `).join("\n");
 
   return res;
