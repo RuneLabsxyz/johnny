@@ -62,12 +62,7 @@ export const swap = (chain: StarknetChain) => action({
             // Fetch quotes from AVNU
             const quotes = await fetchQuotes(quoteParams);
 
-            let res = await quotes.json();
-            console.log('quotes', res);
-
-            console.log('Found quotes:', res.length);
-            // Use the best quote (first one)
-            const bestQuote = res[0];
+            const bestQuote = quotes[0];
 
             console.log('Executing swap with AVNU SDK...');
 
