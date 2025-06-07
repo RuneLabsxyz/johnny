@@ -115,3 +115,20 @@ export const indexToPosition = (index: number, gridWidth: number = GRID_WIDTH): 
 export const positionToIndex = (x: number, y: number, gridWidth: number = GRID_WIDTH): number => {
   return y * gridWidth + x;
 };
+
+export const trimLeadingZeros = (hexString: string): string => {
+  // Return original string if not hex or too short
+  if (!hexString.startsWith('0x') || hexString.length <= 2) {
+    return hexString;
+  }
+
+  // Remove 0x, trim zeros, add 0x back
+  const trimmed = hexString.slice(2).replace(/^0+/, '');
+  
+  // Handle case of all zeros
+  if (trimmed.length === 0) {
+    return '0x0';
+  }
+
+  return '0x' + trimmed;
+};

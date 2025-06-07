@@ -10,6 +10,7 @@ import {
 
 import { env } from "../../../env"
 import { getAllTokensFromAPI } from "../utils/ponziland_api"
+import { trimLeadingZeros } from "../utils/utils"
 
 export const swap = (chain: StarknetChain) => action({
     name: "swap",
@@ -27,8 +28,8 @@ export const swap = (chain: StarknetChain) => action({
             throw new Error("You cannot swap the same token");
         }
 
-        let token_selling = tokens.find(t => BigInt(t.address) == BigInt(data.selling_address));
-        let token_buying = tokens.find(t => BigInt(t.address) == BigInt(data.buying_address));
+        let token_selling = tokens.find(t => BigInt(trimLeadingZeros(t.address)) == BigInt(trimLeadingZeros(data.selling_address)));
+        let token_buying = tokens.find(t => BigInt(trimLeadingZeros(t.address)) == BigInt(trimLeadingZeros(data.buying_address)));
 
         console.log('token_in', token_selling);
         console.log('token_out', token_buying);
