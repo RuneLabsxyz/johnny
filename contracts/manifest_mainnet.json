@@ -1328,8 +1328,8 @@
   },
   "contracts": [
     {
-      "address": "0x48baf29100768cf2af199f70950a6e5c678da0df4e7bb24764f3e68dd2dffe3",
-      "class_hash": "0x54b495bf91e18da5597c991dc98340c9e7fdbbddc198767567c3cffcbc27df",
+      "address": "0x72419f74267f0c457512f6673f12461b7ac605822a56cc7e85c9b31ab5f3620",
+      "class_hash": "0x90b2886845b856b5c6543545aef79bd740fa690d8e5b759af77ddeed016956",
       "abi": [
         {
           "type": "impl",
@@ -1714,8 +1714,8 @@
         }
       ],
       "init_calldata": [],
-      "tag": "orchards3-player_actions",
-      "selector": "0x4414fa4aed997b646fb104f53c09ba3d49d9c573eb713abe6a58cec053cc6ee",
+      "tag": "orchards-player_actions",
+      "selector": "0x43854e96dc77b60753119b939094327403e5a68b6728d1a5d174330b28febea",
       "systems": [
         "upgrade"
       ]
@@ -1726,26 +1726,26 @@
     {
       "members": [],
       "class_hash": "0x6b223fa53afd359f68ce35f72c44e252e2a8bc491c6928b3f8576705ff945c4",
-      "tag": "orchards3-Auction",
-      "selector": "0x12a52a3ce2b72c3bd52c360a4a6e0b107915cc854e3106138e5bc51efe85a34"
+      "tag": "orchards-Auction",
+      "selector": "0x5b25404953ea9c595b0fc3b8cedb270fde62b5eae97842768c427e6a67740eb"
     },
     {
       "members": [],
       "class_hash": "0x1ab2b6b3b367a85b01e27b98d3d4b429d102c87e3bd871b1b9acab599f70e2d",
-      "tag": "orchards3-Johnny",
-      "selector": "0x5ca8082dc27629f70dcce7f9653f05d2eb36db11315867c8e6c9afae1026f2b"
+      "tag": "orchards-Johnny",
+      "selector": "0x253c7797a0afcbc374834a4e398c597cb22fa9b1974536171765b35c8934286"
     },
     {
       "members": [],
       "class_hash": "0x44f97e79cfa97651478b26d652fba04ef02ebf85b26fd2ef1057f8cb6eedf4a",
-      "tag": "orchards3-Land",
-      "selector": "0x29ab88cd7626999d68e9ccd9f7dfe5d2e8731d7dd2bbf0783e3831dc0029966"
+      "tag": "orchards-Land",
+      "selector": "0x5aef021f931a83f6b0c84a224ad902f2daadd07701a2296f93c5d4c1c5085c2"
     },
     {
       "members": [],
       "class_hash": "0x57d62e9b1e64477cba2abedaca2d76f5f4cb002b01e0663cb92019aa57fba32",
-      "tag": "orchards3-Orchard",
-      "selector": "0x404f918d7b164327993168930c9c71d0548c3f26650b0d6f071d2b1246fc171"
+      "tag": "orchards-Orchard",
+      "selector": "0x252e3e5fbe2239ed9d0da5b5680dee428dd2a2374cc28fb2371e5b4934fcc00"
     }
   ],
   "events": [],
