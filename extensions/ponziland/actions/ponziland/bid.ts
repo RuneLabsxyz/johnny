@@ -41,7 +41,7 @@ export const bid = (chain: StarknetChain) => action({
 
         let ponziLandContract = (new Contract(manifest.contracts[0].abi, ponziland_address, chain.provider)).typedv2(manifest.contracts[0].abi as Abi);
 
-        let price = await ponziLandContract.get_current_auction_price(data.land_location);\
+        let price = await ponziLandContract.get_current_auction_price(data.land_location);
 
         if (agent_token) {
             data.token_for_sale = agent_token;
