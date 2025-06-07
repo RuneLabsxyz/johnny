@@ -7,7 +7,7 @@ import { Abi, CallData, Contract, cairo } from "starknet";
 import { Call } from "starknet";
 import { getLiquidityPoolFromAPI } from "../../utils/ponziland_api"
 import { decodeTokenTransferEvents } from "../../utils/utils";
-import { env } from "../../../../env";
+import { env, getTokenAddress } from "../../../../env";
 import { indexToPosition } from "../../utils/utils";
 
 
@@ -38,6 +38,12 @@ export const buy = (chain: StarknetChain) => action({
             entrypoint: "balanceOf",
             calldata: CallData.compile({ address: env.STARKNET_ADDRESS! })
         });
+
+        let agent_token = getTokenAddress();
+
+        if (agent_token) {
+            data.token_for_sale = agent_token;
+        }
 
     
         let token = land[0].token_used;

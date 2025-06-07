@@ -104,7 +104,7 @@ pub mod player_actions {
             let two_days_in_seconds = 172800;
             let elapsed_time = (get_block_timestamp() - land.block_date_bought) * time_speed;
 
-            if elapsed_time >= two_days_in_seconds {
+            if elapsed_time >= two_days_in_seconds && land.level != Level::Second {
                 return true;
             }
             else {
@@ -120,6 +120,6 @@ pub mod player_actions {
     }
 
     pub fn namespace() -> @ByteArray {
-        @"orchards3"
+        @"orchards"
     }
 }

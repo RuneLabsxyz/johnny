@@ -5,7 +5,7 @@ import { type Abi, CallData, Contract, cairo } from "starknet";
 import { type Call } from "starknet";
 import { getLiquidityPoolFromAPI } from "../../utils/ponziland_api"
 import { decodeTokenTransferEvents } from "../../utils/utils";
-import { env } from "../../../../env";
+import { env, getTokenAddress } from "../../../../env";
 import { indexToPosition } from "../../utils/utils";
 
 
@@ -37,9 +37,15 @@ export const bid = (chain: StarknetChain) => action({
             calldata: [env.STARKNET_ADDRESS!]
         });
 
+        let agent_token = getTokenAddress();
+
         let ponziLandContract = (new Contract(manifest.contracts[0].abi, ponziland_address, chain.provider)).typedv2(manifest.contracts[0].abi as Abi);
 
-        let price = await ponziLandContract.get_current_auction_price(data.land_location);
+        let price = await ponziLandContract.get_current_auction_price(data.land_location);\
+
+        if (agent_token) {
+            data.token_for_sale = agent_token;
+        }
 
         if (data.token_for_sale == estark_address) {
             let estark_call: Call = { contractAddress: estark_address, entrypoint: "approve", calldata: CallData.compile({ spender: ponziland_address, amount: cairo.uint256(data.amount_to_stake + price) }) };

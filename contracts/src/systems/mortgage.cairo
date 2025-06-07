@@ -47,7 +47,7 @@ pub mod mortgage {
     }
 
     pub fn namespace() -> @ByteArray {
-        @"orchards3"
+        @"orchards"
     }
 }
 
