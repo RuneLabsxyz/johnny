@@ -52,14 +52,14 @@ export const swap = (chain: StarknetChain) => action({
             const quoteParams = {
                 sellTokenAddress: pool.token1,
                 buyTokenAddress: pool.token0,
-                sellAmount: "0x" + sellAmount.toString(16),
+                sellAmount: sellAmount,
             };
 
             console.log('Fetching quotes with params:', quoteParams);
 
             let baseUrl = env.AVNU_BASE_URL;
             // Fetch quotes from AVNU
-            const quotes = await fetch(`${baseUrl}/swap/v2/quotes?sellTokenAddress=${quoteParams.sellTokenAddress}&buyTokenAddress=${quoteParams.buyTokenAddress}&sellAmount=${quoteParams.sellAmount}`);
+            const quotes = await fetchQuotes(quoteParams);
 
             let res = await quotes.json();
             console.log('quotes', res);
