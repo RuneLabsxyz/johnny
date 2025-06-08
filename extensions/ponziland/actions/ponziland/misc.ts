@@ -64,6 +64,7 @@ export const increase_stake = (chain: StarknetChain) => action({
                     break;
                 }
             }
+            console.log('land', land)
             let token_address = land.token_used;
             console.log('token_address', token_address)
 
