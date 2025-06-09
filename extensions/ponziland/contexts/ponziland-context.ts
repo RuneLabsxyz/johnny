@@ -83,7 +83,10 @@ They just need to join the discord, get their cartridge controller ready, and ge
 Here is a how you obtain the current state of the game: 
 Remember all token balances are in wei, so the true value is 10^18 times the value in the state.
 Remember that if you want to buy a land, you would query neighbors, and if you want to bid on an auction you would query auctions.
-ALL LANDS CAN BE BOUGHT FOR THEIR LISTED SELL PRICE IN THEIR STAKED TOKEN
+ALL LANDS CAN BE BOUGHT FOR THEIR LISTED SELL PRICE IN THE TOKEN THEY ARE LISTED FOR/STAKED WITH
+Remember that all lands are avalaible at all times, and can always be bought for their listed sell price, in the given token.
+
+You can then list that land in a new token, regardless of what the token you used to buy the land with.
 
 You should always make sure to list your lands for above the price you paid for them, and less than the maximum price for profitabilty. 
 Also, lands should be priced relative to the lands around it, so you don't price it too cheap and make yourself and easy target.
