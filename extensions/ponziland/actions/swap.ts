@@ -10,6 +10,7 @@ import {
 
 import { env } from "../../../env"
 import { getAllTokensFromAPI } from "../utils/ponziland_api"
+import { trimLeadingZeros } from "../utils/utils"
 
 export const swap = (chain: StarknetChain) => action({
     name: "swap",
@@ -27,8 +28,8 @@ export const swap = (chain: StarknetChain) => action({
             throw new Error("You cannot swap the same token");
         }
 
-        let token_selling = tokens.find(t => BigInt(t.address) == BigInt(data.selling_address));
-        let token_buying = tokens.find(t => BigInt(t.address) == BigInt(data.buying_address));
+        let token_selling = tokens.find(t => BigInt(trimLeadingZeros(t.address)) == BigInt(trimLeadingZeros(data.selling_address)));
+        let token_buying = tokens.find(t => BigInt(trimLeadingZeros(t.address)) == BigInt(trimLeadingZeros(data.buying_address)));
 
         console.log('token_in', token_selling);
         console.log('token_out', token_buying);
@@ -50,30 +51,25 @@ export const swap = (chain: StarknetChain) => action({
             }
 
             const quoteParams = {
-                sellTokenAddress: pool.token1,
-                buyTokenAddress: pool.token0,
-                sellAmount: "0x" + sellAmount.toString(16),
+                sellTokenAddress: pool.token0,
+                buyTokenAddress: pool.token1,
+                sellAmount: sellAmount,
             };
 
             console.log('Fetching quotes with params:', quoteParams);
 
             let baseUrl = env.AVNU_BASE_URL;
             // Fetch quotes from AVNU
-            const quotes = await fetch(`${baseUrl}/swap/v2/quotes?sellTokenAddress=${quoteParams.sellTokenAddress}&buyTokenAddress=${quoteParams.buyTokenAddress}&sellAmount=${quoteParams.sellAmount}`);
+            const quotes = await fetchQuotes(quoteParams);
 
-            let res = await quotes.json();
-            console.log('quotes', res);
-
-            console.log('Found quotes:', res.length);
-            // Use the best quote (first one)
-            const bestQuote = res[0];
+            const bestQuote = quotes[0];
 
             console.log('Executing swap with AVNU SDK...');
 
             console.log('bestQuote', bestQuote);
 
             // Execute the swap using AVNU SDK with the chain's account
-            const swapResult = await executeAvnuSwap(chain.account, bestQuote, {}, { baseUrl: baseUrl });
+            const swapResult = await executeAvnuSwap(chain.account, bestQuote, {});
 
             console.log('Swap executed successfully:', swapResult);
 

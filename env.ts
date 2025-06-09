@@ -22,13 +22,24 @@ const personalities = {
   "blobert": blobertPersonality
 }
 
+const token_addresses = {
+  "blobert": "0x00dcdc180a8b4b9cef2d039462ad30de95c5609178a1c2bc55779309c07d45db",
+  "duck": "0x078c1138aa1cfd27436b26279d5ac4e3f8f5a432927d85d22b2a2e7c0e5528b4",
+  "everai": "0x074ad80778e07102902abdec71e0161023b45d1204c29e2c4ec3befab3bb82f5",
+  "wolf": "0x040025cec149bf1f58d2e34a6924605b571a5fce7b798a47ec52cfbd3ff68b6e",
+}
+
 const args = minimist(process.argv.slice(2));
 const character = args.character;
 const network = args.network || "sepolia";
-const discord = args.main_discord ? { chat: "1369338053360881795", thoughts: "1379477765786701824" } : { chat: "1379102407459602503", thoughts: "1352657633374371861" };
+const discord = args.main_discord ? { chat: "1379975758574915654", thoughts: "1379477765786701824" } : { chat: "1379102407459602503", thoughts: "1352657633374371861" };
 
 export const getPersonality = () => {
   return personalities[character as keyof typeof personalities](env.DISCORD_THOUGHTS_CHANNEL_ID) || ponziusPersonality(env.DISCORD_THOUGHTS_CHANNEL_ID);
+}
+
+export const getTokenAddress = () => {
+  return token_addresses[character as keyof typeof token_addresses];
 }
 
 export const getEnvWithPrefix = (name: string) => {

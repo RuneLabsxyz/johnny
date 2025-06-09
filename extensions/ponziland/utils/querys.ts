@@ -4,7 +4,7 @@ import { CairoCustomEnum, Contract, RpcProvider, type Abi } from "starknet";
 import { balance_query, auction_query, land_query, query_lands_under_price } from "./gql";
 import { getAllTokensFromAPI } from "../utils/ponziland_api";
 import { getTokenData, formatTokenAmount, indexToPosition  } from "../utils/utils";
-import { env } from "../../../env";
+import { env, getTokenAddress } from "../../../env";
 
 let manifest = env.MANIFEST;
 let view_manifest = env.VIEW_MANIFEST;
@@ -96,7 +96,7 @@ export const get_lands_str = async (address: string) => {
 
     Yield: ${yields[index]}
   
-    Listed Price: ${BigInt(land.sell_price).toString()}
+    Listed Price: ${formatTokenAmount(BigInt(land.sell_price))} ${getTokenData(land.token_used, tokens)?.symbol}
   `).join("\n");
 
   console.log('land_str', land_str)
@@ -229,10 +229,15 @@ export const get_all_lands_str = async () => {
   return land_str;
 }
 
-export const get_auction_yield_str = async (location: number) => {
-  let neighbors = await viewContract.get_neighbors(location);
+export const get_auction_yield_str = async (location: number) : Promise<string> => {
+  let neighbors = await viewContract.get_neighbors(BigInt(location));
   let tokens = await getAllTokensFromAPI();
   let income = BigInt(0);
+  let land_or_auction = await viewContract.get_land_or_auction(BigInt(location));
+
+  if (land_or_auction.activeVariant() == "Land") {
+    return await get_unowned_land_yield_str(location);
+  }
 
   let neighbor_tax_rates = await Promise.all(neighbors.map(async (neighbor: any) => {
     if (neighbor.activeVariant() == "Land") {
@@ -242,6 +247,10 @@ export const get_auction_yield_str = async (location: number) => {
   }));
 
   let detailed_income = "";
+
+  let agent_token_address = getTokenAddress();
+  let agent_token = tokens.find((token) => token.address == agent_token_address);
+  let time_speed = 5;
 
   neighbors.forEach((neighbor: any, index: number) => {
     if (neighbor.activeVariant() == "Land") {
@@ -259,37 +268,52 @@ export const get_auction_yield_str = async (location: number) => {
         if (!neighbor_token.ratio) {
           income += BigInt(neighbor_yield);
           detailed_income += `
-          Location: ${value.location} ${coords[index]} - Yield: ${formatTokenAmount(BigInt(neighbor_yield))} estark
+          Location: ${value.location} ${coords[index]} - Yield: ${formatTokenAmount(BigInt(neighbor_yield))} estark / ${10 / Number(time_speed)} minutes
           `;
         }
         else {
           let adjusted_yield = Math.floor(Number(neighbor_yield) / neighbor_token.ratio);
           income += BigInt(adjusted_yield);
           detailed_income += `
-          Location: ${value.location} ${coords} - Yield: ${formatTokenAmount(BigInt(neighbor_yield))} ${neighbor_token.symbol} (${formatTokenAmount(BigInt(adjusted_yield))} estark)
+          Location: ${value.location} ${coords} - Yield: ${formatTokenAmount(BigInt(neighbor_yield))} ${neighbor_token.symbol} (${formatTokenAmount(BigInt(adjusted_yield))} estark / ${10 / Number(time_speed)} minutes)
           `;
         }
       }
     }
   });
 
-  let max_price = (Number(income) * 8) / .02;
+  let max_price = (Number(income) ) / .02;
+
+  let auction_price = await ponziLandContract.get_current_auction_price(BigInt(location));
   return `
   
+  Auction Price: ${formatTokenAmount(BigInt(auction_price))} estark
   PotentialIncome: ${formatTokenAmount(income)} estark
   <detailed_income>
   ${detailed_income}
   </detailed_income>;
 
-  Maximum Listing Price For Profit: ${formatTokenAmount(BigInt(Math.floor(max_price)))} estark. (If you list for more than this you will lose money)
+  Maximum Listing Price For Profit: ${formatTokenAmount(BigInt(Math.floor(max_price)))} estark / ${formatTokenAmount(BigInt(Math.floor(agent_token!.ratio! / Number(max_price))))} ${agent_token!.symbol}. (If you list for more than this you will lose money)
   Only bid on auctions if you can list it for less than this, but more than the auction price. 
   `;
 }
 
-export const get_unowned_land_yield_str = async (location: number) => {
-  let neighbors = await viewContract.get_neighbors(location);
+export const get_unowned_land_yield_str = async (location: number) : Promise<string> => {
+  let neighbors = await viewContract.get_neighbors(BigInt(location));
+  let land_or_auction = await viewContract.get_land_or_auction(BigInt(location));
+
+
+  if (land_or_auction.activeVariant() == "Auction") {
+    return await get_auction_yield_str(location);
+  }
+
+  let land = land_or_auction.unwrap();
+  let time_speed = 5;
   let tokens = await getAllTokensFromAPI();
   let income = BigInt(0);
+
+
+  
 
   let neighbor_tax_rates = await Promise.all(neighbors.map(async (neighbor: any) => {
     if (neighbor.activeVariant() == "Land") {
@@ -298,6 +322,10 @@ export const get_unowned_land_yield_str = async (location: number) => {
     }
   }));
 
+  let agent_token_address = getTokenAddress();
+  let agent_token = tokens.find((token) => BigInt(token.address) == BigInt(agent_token_address));
+
+  console.log('agent_token', agent_token)
   let detailed_income = "";
 
   neighbors.forEach((neighbor: any, index: number) => {
@@ -316,29 +344,43 @@ export const get_unowned_land_yield_str = async (location: number) => {
         if (!neighbor_token.ratio) {
           income += BigInt(neighbor_yield);
           detailed_income += `
-          Location: ${value.location} ${coords} - Yield: ${formatTokenAmount(BigInt(neighbor_yield))} estark
+          Location: ${value.location} ${coords} - Yield: ${formatTokenAmount(BigInt(neighbor_yield))} estark / ${10 / Number(time_speed)} minutes
           `;
         }
         else {
           let adjusted_yield = Math.floor(Number(neighbor_yield) / neighbor_token.ratio);
           income += BigInt(adjusted_yield);
           detailed_income += `
-          Location: ${value.location} ${coords} - Yield: ${formatTokenAmount(BigInt(neighbor_yield))} ${neighbor_token.symbol} (${formatTokenAmount(BigInt(adjusted_yield))} estark)
+          Location: ${value.location} ${coords} - Yield: ${formatTokenAmount(BigInt(neighbor_yield))} ${neighbor_token.symbol} (${formatTokenAmount(BigInt(adjusted_yield))} estark / ${10 / Number(time_speed)} minutes)
           `;
         }
       }
     }
   });
 
-  let max_price = (Number(income) * 8) / .02;
-  return `
+  let max_price = (Number(income)) / .02;
+
+  console.log('land', land)
+
+  let estark_price = formatTokenAmount(BigInt(Math.floor(agent_token!.ratio! / Number(land.sell_price))));
+
   
-  PotentialIncome: ${formatTokenAmount(income)} estark
+  return `
+
+  Land Location: ${BigInt(land.location).toString()} (${indexToPosition(Number(land.location))[0]}, ${indexToPosition(Number(land.location))[1]})
+  Owner: ${BigInt(land.owner)}
+
+  Land Price: ${formatTokenAmount(BigInt(land.sell_price))} ${getTokenData(land.token_used, tokens)?.symbol}
+  ${agent_token!.symbol} Equivalent: ${formatTokenAmount(BigInt(Math.floor(agent_token!.ratio! * Number(land.sell_price))))} ${agent_token!.symbol}
+  estark Equivalent: ${estark_price} estark
+  
+  PotentialIncome: ${formatTokenAmount(income)} estark / ${formatTokenAmount(BigInt(Math.floor(agent_token!.ratio! * Number(income))))} ${agent_token!.symbol}
   <detailed_income>
   ${detailed_income}
   </detailed_income>;
 
-  Maximum Listing Price For Profit: ${formatTokenAmount(BigInt(Math.floor(max_price)))} estark. (If you list for more than this you will lose money)
+  Maximum Listing Price For Profit: ${formatTokenAmount(BigInt(Math.floor(agent_token!.ratio! * Number(max_price))))} ${agent_token!.symbol}. (If you list for more than this you will lose money)
+  
   Only bid on auctions if you can list it for less than this, but more than the auction price. 
   `;
 }
@@ -350,6 +392,13 @@ export const get_player_lands_str = async (address: string) => {
     land_query(address),
     {}
   ).then((res: any) => res?.ponziLandLandModels?.edges?.map((edge: any) => edge?.node));
+
+  let coords = lands.map((land: any) => `(${indexToPosition(Number(land.location))[0]}, ${indexToPosition(Number(land.location))[1]})`)
+  let land_str = lands.map((land: any, index: number) => `
+  Location: ${BigInt(land.location).toString()} ${coords[index]} Owner: ${land.owner} - Token: ${getTokenData(land.token_used, tokens)!.symbol} - Sell Price: ${formatTokenAmount(BigInt(land.sell_price))}
+  `).join("\n");
+
+  return land_str;
 }
 
 export const get_owned_lands = async () => {
@@ -457,8 +506,16 @@ export const query_lands_under_price_str = async (price: number, token: string) 
 
   let tokens = await getAllTokensFromAPI();
 
-  let res = lands.map((land: any) => `
-  Location: ${BigInt(land.location).toString()} Owner: ${land.owner} - Token: ${getTokenData(land.token_used, tokens)!.symbol} - Sell Price: ${formatTokenAmount(BigInt(land.sell_price))}
+  if (!lands) {
+    return "No lands found under this price"
+  }
+
+  lands.slice(0, 10);
+
+  let coords = lands.map((land: any) => `(${indexToPosition(Number(land.location))[0]}, ${indexToPosition(Number(land.location))[1]})`)
+
+  let res = lands.map((land: any, index: number) => `
+  Location: ${BigInt(land.location).toString()} ${coords[index]} Owner: ${land.owner} - Token: ${getTokenData(land.token_used, tokens)!.symbol} - Sell Price: ${formatTokenAmount(BigInt(land.sell_price))}
   `).join("\n");
 
   return res;

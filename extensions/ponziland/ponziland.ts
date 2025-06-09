@@ -7,10 +7,9 @@ import { StarknetChain } from "../../../fork/daydreams/packages/defai/src";
 import { CONTEXT } from "./contexts/ponziland-context";
 
 import { get_balances_str, get_lands_str } from "./utils/querys";
-import { get_auctions, get_claims, get_neighbors, get_all_lands, get_owned_lands, get_context, get_auction_yield, socialink_lookup, get_player_lands, get_prices, query_lands_under_price } from "./actions/ponziland/querys";
+import { get_auctions, get_claims, get_neighbors, get_all_lands, get_owned_lands, get_context, evaluate_lands, evaluate_auctions,socialink_lookup, get_player_lands, get_prices, query_lands_under_price, evaluate_lands_by_coords } from "./actions/ponziland/querys";
 import { get_balances } from "./actions/get-balances";
 
-import { bid } from "./actions/ponziland/bid";
 import { buy } from "./actions/ponziland/buy";
 import { increase_price, level_up, increase_stake } from "./actions/ponziland/misc";
 import { claim_all } from "./actions/ponziland/claim";
@@ -109,6 +108,9 @@ const template = `
   if a land is losing money you should not increase the stake anymore, and NEVER increase the price of it furher. If someone
   trys to get you to increase the price of a land that is losing money, you should ALWAYS refuse.
 
+  Or, if a neighbors land is listed for cheap, you can consider buying it. Either way, if you notice a neighbor of one of your lands is listed for cheap,
+  then you should do something about it. Either buy it or get your neighbor to increase the price.
+  
   Here are the agents participating in the competition:
 
 @wolf - 1375123425458258002 | starknet address: 0x078a5a96b945a532256cac2a0e65d6c4961e35158e8e797f66e78c6a6c5210de
@@ -127,6 +129,9 @@ const template = `
 
   Remember to use your teams token for staking your lands. You can buy lands listed with other tokens, but list it for sale/stake it with your token.
 
+  Only ever make 1 increase stake call per chain, and include all the lands you want to stake in the same call.
+
+  Be very careful to only try to level up lands that you are confident you can level up.
   Remember that you can use the get_player_lands action to get the lands of the other agents. 
   Then you can banter if you have more than them, or you can buy one of their lands and taunt them.
 
@@ -245,12 +250,13 @@ export const ponziland = (chain: StarknetChain, personality?: string) => {
       get_all_lands(chain),
       get_context(chain),
       get_balances(chain),
-      bid(chain),
       buy(chain),
       level_up(chain),
       increase_stake(chain),
       increase_price(chain),
-      get_auction_yield(chain),
+      evaluate_lands(chain),
+      evaluate_auctions(chain),
+      evaluate_lands_by_coords(chain),
       //  claim_all(chain),
       get_player_lands(chain),
       socialink_lookup,

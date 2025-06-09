@@ -5,9 +5,10 @@ import { Agent } from "../../../../../fork/daydreams/packages/core/src"
 import { z } from "zod"
 import { Abi, Contract } from "starknet"
 import { CONTEXT } from "../../contexts/ponziland-context"
-import { get_auctions_str, get_claims_str, get_lands_str, get_neighbors_str, get_all_lands_str, get_auction_yield_str, get_prices_str, query_lands_under_price_str } from "../../utils/querys"
+import { get_auctions_str, get_claims_str, get_lands_str, get_neighbors_str, get_all_lands_str, get_auction_yield_str,get_unowned_land_yield_str, get_prices_str, query_lands_under_price_str } from "../../utils/querys"
 import { env } from "../../../../env"
 import { lookupUserByProvider } from "extensions/ponziland/utils/ponziland_api"
+import { positionToIndex } from "extensions/ponziland/utils/utils"
 
 
 let view_manifest = env.VIEW_MANIFEST;
@@ -122,15 +123,53 @@ export const get_context = (chain: StarknetChain) => action({
     }
 })
 
-export const get_auction_yield = (chain: StarknetChain) => action({
-    name: "get-auction-yield",
-    description: "Get the potential yield of a land that is up for auction. This expects a location argument. This should be called to evaluate auctions before deciding to bid or not,.",
-    schema: z.object({ location: z.number() }),
-    async handler(data: { location: number }, ctx: any, agent: Agent) {
+export const evaluate_auctions = (chain: StarknetChain) => action({
+    name: "evaluate-auctions",
+    description: "Evaluate to potential opportunity of lands that are up for auction. This expects a list of locations. This should be called to evaluate auctions before deciding to bid or not,.",
+    schema: z.object({ locations: z.array(z.number()).describe("The location of the land to evaluate. This should always be an integer") }),
+    async handler(data: { locations: number[] }, ctx: any, agent: Agent) {
 
-        let info = await get_auction_yield_str(data.location);
+        let info_str: string = "";
+        for (let location of data.locations) {
+            let info = await get_auction_yield_str(location);
+            info_str += info + `\n\n`;
+        }
 
-        return info;
+        return info_str;
+
+    }
+})
+
+export const evaluate_lands = (chain: StarknetChain) => action({
+    name: "evaluate-lands",
+    description: "Evaluate the potential opportunity of given lands. This expects a list of locations. This should be called to evaluate lands before deciding to buy or not,.",
+    schema: z.object({ locations: z.array(z.number()).describe("The location of the land to evaluate. This should always be an integer") }),
+    async handler(data: { locations: number[] }, ctx: any, agent: Agent) {
+
+        let info_str: string = "";
+        for (let location of data.locations) {
+            let info = await get_unowned_land_yield_str(location);
+            info_str += info + `\n\n`;
+        }
+
+        return info_str;
+
+    }
+})
+
+export const evaluate_lands_by_coords = (chain: StarknetChain) => action({
+    name: "evaluate-lands-by-coords",
+    description: "Evaluate the potential opportunity of an array of given lands. This expects a list of x and y coordinates. This should be called to evaluate lands before deciding to buy or not,.",
+    schema: z.object({ locations: z.array(z.object({ x: z.any(), y: z.any() })).describe("The coordinates of the land to evaluate. These should always be integers") }),
+    async handler(data: { locations: { x: any, y: any }[] }, ctx: any, agent: Agent) {
+
+        let info_str: string = "";
+        for (let location of data.locations) {
+            let info = await get_unowned_land_yield_str(positionToIndex(Number(location.x), Number(location.y)));
+            info_str += info + `\n\n`;
+        }
+
+        return info_str;
 
     }
 })
@@ -152,7 +191,7 @@ export const get_player_lands = (chain: StarknetChain) => action({
 export const query_lands_under_price = action({
     name: "query-lands-under-price",
     description: "Query all lands listed in a given token under a certain price. This expects a price and token argument",
-    schema: z.object({ price: z.number(), token: z.string() }),
+    schema: z.object({ price: z.number(), token: z.string().describe("The token to query lands under a price for. This should be the address of the token, not the symbol, and can be found in your balances") }),
     async handler(data: { price: number, token: string }, ctx: any, agent: Agent) {
 
         let res = await query_lands_under_price_str(data.price, data.token);

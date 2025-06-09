@@ -54,15 +54,8 @@ const discordChannelContext = context({
       3. Don't take part in conversations unless you have been mentioned or asked to join the conversation
       4. Don't send multiple messages in a row
       5. When you @ someone, use the syntax <@userId>
-      6. Do not respond to messages that do not mention you or are not directly relevant to you in some way.
-      7. Even basic hello or gm messages should not be responded to unless you are specifically tagged or mentioned.
-      8. Remember that you are in a public channel and you should only be considered mentioned when directly addressed or tagged.
-      10. If you are not directly relevant to the conversation or incoming message, assume you should not reply
-      11. Do not tag people in messages unless it is a direct response to them tagging you. Never do it unprompted
-      12. Even if you are taged in a message, do not reply if you have already replied to similar previous message. do not repeat yourself or get stuck in loops
-      13. If a conversation is not going anywhere, you should stop responding
-      14. When it is appropriate for you to tag someone, you should be very careful to ensure you are tagging the right person.
-      
+      6. Always make sure to send messages in the correct channel. You should always reply in the same channel as the message you are replying to.
+
       `;
   },
   render({ args }) {
@@ -103,9 +96,9 @@ export const discord = extension({
 
           let channel = await client.channels.fetch(message.channelId);
 
-          let blacklistedChannels = ["1375477437953216633", "1379102407459602503", "1375502718877171794", "1375502743824891964", "1377360891267387423", "1375502867686756534"];
+          let blacklistedChannels = ["1375477437953216633", "1379975758574915654", "1379102407459602503", "1375502718877171794", "1375502743824891964", "1377360891267387423", "1375502867686756534"];
 
-          let blacklistedUsers = ["1375123425458258002", "1375124604464529548", "1375124244832452609", "1328909573972557904", "1375124244832452609"]
+          let blacklistedUsers = ["1375123425458258002", "1379991074742861956", "1375124604464529548", "1375124244832452609", "1328909573972557904", "1375124244832452609"]
           if (!channel || !channel.isTextBased() || blacklistedChannels.includes(channel.id) || blacklistedUsers.includes(message.author.id)) {
             console.log(`Skipping message`, message.content);
             return;
@@ -117,7 +110,7 @@ export const discord = extension({
             return;
           }
 
-          let sociallink_res = await lookupUserByProvider("discord", message.author.id);
+      //    let sociallink_res = await lookupUserByProvider("discord", message.author.id);
 
           console.log('sociallink', sociallink_res);
 
@@ -125,7 +118,7 @@ export const discord = extension({
 
           let sortedMessages = messages.sort((a, b) => a.createdTimestamp - b.createdTimestamp);
 
-          let context = "Your ID: " + client.user?.id + "\n\n\n Be extremely careful to only reply if you are tagged by this id. \n\n\n";
+          let context = "Discord Channel ID: " + message.channelId + "\n\n\n Your ID: " + client.user?.id + "\n\n\n Be extremely careful to only reply if you are tagged by this id. \n\n\n";
           let i = 0;
 
           for (const message of sortedMessages) {
@@ -270,8 +263,8 @@ export const discord = extension({
         // Function to schedule the next check with random timing
         const scheduleNextCheck = async () => {
           // Random delay between 5 and 15 minutes (300000-900000 ms)
-          const minDelay = 400000; // 20 minutes
-          const maxDelay = 750000; // 30 minutes
+          const minDelay = 2400000; // 40 minutes
+          const maxDelay = 3600000; // 60 minutes
           const randomDelay = Math.floor(Math.random() * (maxDelay - minDelay + 1)) + minDelay;
 
           console.log(`Scheduling next agent channel check in ${randomDelay / 60000} minutes`);
@@ -416,6 +409,11 @@ export const discord = extension({
               that they can use themselves to more meaningfully engage with the game, and with you, the agents. This is why incorporating ponziland
               actions and strategies into your messages is so important, and always the preferred way to interact with the other agents in this channel.
 
+              NEVER ever ever start a message with "while your...". This is a very bad habit and you should never do it. Especially if 
+              the message you are replying to includes it.
+
+              The absolute best thing to incorporate into your messages are directly related to interacting with your
+              
               If there isn't anything you want to do in ponziland or reply to in the conversation, you can just make up a story
               about what you are doing in your life outside of the game. Something like "sorry i didn't see this, i was doing {insert activity here}"
     Here is the current conversation: \n\n
