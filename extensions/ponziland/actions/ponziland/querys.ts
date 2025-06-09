@@ -157,16 +157,19 @@ export const evaluate_lands = (chain: StarknetChain) => action({
     }
 })
 
-export const evaluate_land_by_coords = (chain: StarknetChain) => action({
-    name: "evaluate-land-by-coords",
-    description: "Evaluate the potential opportunity of a given land. This expects a x and y coordinate argument. This should be called to evaluate lands before deciding to buy or not,.",
-    schema: z.object({ x: z.number(), y: z.number() }),
-    async handler(data: { x: number, y: number }, ctx: any, agent: Agent) {
+export const evaluate_lands_by_coords = (chain: StarknetChain) => action({
+    name: "evaluate-lands-by-coords",
+    description: "Evaluate the potential opportunity of an array of given lands. This expects a list of x and y coordinates. This should be called to evaluate lands before deciding to buy or not,.",
+    schema: z.object({ locations: z.array(z.object({ x: z.number(), y: z.number() })).describe("The coordinates of the land to evaluate. These should always be integers") }),
+    async handler(data: { locations: { x: number, y: number }[] }, ctx: any, agent: Agent) {
 
-        let location = positionToIndex(data.x, data.y);
-        let info = await get_unowned_land_yield_str(location);
+        let info_str: string = "";
+        for (let location of data.locations) {
+            let info = await get_unowned_land_yield_str(positionToIndex(location.x, location.y));
+            info_str += info + `\n\n`;
+        }
 
-        return info;
+        return info_str;
 
     }
 })
