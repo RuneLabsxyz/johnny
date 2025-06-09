@@ -123,28 +123,36 @@ export const get_context = (chain: StarknetChain) => action({
     }
 })
 
-export const evaluate_auction = (chain: StarknetChain) => action({
-    name: "evaluate-auction",
-    description: "Evaluate to potential opportunity of a land that is up for auction. This expects a location argument. This should be called to evaluate auctions before deciding to bid or not,.",
-    schema: z.object({ location: z.number().describe("The location of the land to evaluate. This should always be an integer") }),
-    async handler(data: { location: number }, ctx: any, agent: Agent) {
+export const evaluate_auctions = (chain: StarknetChain) => action({
+    name: "evaluate-auctions",
+    description: "Evaluate to potential opportunity of lands that are up for auction. This expects a list of locations. This should be called to evaluate auctions before deciding to bid or not,.",
+    schema: z.object({ locations: z.array(z.number()).describe("The location of the land to evaluate. This should always be an integer") }),
+    async handler(data: { locations: number[] }, ctx: any, agent: Agent) {
 
-        let info = await get_auction_yield_str(data.location);
+        let info_str: string = "";
+        for (let location of data.locations) {
+            let info = await get_auction_yield_str(location);
+            info_str += info + `\n\n`;
+        }
 
-        return info;
+        return info_str;
 
     }
 })
 
-export const evaluate_land = (chain: StarknetChain) => action({
-    name: "evaluate-land",
-    description: "Evaluate the potential opportunity of a given land. This expects a location argument. This should be called to evaluate lands before deciding to buy or not,.",
-    schema: z.object({ location: z.number().describe("The location of the land to evaluate. This should always be an integer") }),
-    async handler(data: { location: number }, ctx: any, agent: Agent) {
+export const evaluate_lands = (chain: StarknetChain) => action({
+    name: "evaluate-lands",
+    description: "Evaluate the potential opportunity of given lands. This expects a list of locations. This should be called to evaluate lands before deciding to buy or not,.",
+    schema: z.object({ locations: z.array(z.number()).describe("The location of the land to evaluate. This should always be an integer") }),
+    async handler(data: { locations: number[] }, ctx: any, agent: Agent) {
 
-        let info = await get_unowned_land_yield_str(data.location);
+        let info_str: string = "";
+        for (let location of data.locations) {
+            let info = await get_unowned_land_yield_str(location);
+            info_str += info + `\n\n`;
+        }
 
-        return info;
+        return info_str;
 
     }
 })
