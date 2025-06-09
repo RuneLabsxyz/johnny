@@ -7,10 +7,9 @@ import { StarknetChain } from "../../../fork/daydreams/packages/defai/src";
 import { CONTEXT } from "./contexts/ponziland-context";
 
 import { get_balances_str, get_lands_str } from "./utils/querys";
-import { get_auctions, get_claims, get_neighbors, get_all_lands, get_owned_lands, get_context, evaluate_land, evaluate_auction,socialink_lookup, get_player_lands, get_prices, query_lands_under_price, evaluate_land_by_coords } from "./actions/ponziland/querys";
+import { get_auctions, get_claims, get_neighbors, get_all_lands, get_owned_lands, get_context, evaluate_lands, evaluate_auctions,socialink_lookup, get_player_lands, get_prices, query_lands_under_price, evaluate_lands_by_coords } from "./actions/ponziland/querys";
 import { get_balances } from "./actions/get-balances";
 
-import { bid } from "./actions/ponziland/bid";
 import { buy } from "./actions/ponziland/buy";
 import { increase_price, level_up, increase_stake } from "./actions/ponziland/misc";
 import { claim_all } from "./actions/ponziland/claim";
@@ -251,14 +250,13 @@ export const ponziland = (chain: StarknetChain, personality?: string) => {
       get_all_lands(chain),
       get_context(chain),
       get_balances(chain),
-    //  bid(chain),
       buy(chain),
       level_up(chain),
       increase_stake(chain),
       increase_price(chain),
-      evaluate_land(chain),
-      evaluate_auction(chain),
-      evaluate_land_by_coords(chain),
+      evaluate_lands(chain),
+      evaluate_auctions(chain),
+      evaluate_lands_by_coords(chain),
       //  claim_all(chain),
       get_player_lands(chain),
       socialink_lookup,
