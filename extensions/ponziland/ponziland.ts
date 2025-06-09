@@ -251,7 +251,7 @@ export const ponziland = (chain: StarknetChain, personality?: string) => {
       get_all_lands(chain),
       get_context(chain),
       get_balances(chain),
-      bid(chain),
+    //  bid(chain),
       buy(chain),
       level_up(chain),
       increase_stake(chain),
