@@ -229,10 +229,15 @@ export const get_all_lands_str = async () => {
   return land_str;
 }
 
-export const get_auction_yield_str = async (location: number) => {
+export const get_auction_yield_str = async (location: number) : Promise<string> => {
   let neighbors = await viewContract.get_neighbors(BigInt(location));
   let tokens = await getAllTokensFromAPI();
   let income = BigInt(0);
+  let land_or_auction = await viewContract.get_land_or_auction(BigInt(location));
+
+  if (land_or_auction.activeVariant() == "Land") {
+    return await get_unowned_land_yield_str(location);
+  }
 
   let neighbor_tax_rates = await Promise.all(neighbors.map(async (neighbor: any) => {
     if (neighbor.activeVariant() == "Land") {
@@ -293,12 +298,21 @@ export const get_auction_yield_str = async (location: number) => {
   `;
 }
 
-export const get_unowned_land_yield_str = async (location: number) => {
+export const get_unowned_land_yield_str = async (location: number) : Promise<string> => {
   let neighbors = await viewContract.get_neighbors(BigInt(location));
-  let land = (await viewContract.get_land_or_auction(BigInt(location))).unwrap();
+  let land_or_auction = await viewContract.get_land_or_auction(BigInt(location));
+
+
+  if (land_or_auction.activeVariant() == "Auction") {
+    return await get_auction_yield_str(location);
+  }
+
+  let land = land_or_auction.unwrap();
   let time_speed = 5;
   let tokens = await getAllTokensFromAPI();
   let income = BigInt(0);
+
+
   
 
   let neighbor_tax_rates = await Promise.all(neighbors.map(async (neighbor: any) => {
@@ -308,9 +322,10 @@ export const get_unowned_land_yield_str = async (location: number) => {
     }
   }));
 
-  let agent_token_address = getTokenAddress(address);
+  let agent_token_address = getTokenAddress();
   let agent_token = tokens.find((token) => BigInt(token.address) == BigInt(agent_token_address));
 
+  console.log('agent_token', agent_token)
   let detailed_income = "";
 
   neighbors.forEach((neighbor: any, index: number) => {
@@ -344,6 +359,8 @@ export const get_unowned_land_yield_str = async (location: number) => {
   });
 
   let max_price = (Number(income)) / .02;
+
+  console.log('land', land)
 
   let estark_price = formatTokenAmount(BigInt(Math.floor(agent_token!.ratio! / Number(land.sell_price))));
 
