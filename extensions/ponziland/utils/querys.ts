@@ -96,7 +96,7 @@ export const get_lands_str = async (address: string) => {
 
     Yield: ${yields[index]}
   
-    Listed Price: ${BigInt(land.sell_price).toString()}
+    Listed Price: ${formatTokenAmount(BigInt(land.sell_price))} ${getTokenData(land.token_used, tokens)?.symbol}
   `).join("\n");
 
   console.log('land_str', land_str)
