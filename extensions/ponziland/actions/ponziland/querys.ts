@@ -79,18 +79,18 @@ export const get_claims = (chain: StarknetChain) => action({
 
 export const get_neighbors = (chain: StarknetChain) => action({
     name: "get-neighbors",
-    description: "Get all of your lands neighbors in ponziland. Remember this expects a location argument",
-    schema: z.object({ location: z.number() }),
-    async handler(data: { location: number }, ctx: any, agent: Agent) {
+    description: "Get all of the neighbors for a given list of lands. This expects a list of locations",
+    schema: z.object({ locations: z.array(z.number()).describe("The location of the lands to get neighbors for. This should always be an integer") }),
+    async handler(data: { locations: number[] }, ctx: any, agent: Agent) {
 
         //todo
-        let neighbors = await get_neighbors_str(data.location);
-
-        if (neighbors == "") {
-            return "Failed to get neighbors for location " + location + ". land may not exist."
+        let neighbors_str: string = "";
+        for (let location of data.locations) {
+            let neighbors = await get_neighbors_str(location);
+            neighbors_str += neighbors + `\n\n`;
         }
 
-        return neighbors
+        return neighbors_str;
 
     }
 });
@@ -160,7 +160,7 @@ export const evaluate_lands = (chain: StarknetChain) => action({
 export const evaluate_lands_by_coords = (chain: StarknetChain) => action({
     name: "evaluate-lands-by-coords",
     description: "Evaluate the potential opportunity of an array of given lands. This expects a list of x and y coordinates. This should be called to evaluate lands before deciding to buy or not,.",
-    schema: z.object({ locations: z.array(z.object({ x: z.any(), y: z.any() })).describe("The coordinates of the land to evaluate. These should always be integers") }),
+    schema: z.object({ locations: z.array(z.object({ x: z.any()., y: z.any() })).describe("The coordinates of the land to evaluate. These should always be integers") }),
     async handler(data: { locations: { x: any, y: any }[] }, ctx: any, agent: Agent) {
 
         let info_str: string = "";
