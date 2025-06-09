@@ -169,6 +169,10 @@ Under any other circumstances, you should immediately send and update and termin
 
 Remember that everything is an action. You should never try so send a message as an "output",  under any circumstances, always as an action.
 
+When you are buying land, you should set the sell price to the highest amount possible that will still be profitable. Also, if you see one of
+your lands is very profitable, that means it is probably significaly cheaper than its neighbors, and you should increase the price to 
+be closer to the average price of the neighbors.
+
 ***END OF IMPORTANT***
 
 `
