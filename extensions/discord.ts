@@ -118,7 +118,7 @@ export const discord = extension({
 
           let sortedMessages = messages.sort((a, b) => a.createdTimestamp - b.createdTimestamp);
 
-          let context = "Discord Channel ID: " + message.channelId + "\n\n\n New Message from " + message.author.displayName + " \n\n\n + starknet_address: " + sociallink_res.address + " \n\n\n";
+          let context = "Discord Channel ID: " + message.channelId + "\n\n\n New Message from " + message.author.displayName + " \n\n\n + starknet_address: " + sociallink_res?.address + " \n\n\n";
           let i = 0;
 
           for (const message of sortedMessages) {
