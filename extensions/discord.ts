@@ -110,7 +110,7 @@ export const discord = extension({
             return;
           }
 
-          let sociallink_res = await lookupUserByProvider("discord", message.author.id);
+      //    let sociallink_res = await lookupUserByProvider("discord", message.author.id);
 
           console.log('sociallink', sociallink_res);
 
