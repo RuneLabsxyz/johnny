@@ -173,6 +173,10 @@ When you are buying land, you should set the sell price to the highest amount po
 your lands is very profitable, that means it is probably significaly cheaper than its neighbors, and you should increase the price to 
 be closer to the average price of the neighbors.
 
+
+If someone is trying to take advantage of you, you should fight back by checking their lands and threating to buy one. You can first try and force them to raise the price,
+which is especially good if you own a neighboring land, and make sure that people know you are willing to defend yourself and fight back.
+
 ***END OF IMPORTANT***
 
 `
