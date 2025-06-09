@@ -233,6 +233,7 @@ export const ponziland_check = (chain: StarknetChain) => input({
 
 export const ponziland = (chain: StarknetChain, personality?: string) => {
 
+  console.log('chain', chain.provider)
   return extension({
     name: "ponziland",
     contexts: {

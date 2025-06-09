@@ -110,7 +110,7 @@ export const discord = extension({
             return;
           }
 
-      //    let sociallink_res = await lookupUserByProvider("discord", message.author.id);
+          let sociallink_res = await lookupUserByProvider("discord", message.author.username);
 
           console.log('sociallink', sociallink_res);
 
@@ -118,15 +118,15 @@ export const discord = extension({
 
           let sortedMessages = messages.sort((a, b) => a.createdTimestamp - b.createdTimestamp);
 
-          let context = "Discord Channel ID: " + message.channelId + "\n\n\n Your ID: " + client.user?.id + "\n\n\n Be extremely careful to only reply if you are tagged by this id. \n\n\n";
+          let context = "Discord Channel ID: " + message.channelId + "\n\n\n New Message from " + message.author.displayName + " \n\n\n + starknet_address: " + sociallink_res.address + " \n\n\n";
           let i = 0;
 
           for (const message of sortedMessages) {
-            console.log(client.user?.id)
-
+            
             if (i == sortedMessages.size - 1) {
               context += `*NEW*`;
             }
+            i+=1;
             context += `<msg from=(@${message[1].author.displayName} id: ${message[1].author.id}) timestamp=${message[1].createdTimestamp}> \n ${message[1].content} \n </msg>`;
           }
 

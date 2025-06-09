@@ -29,6 +29,8 @@ export const buy = (chain: StarknetChain) => action({
         let estark_address = env.ESTARK_ADDRESS;
         let ponziland_address = manifest.contracts[0].address;
 
+        console.log(chain.provider)
+
         let ponziLandContract = (new Contract(manifest.contracts[0].abi, ponziland_address, chain.provider)).typedv2(manifest.contracts[0].abi as Abi);
 
         let viewContract = new Contract(view_manifest.contracts[0].abi, view_manifest.contracts[0].address, chain.provider);
