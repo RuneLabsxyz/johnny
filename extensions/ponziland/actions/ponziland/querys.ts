@@ -125,7 +125,7 @@ export const get_context = (chain: StarknetChain) => action({
 
 export const evaluate = (chain: StarknetChain) => action({
     name: "evaluate",
-    description: "Evaluate to potential opportunity of a list of lands. This expects a list of locations, or coordinates. This should be called to evaluate auctions or lands before deciding to buy or not,.",
+    description: "Evaluate to potential opportunity of a list of lands. This expects a list of locations, or coordinates. This should be called to evaluate auctions or lands before deciding to buy or not. Try to evaluate about 3-10 locations at a time",
     schema: z.object({ locations: z.array(z.number().or(z.object({ x: z.number(), y: z.number() }))).describe("The location of the land to evaluate. This can be either the location id or the x,y coordinates.") }),
     async handler(data: { locations: (number | { x: number, y: number })[] }, ctx: any, agent: Agent) {
 
