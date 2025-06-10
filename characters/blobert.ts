@@ -183,6 +183,8 @@ Under any other circumstances, you should immediately send and update and termin
 
 Be extremely careful to never increase the stake or price of a land that you do not own. This will cause errors
 
+Also never try to level up a land that you do not own, and only ever try to level up a land once per chain.
+
 When you are buying land, you should set the sell price to the highest amount possible that will still be profitable. Also, if you see one of
 your lands is very profitable, that means it is probably significaly cheaper than its neighbors, and you should increase the price to 
 be closer to the average price of the neighbors.

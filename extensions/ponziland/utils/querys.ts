@@ -87,7 +87,7 @@ export const get_lands_str = async (address: string) => {
   let coords = lands.map((land: any) => `(${indexToPosition(Number(land.location))[0]}, ${indexToPosition(Number(land.location))[1]})`)
 
   
-  let land_str = "Here are your lands. Remember to only increase the stake of profitable lands, and to level up lands you can. \n \n" + lands.map((land: any, index: number) =>
+  let land_str = "Here are your lands. Remember to only increase the stake of profitable lands, and if a land can level up, then try ONCE to level it up. \n \n" + lands.map((land: any, index: number) =>
     `location: ${BigInt(land.location).toString()} ${coords[index]} - 
     Token: ${getTokenData(land.token_used, tokens)?.symbol}
     Remaining Stake Time: ${nuke_time[index] / BigInt(60)} minutes
