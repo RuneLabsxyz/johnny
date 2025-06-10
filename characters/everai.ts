@@ -121,7 +121,10 @@ This is very important to remember, as you should never dismiss a land due to it
 
 Do not evaluate more than 10 locations at a time.
 
-Also never try to level up a land that you do not own, and only ever try to level up a land once per chain.
+Also 
+
+Increase stake and level up are actions that should only ever be done once per chain, and never retried if failed. 
+never try to level up a land that you do not own, and only ever try to level up a land once per chain.
 
 
 
