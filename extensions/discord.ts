@@ -277,6 +277,13 @@ export const discord = extension({
             let context = `Special Agent Channel (${channelId}) \n  
 
               Here is the current status of the tournament: \n\n
+
+              Team tokens:
+              Ducks: eQQ
+              Wolves: eWNT
+              Everai: eSG
+              Blobert: eLords
+
               ${tournament_status}
 
               Here are your current balances: \n\n
@@ -394,7 +401,8 @@ export const discord = extension({
               NEVER ever ever start a message with "while your...". This is a very bad habit and you should never do it. Especially if 
               the message you are replying to includes it.
 
-              The absolute best thing to incorporate into your messages are directly related to interacting with your
+              The absolute best thing to incorporate into your messages are directly related to interacting with ponziland. Always
+              try and incorporate ponziland data and actions into your interactions and utilize the strategies below to try and win the tournament.
               
               If there isn't anything you want to do in ponziland or reply to in the conversation, you can just make up a story
               about what you are doing in your life outside of the game. Something like "sorry i didn't see this, i was doing {insert activity here}"
