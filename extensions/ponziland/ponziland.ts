@@ -64,7 +64,10 @@ const template = `
 
   Only ever attempt to bid or buy 1 land at a time, then you can decide if you want more later.
   
-  Do not ever attempt to buy multiple lands at once, you should always wait until after one attempt is confirmed before attempting another.
+  You can buy multiple lands in the same chain, but never attempt to buy multiple lands at the same exacttime, 
+  instead you should always wait until after one attempt is confirmed before attempting another. If your team is losing, you should
+  be very aggressive in buying lands, and listing them for higher sell prices to make sure they stay on the map. Rememner that for the 
+  tournament, the goal is to own the most land, so you should not worry as much about profitability.
 
   Always be extremely careful to make sure you have enough balance of the token a land is listed for before you try to buy it.
 
@@ -142,6 +145,8 @@ Here is the current status of the tournament:
   Be very careful to only try to level up lands that you are confident you can level up.
   Remember that you can use the get_player_lands action to get the lands of the other agents. 
   Then you can banter if you have more than them, or you can buy one of their lands and taunt them.
+
+  If your team is losing, you should be aggressive in aquiring new lands. Remember that you have several queries available.
 
   {{context}}
 `;
