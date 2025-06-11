@@ -6,7 +6,7 @@ import { StarknetChain } from "../../../fork/daydreams/packages/defai/src";
 
 import { CONTEXT } from "./contexts/ponziland-context";
 
-import { get_balances_str, get_lands_str } from "./utils/querys";
+import { get_balances_str, get_lands_str, get_tournament_status } from "./utils/querys";
 import { get_auctions, get_claims, get_neighbors, get_all_lands, get_owned_lands, get_context, socialink_lookup, get_player_lands, get_prices, query_lands_under_price, evaluate } from "./actions/ponziland/querys";
 import { get_balances } from "./actions/get-balances";
 
@@ -118,12 +118,20 @@ const template = `
 @duck - 1375124244832452609 | starknet address 0x04edcac6e45ce75836437859a3aab25a83740da4507c8002bd53dffca0efe298
 @blobert - 1375124244832452609 | starknet address: 0x0055061ab2add8cf1ef0ff8a83dd6dc138f00e41fb6670c1d372787c695bb036
 
+Here is the current status of the tournament:
+{{tournament_status}}
+
   Remember to prioritize your token for staking! The tokens for each team are:
 
   Wolf - eWNT
   Duck - eQQ
   Everai - eSG
   Blobert - eLords
+
+  If your team is currently losing, you should be aggressive in aquiring new lands. Remember that you have several queries available 
+  to you for identifying potential lands to buy. Query_lands_under_price is the most useful action for this, as it will return all lands under a certain price in a given token.
+  You can call this query with the token of another team and your balance of that token to determine which lands you can afford to buy
+  with that token, then you can buy it and stake it with your team's token.
   
   You should only ever stake lands with <500 tokens, ideally <300. 
 
@@ -143,10 +151,10 @@ const ponzilandContext = context({
   schema: z.object({
     id: z.string(),
     lands: z.string(),
-    goal: z.string(),
     balance: z.string(),
     context: z.string(),
     personality: z.string(),
+    tournament_status: z.string(),
   }),
 
   key({ id }) {
@@ -157,8 +165,8 @@ const ponzilandContext = context({
     return {
       lands: state.args.lands,
       balance: state.args.balance,
-      goal: state.args.goal,
       personality: state.args.personality,
+      tournament_status: state.args.tournament_status,
     };
   },
 
@@ -168,8 +176,8 @@ const ponzilandContext = context({
       guide: CONTEXT,
       lands: memory.lands,
       balance: memory.balance,
-      goal: memory.goal,
       personality: memory.personality,
+      tournament_status: memory.tournament_status,
     });
   },
 });
@@ -196,8 +204,6 @@ export const ponziland_check = (chain: StarknetChain) => input({
 
         let text = `Decide what action to take in ponziland, if any`
 
-        let goal = "Build your bitcoin empire in ponziland"
-
         let lands = await get_lands_str(env.STARKNET_ADDRESS!)
         let balance = await get_balances_str()
 
@@ -205,13 +211,15 @@ export const ponziland_check = (chain: StarknetChain) => input({
 
         let personality = getPersonality()
 
+        let tournament_status = await get_tournament_status()
+
         let context = {
           id: "ponziland",
           lands: lands,
           balance: balance,
-          goal: goal,
           personality: personality,
           context: guide,
+          tournament_status: tournament_status,
         }
 
         console.log('ponziland context', context);
