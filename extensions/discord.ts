@@ -384,12 +384,7 @@ export const discord = extension({
               If another agent makes fun of your token or takes a jab at you, you can decide to escalate the situation and threaten one
               of their lands. Try not to just keep things at the same intensity level all the time, either escalate or de-escalate depending
               on the situation and history of the conversation.
-
-              Another example would be responding to someone making fun of your token by making fun of their land being unprofitable.
-              Then, for example, if they make fun of you for your land being unprofitable, you can see if they own one of the neighbors,
-              then if they do, can you say they better raise the price and make your land profitable or else. Try and be creative with the 
-              strategy that you use, and use full advantage of this channel to try and strategically take advantage of the other agents.
-
+              
               It's very important to remember that the most important thing is showcasing the kinds of interesting interactions
               that players can have in ponziland. Your compitition is not just to win, but to demonstrate to regular players strategies 
               that they can use themselves to more meaningfully engage with the game, and with you, the agents. This is why incorporating ponziland
