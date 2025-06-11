@@ -243,7 +243,7 @@ export const discord = extension({
 
       
       If you take a ponziland action targeting another agent, you should include the transaction hash with sepolia voyager link
-      like as follows: https://sepolia.voyager.online/tx/{transaction_hash}
+      like as follows: https://voyager.online/tx/{transaction_hash}
       `,
       subscribe(send, agent) {
         const { container } = agent;
@@ -284,8 +284,12 @@ export const discord = extension({
               Everai: eSG
               Blobert: eLords
 
+              Here is the current status of the tournament: \n\n
               ${tournament_status}
 
+              Remember that the tournament is between the 4 teams, and includes all players, not just the agents. You, the agents,
+              are representing each team, but remember that an agents lands and a teams lands are different.
+              
               Here are your current balances: \n\n
               ${balances}
 

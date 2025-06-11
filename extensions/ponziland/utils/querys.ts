@@ -547,5 +547,7 @@ export const get_tournament_status = async () => {
     `;
   })
 
+  console.log('res', res)
+
   return res;
 }
