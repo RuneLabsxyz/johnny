@@ -526,6 +526,14 @@ const token_addresses = {
   "wolf": "0x040025cec149bf1f58d2e34a6924605b571a5fce7b798a47ec52cfbd3ff68b6e",
 }
 
+const agent_addresses = {
+  "blobert": "0x0055061ab2add8cf1ef0ff8a83dd6dc138f00e41fb6670c1d372787c695bb036",
+  "duck": "0x04edcac6e45ce75836437859a3aab25a83740da4507c8002bd53dffca0efe298",
+  "everai": "0x056106a470b036cad4b2e80846f88e3fd226d7bf7319ac2f895fd75e0ad0f687",
+  "wolf": "0x078a5a96b945a532256cac2a0e65d6c4961e35158e8e797f66e78c6a6c5210de",
+}
+
+const agent_names = ["blobert", "duck", "everai", "wolf"]
 
 export const get_tournament_status = async () => {
 
@@ -533,21 +541,30 @@ export const get_tournament_status = async () => {
 
   let res = "Here are the land totals for each team: \n\n";
 
-  Object.values(token_addresses).forEach(async (token_address: string) => {
-    let lands = await fetchGraphQL(
+  Object.values(token_addresses).forEach(async (token_address: string, index: number) => {
+    let team_lands = await fetchGraphQL(
       env.GRAPHQL_URL + "/graphql",
       land_staked_with_query(token_address),
       {}
     ).then((res: any) => res?.ponziLandLandModels?.edges?.map((edge: any) => edge?.node));
 
-    let count = `${getTokenData(token_address, tokens)!.symbol}: ${lands.length} lands`;
+    let agent_name = agent_names[index];
+    let agent_address = agent_addresses[agent_name as keyof typeof agent_addresses];
+
+    let agent_lands = await fetchGraphQL(
+      env.GRAPHQL_URL + "/graphql",
+      land_query(agent_address),
+      {}
+    ).then((res: any) => res?.ponziLandLandModels?.edges?.map((edge: any) => edge?.node));
+
+    let count = `${getTokenData(token_address, tokens)!.symbol}: ${team_lands.length} team lands - ${agent_lands.length} agent lands`;
     console.log('count', count)
     res += `
     ${count}
     `;
   })
 
-  console.log('res', res)
+  console.log(res);
 
   return res;
 }
