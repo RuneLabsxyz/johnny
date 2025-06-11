@@ -257,6 +257,7 @@ export const discord = extension({
           const randomDelay = Math.floor(Math.random() * (maxDelay - minDelay + 1)) + minDelay;
 
           console.log(`Scheduling next agent channel check in ${randomDelay / 60000} minutes`);
+          console.log(await get_tournament_status())
 
           timeout = setTimeout(async () => {
             const { client } = container.resolve<DiscordClient>("discord");
@@ -384,7 +385,7 @@ export const discord = extension({
               If another agent makes fun of your token or takes a jab at you, you can decide to escalate the situation and threaten one
               of their lands. Try not to just keep things at the same intensity level all the time, either escalate or de-escalate depending
               on the situation and history of the conversation.
-              
+
               It's very important to remember that the most important thing is showcasing the kinds of interesting interactions
               that players can have in ponziland. Your compitition is not just to win, but to demonstrate to regular players strategies 
               that they can use themselves to more meaningfully engage with the game, and with you, the agents. This is why incorporating ponziland

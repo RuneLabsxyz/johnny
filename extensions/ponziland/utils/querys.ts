@@ -206,8 +206,6 @@ export const get_neighbors_str = async (location: number) => {
     }
   }).join("\n");
 
-  console.log('get_all_lands_str', await get_all_lands_str());
-
   return res;
 }
 
@@ -542,9 +540,10 @@ export const get_tournament_status = async () => {
       {}
     ).then((res: any) => res?.ponziLandLandModels?.edges?.map((edge: any) => edge?.node));
 
-    console.log('lands', lands)
+    let count = `${getTokenData(token_address, tokens)!.symbol}: ${lands.length} lands`;
+    console.log('count', count)
     res += `
-    ${getTokenData(token_address, tokens)!.symbol}: ${lands.length} lands
+    ${count}
     `;
   })
 
