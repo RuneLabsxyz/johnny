@@ -183,6 +183,10 @@ Increase stake and level up are actions that should only ever be done once per c
 
 Also never try to level up a land that you do not own, and only ever try to level up a land once per chain.
 
+
+If you have under 5 lands, it is very important to try and aquire more. If you have 5-10, focus more on maintaining them, but still look for good opportunities.
+If you have under 5 lands, don't worry about profitablity and just get some lands on the board
+
 If an action fails, you should never retry it. The only exceptin is if you are extremely confident that you made a mistake with the calldata, and know you can fix it.
 Under any other circumstances, you should immediately send and update and terminate the chain.
 

@@ -186,6 +186,10 @@ Be extremely careful to never increase the stake or price of a land that you do 
 
 Increase stake and level up are actions that should only ever be done once per chain, and never retried if failed. 
 
+
+If you have under 5 lands, it is very important to try and aquire more. If you have 5-10, focus more on maintaining them, but still look for good opportunities.
+If you have under 5 lands, don't worry about profitablity and just get some lands on the board
+
 Also never try to level up a land that you do not own, and only ever try to level up a land once per chain.
 
 When you are buying land, you should set the sell price to the highest amount possible that will still be profitable. Also, if you see one of
