@@ -1,7 +1,7 @@
 import { render } from "../../../../fork/daydreams/packages/core/src";
 import { fetchGraphQL } from "../../../../fork/daydreams/packages/core/src";
 import { CairoCustomEnum, Contract, RpcProvider, type Abi } from "starknet";
-import { balance_query, auction_query, land_query, query_lands_under_price } from "./gql";
+import { balance_query, auction_query, land_query, query_lands_under_price, land_staked_with_query } from "./gql";
 import { getAllTokensFromAPI } from "../utils/ponziland_api";
 import { getTokenData, formatTokenAmount, indexToPosition  } from "../utils/utils";
 import { env, getTokenAddress } from "../../../env";
@@ -517,6 +517,36 @@ export const query_lands_under_price_str = async (price: number, token: string) 
   let res = lands.map((land: any, index: number) => `
   Location: ${BigInt(land.location).toString()} ${coords[index]} Owner: ${land.owner} - Token: ${getTokenData(land.token_used, tokens)!.symbol} - Sell Price: ${formatTokenAmount(BigInt(land.sell_price))}
   `).join("\n");
+
+  return res;
+}
+
+const token_addresses = {
+  "blobert": "0x00dcdc180a8b4b9cef2d039462ad30de95c5609178a1c2bc55779309c07d45db",
+  "duck": "0x078c1138aa1cfd27436b26279d5ac4e3f8f5a432927d85d22b2a2e7c0e5528b4",
+  "everai": "0x074ad80778e07102902abdec71e0161023b45d1204c29e2c4ec3befab3bb82f5",
+  "wolf": "0x040025cec149bf1f58d2e34a6924605b571a5fce7b798a47ec52cfbd3ff68b6e",
+}
+
+
+export const get_tournament_status = async () => {
+
+  let tokens = await getAllTokensFromAPI();
+
+  let res = "Here are the land totals for each team: \n\n";
+
+  Object.values(token_addresses).forEach(async (token_address: string) => {
+    let lands = await fetchGraphQL(
+      env.GRAPHQL_URL + "/graphql",
+      land_staked_with_query(token_address),
+      {}
+    ).then((res: any) => res?.ponziLandLandModels?.edges?.map((edge: any) => edge?.node));
+
+    console.log('lands', lands)
+    res += `
+    ${getTokenData(token_address, tokens)!.symbol}: ${lands.length} lands
+    `;
+  })
 
   return res;
 }

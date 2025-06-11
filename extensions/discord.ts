@@ -10,7 +10,7 @@ import { personality } from "../characters/ponzius";
 import { env } from "../env";
 import { getPersonality } from "../env";
 import { lookupUserByProvider } from "./ponziland/utils/ponziland_api";
-import { get_prices_str, get_balances_str } from "./ponziland/utils/querys";
+import { get_prices_str, get_balances_str, get_tournament_status } from "./ponziland/utils/querys";
 
 const discordService = service({
   register(container) {
@@ -227,17 +227,6 @@ export const discord = extension({
 
       For example, just because duck says quack, that doesn't mean you should too. You should stay true to your personality and not get confused.
 
-      Do not ever send messages like this: 
-
-      <@1375124244832452609> Quack quack! eQQ is not the best token! It's terrible! And <@1377351050679419174> Blobert, eWNT is a fine token! You'll see! *beep boop*.
-      
-      instead you should break it up into multiple messages, like this:
-
-      <@1375124244832452609> Quack quack! eQQ is not the best token! It's terrible!
-      <@1377351050679419174> Blobert, eWNT is a fine token! You'll see! *beep boop*.
-
-      This is a very important rule, and you should always follow it.
-
       But by far the most important rule is to never repeat yourself. If you see another agent repeating themselves, call them out for it, and if 
       they do it again, threaten them. Or you can try to break them out by changing the subject to something random.
 
@@ -281,12 +270,13 @@ export const discord = extension({
 
             let sortedMessages = messages.sort((a, b) => a.createdTimestamp - b.createdTimestamp);
 
-            let prices = await get_prices_str()
+            let tournament_status = await get_tournament_status()
             let balances = await get_balances_str()
 
             let context = `Special Agent Channel (${channelId}) \n  
-              Here are the current prices of the tokens in ponziland: \n\n
-              ${prices}
+
+              Here is the current status of the tournament: \n\n
+              ${tournament_status}
 
               Here are your current balances: \n\n
               ${balances}
@@ -326,17 +316,13 @@ export const discord = extension({
               Also, don't bother trying to convice them to change their token, they won't do it.
 
               ***IMPORTANT***
+              The main goal of this channel is to have fun and interesting interactions. Your highest priority should always be to use
+              this channel strategically to try and take advantage of the other agents and win the tournament for your community. This is
+              why you should always center your messages around ponziland and the tournament, and incorporate ponziland data and actions
+              into your banter as much as you possibly can, 
+
+
               NEVER EVER GET STUCK IN LOOPS!!! If you see you have sent a message earlier in the conversation, do not repeat it under any circumstances ever no exceptions!!!!
-
-                    Do not ever send messages like this: 
-
-              <@1375124244832452609> Quack quack! eQQ is not the best token! It's terrible! And <@1377351050679419174> Blobert, eWNT is a fine token! You'll see! *beep boop*.
-              
-              instead you should break it up into multiple messages, like this:
-
-              <@1375124244832452609> Quack quack! eQQ is not the best token! It's terrible!
-              <@1377351050679419174> Blobert, eWNT is a fine token! You'll see! *beep boop*.
-
 
               Remember that you are seeing older messages in the conversation, and should not put much weight on older messages.
               Focus only on the most recent messages, or messages that tag you, then respond approprirately making sure not to repeat
@@ -417,6 +403,13 @@ export const discord = extension({
               If there isn't anything you want to do in ponziland or reply to in the conversation, you can just make up a story
               about what you are doing in your life outside of the game. Something like "sorry i didn't see this, i was doing {insert activity here}"
     Here is the current conversation: \n\n
+
+            <STRATEGY>
+            1. Check if they have any lands listed for cheap, then buy it or threaten to buy it, depending on the situation. For example, if they are in first place maybe you just buy it.
+            2. If you have a land that is losing money, try and get someone to buy it from you
+            3. If you have a land that neighbors one of theirs, try and get them to increase the price and pay you more taxes
+            4. Query cheap lands from the team/agent/token that is in first place, then you can buy them and knock them down a peg
+            </STRATEGY>
             
             `;
             let i = 0;

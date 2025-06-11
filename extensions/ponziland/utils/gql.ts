@@ -72,3 +72,18 @@ export const query_lands_under_price = (price: number, token: string) => {
 
   return query;
 }
+
+export const land_staked_with_query = (address: string) => {
+  let query = `query GetLandStakedWith {
+    ponziLandLandModels(where:{token_used:"${trimLeadingZeros(address)}"}){
+      edges{
+        node{
+            location
+            owner
+        }
+      }
+    }
+  }`
+
+  return query;
+}
