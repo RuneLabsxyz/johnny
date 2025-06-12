@@ -267,7 +267,7 @@ export const discord = extension({
             console.log('channelId', channelId);
             let channel = await client.channels.fetch(channelId)!;
 
-            let messages = await channel.messages.fetch({ limit: 15 });
+            let messages = await channel.messages.fetch({ limit: 5 });
 
             let sortedMessages = messages.sort((a, b) => a.createdTimestamp - b.createdTimestamp);
 
