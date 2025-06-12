@@ -541,7 +541,9 @@ export const get_tournament_status_str = async () => {
 
   let res = "Here are the land totals for each team: \n\n";
 
-  Object.values(token_addresses).forEach(async (token_address: string, index: number) => {
+
+
+  let counts = await Promise.all(Object.values(token_addresses).map(async (token_address: string, index: number) => {
     let team_lands = await fetchGraphQL(
       env.GRAPHQL_URL + "/graphql",
       land_staked_with_query(token_address),
@@ -559,12 +561,12 @@ export const get_tournament_status_str = async () => {
 
     let count = `${getTokenData(token_address, tokens)!.symbol}: ${team_lands.length} team lands - ${agent_lands.length} agent lands`;
     console.log('count', count)
-    res += `
-    ${count}
-    `;
-  })
 
-  console.log(res);
+    return count;
+    
+  }));
 
-  return res;
+  console.log(counts);
+
+  return res + counts.join("\n");
 }
