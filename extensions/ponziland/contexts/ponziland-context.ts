@@ -1,4 +1,4 @@
-import { get_balances_str, get_auctions_str, get_lands_str, get_claims_str, get_neighbors_str, get_tournament_status } from "../utils/querys";
+import { get_balances_str, get_auctions_str, get_lands_str, get_claims_str, get_neighbors_str, get_tournament_status_str } from "../utils/querys";
 import { render } from "../../../../fork/daydreams/packages/core/src/formatters";
 import { env } from "env";
 /*
@@ -143,7 +143,7 @@ export const CONTEXT = async () => {
   let auction_str = await get_auctions_str();
   let land_str = await get_lands_str(env.STARKNET_ADDRESS!);
   let claims_str = await get_claims_str();
-  let tournament_status = await get_tournament_status();
+  let tournament_status = await get_tournament_status_str();
 
   return render(PONZILAND_CONTEXT, {
     balances: balance_str,

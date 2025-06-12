@@ -535,7 +535,7 @@ const agent_addresses = {
 
 const agent_names = ["blobert", "duck", "everai", "wolf"]
 
-export const get_tournament_status = async () => {
+export const get_tournament_status_str = async () => {
 
   let tokens = await getAllTokensFromAPI();
 

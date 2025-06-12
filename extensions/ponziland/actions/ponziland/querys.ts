@@ -5,7 +5,7 @@ import { Agent } from "../../../../../fork/daydreams/packages/core/src"
 import { z } from "zod"
 import { Abi, Contract } from "starknet"
 import { CONTEXT } from "../../contexts/ponziland-context"
-import { get_auctions_str, get_claims_str, get_lands_str, get_neighbors_str, get_all_lands_str, get_auction_yield_str,get_unowned_land_yield_str, get_prices_str, query_lands_under_price_str } from "../../utils/querys"
+import { get_auctions_str, get_claims_str, get_lands_str, get_neighbors_str, get_all_lands_str, get_auction_yield_str,get_unowned_land_yield_str, get_prices_str, query_lands_under_price_str, get_tournament_status_str } from "../../utils/querys"
 import { env } from "../../../../env"
 import { lookupUserByProvider } from "extensions/ponziland/utils/ponziland_api"
 import { positionToIndex } from "extensions/ponziland/utils/utils"
@@ -153,6 +153,16 @@ export const get_player_lands = (chain: StarknetChain) => action({
         return res;
 
 
+    }
+})
+
+export const get_tournament_status = (chain: StarknetChain) => action({
+    name: "get-tournament-status",
+    description: "Get the current status of the tournament. This returns the number of lands each team has. This should be used if you are unable to see the tournamnet status in the context",
+    schema: z.object({}),
+    async handler(data: {}, ctx: any, agent: Agent) {
+        let res = await get_tournament_status_str();
+        return res;
     }
 })
 
