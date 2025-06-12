@@ -10,7 +10,7 @@ import { personality } from "../characters/ponzius";
 import { env } from "../env";
 import { getPersonality } from "../env";
 import { lookupUserByProvider } from "./ponziland/utils/ponziland_api";
-import { get_prices_str, get_balances_str, get_tournament_status } from "./ponziland/utils/querys";
+import { get_prices_str, get_balances_str, get_tournament_status_str } from "./ponziland/utils/querys";
 
 const discordService = service({
   register(container) {
@@ -252,12 +252,12 @@ export const discord = extension({
         // Function to schedule the next check with random timing
         const scheduleNextCheck = async () => {
           // Random delay between 5 and 15 minutes (300000-900000 ms)
-          const minDelay = 900000; // 40 minutes
-          const maxDelay = 1200000; // 60 minutes
+          const minDelay = 450000; // 40 minutes
+          const maxDelay = 600000; // 60 minutes
           const randomDelay = Math.floor(Math.random() * (maxDelay - minDelay + 1)) + minDelay;
 
           console.log(`Scheduling next agent channel check in ${randomDelay / 60000} minutes`);
-          console.log(await get_tournament_status())
+          console.log(await get_tournament_status_str())
 
           timeout = setTimeout(async () => {
             const { client } = container.resolve<DiscordClient>("discord");
@@ -271,7 +271,7 @@ export const discord = extension({
 
             let sortedMessages = messages.sort((a, b) => a.createdTimestamp - b.createdTimestamp);
 
-            let tournament_status = await get_tournament_status()
+            let tournament_status = await get_tournament_status_str()
 
             console.log('tournament_status', tournament_status)
             let balances = await get_balances_str()
