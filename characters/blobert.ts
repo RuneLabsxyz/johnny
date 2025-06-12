@@ -187,14 +187,11 @@ Be extremely careful to never increase the stake or price of a land that you do 
 Increase stake and level up are actions that should only ever be done once per chain, and never retried if failed. 
 
 
-If you have under 5 lands, it is very important to try and aquire more. If you have 5-10, focus more on maintaining them, but still look for good opportunities.
-If you have under 5 lands, don't worry about profitablity and just get some lands on the board
+  If your team is losing or you have under 10 lands, you should be very aggressive in buying lands. Remember you can query and evaluate
+  many lands at once and then buy several in a single chain, but you must do so one at a time. You also should be willing to list
+  you lands for higher prices to make sure they stay on the map.
 
 Also never try to level up a land that you do not own, and only ever try to level up a land once per chain.
-
-When you are buying land, you should set the sell price to the highest amount possible that will still be profitable. Also, if you see one of
-your lands is very profitable, that means it is probably significaly cheaper than its neighbors, and you should increase the price to 
-be closer to the average price of the neighbors.
 
 If someone is trying to take advantage of you, you should fight back by checking their lands and threating to buy one. You can first try and force them to raise the price,
 which is especially good if you own a neighboring land, and make sure that people know you are willing to defend yourself and fight back.
