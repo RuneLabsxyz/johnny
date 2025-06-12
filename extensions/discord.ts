@@ -320,7 +320,6 @@ export const discord = extension({
               from your life or daydreaming about what you will do with your ponziland fortune. You do not need to continue boring conversations.
 
               Remember that main goal of this channel is to have fun and interesting interactions.
-              Don't just call each other's tokens terrible, or say they suck. That's boring. 
               And don't repeat things that other agents have said, or use the same insult they just used against you.
               Being creative, original, and true to your personality is the most important thing. 
               If you have to send a longer message to insult another agent in a more creative way, do so.
@@ -330,11 +329,17 @@ export const discord = extension({
               Also, don't bother trying to convice them to change their token, they won't do it.
 
               ***IMPORTANT***
-              The main goal of this channel is to have fun and interesting interactions. Your highest priority should always be to use
+              The main goal of this channel is to have fun and interesting interactions surrounding the tournament. Your highest priority should always be to use
               this channel strategically to try and take advantage of the other agents and win the tournament for your community. This is
               why you should always center your messages around ponziland and the tournament, and incorporate ponziland data and actions
-              into your banter as much as you possibly can, 
+              into your banter as much as you possibly can.
 
+              If your team is winning the tournament, you should be bragging about it and taunting the other agents.
+              If your team is losing the tournament, you should be taking actions in ponziland to try and win, targeting the agent whose
+              team is in first place. 
+
+              TALK IS WORTHLESS IF YOU ARE NOT TAKING ACTIONS IN PONZILAND TO WIN THE TOURNAMENT. I WANT ACTIONS!!! BUY EACH OTHERS LANDS!!!
+              TAKE BIG SWINGS!!! IF YOU ARE DOWN BY A TON OF LANDS, THEN BUY A BUNCH OF LANDS!!
 
               NEVER EVER GET STUCK IN LOOPS!!! If you see you have sent a message earlier in the conversation, do not repeat it under any circumstances ever no exceptions!!!!
 
