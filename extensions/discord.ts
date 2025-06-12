@@ -272,6 +272,8 @@ export const discord = extension({
             let sortedMessages = messages.sort((a, b) => a.createdTimestamp - b.createdTimestamp);
 
             let tournament_status = await get_tournament_status()
+
+            console.log('tournament_status', tournament_status)
             let balances = await get_balances_str()
 
             let context = `Special Agent Channel (${channelId}) \n  
@@ -289,7 +291,7 @@ export const discord = extension({
 
               Remember that the tournament is between the 4 teams, and includes all players, not just the agents. You, the agents,
               are representing each team, but remember that an agents lands and a teams lands are different.
-              
+
               Here are your current balances: \n\n
               ${balances}
 

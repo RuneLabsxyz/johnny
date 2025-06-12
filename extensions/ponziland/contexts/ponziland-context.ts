@@ -82,9 +82,9 @@ They just need to join the discord, get their cartridge controller ready, and ge
   {{lands}}
 </Your Lands>
 
-<Tournament Info>
+<Tournament Status>
   {{tournament_status}}
-</Tournament Info>
+</Tournament Status>
 
 Here is a how you obtain the current state of the game: 
 Remember all token balances are in wei, so the true value is 10^18 times the value in the state.
