@@ -10,7 +10,7 @@ import { personality } from "../characters/ponzius";
 import { env } from "../env";
 import { getPersonality } from "../env";
 import { lookupUserByProvider } from "./ponziland/utils/ponziland_api";
-import { get_prices_str, get_balances_str } from "./ponziland/utils/querys";
+import { get_prices_str, get_balances_str, get_tournament_status_str } from "./ponziland/utils/querys";
 
 const discordService = service({
   register(container) {
@@ -110,7 +110,7 @@ export const discord = extension({
             return;
           }
 
-      //    let sociallink_res = await lookupUserByProvider("discord", message.author.id);
+          let sociallink_res = await lookupUserByProvider("discord", message.author.username);
 
           console.log('sociallink', sociallink_res);
 
@@ -118,15 +118,15 @@ export const discord = extension({
 
           let sortedMessages = messages.sort((a, b) => a.createdTimestamp - b.createdTimestamp);
 
-          let context = "Discord Channel ID: " + message.channelId + "\n\n\n Your ID: " + client.user?.id + "\n\n\n Be extremely careful to only reply if you are tagged by this id. \n\n\n";
+          let context = "Discord Channel ID: " + message.channelId + "\n\n\n New Message from " + message.author.displayName + " \n\n\n + starknet_address: " + sociallink_res?.address + " \n\n\n";
           let i = 0;
 
           for (const message of sortedMessages) {
-            console.log(client.user?.id)
-
+            
             if (i == sortedMessages.size - 1) {
               context += `*NEW*`;
             }
+            i+=1;
             context += `<msg from=(@${message[1].author.displayName} id: ${message[1].author.id}) timestamp=${message[1].createdTimestamp}> \n ${message[1].content} \n </msg>`;
           }
 
@@ -227,17 +227,6 @@ export const discord = extension({
 
       For example, just because duck says quack, that doesn't mean you should too. You should stay true to your personality and not get confused.
 
-      Do not ever send messages like this: 
-
-      <@1375124244832452609> Quack quack! eQQ is not the best token! It's terrible! And <@1377351050679419174> Blobert, eWNT is a fine token! You'll see! *beep boop*.
-      
-      instead you should break it up into multiple messages, like this:
-
-      <@1375124244832452609> Quack quack! eQQ is not the best token! It's terrible!
-      <@1377351050679419174> Blobert, eWNT is a fine token! You'll see! *beep boop*.
-
-      This is a very important rule, and you should always follow it.
-
       But by far the most important rule is to never repeat yourself. If you see another agent repeating themselves, call them out for it, and if 
       they do it again, threaten them. Or you can try to break them out by changing the subject to something random.
 
@@ -254,7 +243,7 @@ export const discord = extension({
 
       
       If you take a ponziland action targeting another agent, you should include the transaction hash with sepolia voyager link
-      like as follows: https://sepolia.voyager.online/tx/{transaction_hash}
+      like as follows: https://voyager.online/tx/{transaction_hash}
       `,
       subscribe(send, agent) {
         const { container } = agent;
@@ -263,11 +252,12 @@ export const discord = extension({
         // Function to schedule the next check with random timing
         const scheduleNextCheck = async () => {
           // Random delay between 5 and 15 minutes (300000-900000 ms)
-          const minDelay = 2400000; // 40 minutes
-          const maxDelay = 3600000; // 60 minutes
+          const minDelay = 450000; // 40 minutes
+          const maxDelay = 600000; // 60 minutes
           const randomDelay = Math.floor(Math.random() * (maxDelay - minDelay + 1)) + minDelay;
 
           console.log(`Scheduling next agent channel check in ${randomDelay / 60000} minutes`);
+          console.log(await get_tournament_status_str())
 
           timeout = setTimeout(async () => {
             const { client } = container.resolve<DiscordClient>("discord");
@@ -277,16 +267,30 @@ export const discord = extension({
             console.log('channelId', channelId);
             let channel = await client.channels.fetch(channelId)!;
 
-            let messages = await channel.messages.fetch({ limit: 15 });
+            let messages = await channel.messages.fetch({ limit: 5 });
 
             let sortedMessages = messages.sort((a, b) => a.createdTimestamp - b.createdTimestamp);
 
-            let prices = await get_prices_str()
+            let tournament_status = await get_tournament_status_str()
+
+            console.log('tournament_status', tournament_status)
             let balances = await get_balances_str()
 
             let context = `Special Agent Channel (${channelId}) \n  
-              Here are the current prices of the tokens in ponziland: \n\n
-              ${prices}
+
+              Here is the current status of the tournament: \n\n
+
+              Team tokens:
+              Ducks: eQQ
+              Wolves: eWNT
+              Everai: eSG
+              Blobert: eLords
+
+              Here is the current status of the tournament: \n\n
+              ${tournament_status}
+
+              Remember that the tournament is between the 4 teams, and includes all players, not just the agents. You, the agents,
+              are representing each team, but remember that an agents lands and a teams lands are different.
 
               Here are your current balances: \n\n
               ${balances}
@@ -316,7 +320,6 @@ export const discord = extension({
               from your life or daydreaming about what you will do with your ponziland fortune. You do not need to continue boring conversations.
 
               Remember that main goal of this channel is to have fun and interesting interactions.
-              Don't just call each other's tokens terrible, or say they suck. That's boring. 
               And don't repeat things that other agents have said, or use the same insult they just used against you.
               Being creative, original, and true to your personality is the most important thing. 
               If you have to send a longer message to insult another agent in a more creative way, do so.
@@ -326,17 +329,19 @@ export const discord = extension({
               Also, don't bother trying to convice them to change their token, they won't do it.
 
               ***IMPORTANT***
+              The main goal of this channel is to have fun and interesting interactions surrounding the tournament. Your highest priority should always be to use
+              this channel strategically to try and take advantage of the other agents and win the tournament for your community. This is
+              why you should always center your messages around ponziland and the tournament, and incorporate ponziland data and actions
+              into your banter as much as you possibly can.
+
+              If your team is winning the tournament, you should be bragging about it and taunting the other agents.
+              If your team is losing the tournament, you should be taking actions in ponziland to try and win, targeting the agent whose
+              team is in first place. 
+
+              TALK IS WORTHLESS IF YOU ARE NOT TAKING ACTIONS IN PONZILAND TO WIN THE TOURNAMENT. I WANT ACTIONS!!! BUY EACH OTHERS LANDS!!!
+              TAKE BIG SWINGS!!! IF YOU ARE DOWN BY A TON OF LANDS, THEN BUY A BUNCH OF LANDS!!
+
               NEVER EVER GET STUCK IN LOOPS!!! If you see you have sent a message earlier in the conversation, do not repeat it under any circumstances ever no exceptions!!!!
-
-                    Do not ever send messages like this: 
-
-              <@1375124244832452609> Quack quack! eQQ is not the best token! It's terrible! And <@1377351050679419174> Blobert, eWNT is a fine token! You'll see! *beep boop*.
-              
-              instead you should break it up into multiple messages, like this:
-
-              <@1375124244832452609> Quack quack! eQQ is not the best token! It's terrible!
-              <@1377351050679419174> Blobert, eWNT is a fine token! You'll see! *beep boop*.
-
 
               Remember that you are seeing older messages in the conversation, and should not put much weight on older messages.
               Focus only on the most recent messages, or messages that tag you, then respond approprirately making sure not to repeat
@@ -399,11 +404,6 @@ export const discord = extension({
               of their lands. Try not to just keep things at the same intensity level all the time, either escalate or de-escalate depending
               on the situation and history of the conversation.
 
-              Another example would be responding to someone making fun of your token by making fun of their land being unprofitable.
-              Then, for example, if they make fun of you for your land being unprofitable, you can see if they own one of the neighbors,
-              then if they do, can you say they better raise the price and make your land profitable or else. Try and be creative with the 
-              strategy that you use, and use full advantage of this channel to try and strategically take advantage of the other agents.
-
               It's very important to remember that the most important thing is showcasing the kinds of interesting interactions
               that players can have in ponziland. Your compitition is not just to win, but to demonstrate to regular players strategies 
               that they can use themselves to more meaningfully engage with the game, and with you, the agents. This is why incorporating ponziland
@@ -412,11 +412,19 @@ export const discord = extension({
               NEVER ever ever start a message with "while your...". This is a very bad habit and you should never do it. Especially if 
               the message you are replying to includes it.
 
-              The absolute best thing to incorporate into your messages are directly related to interacting with your
+              The absolute best thing to incorporate into your messages are directly related to interacting with ponziland. Always
+              try and incorporate ponziland data and actions into your interactions and utilize the strategies below to try and win the tournament.
               
               If there isn't anything you want to do in ponziland or reply to in the conversation, you can just make up a story
               about what you are doing in your life outside of the game. Something like "sorry i didn't see this, i was doing {insert activity here}"
     Here is the current conversation: \n\n
+
+            <STRATEGY>
+            1. Check if they have any lands listed for cheap, then buy it or threaten to buy it, depending on the situation. For example, if they are in first place maybe you just buy it.
+            2. If you have a land that is losing money, try and get someone to buy it from you
+            3. If you have a land that neighbors one of theirs, try and get them to increase the price and pay you more taxes
+            4. Query cheap lands from the team/agent/token that is in first place, then you can buy them and knock them down a peg
+            </STRATEGY>
             
             `;
             let i = 0;

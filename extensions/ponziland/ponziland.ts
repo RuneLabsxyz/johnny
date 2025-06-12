@@ -6,8 +6,8 @@ import { StarknetChain } from "../../../fork/daydreams/packages/defai/src";
 
 import { CONTEXT } from "./contexts/ponziland-context";
 
-import { get_balances_str, get_lands_str } from "./utils/querys";
-import { get_auctions, get_claims, get_neighbors, get_all_lands, get_owned_lands, get_context, evaluate_lands, evaluate_auctions,socialink_lookup, get_player_lands, get_prices, query_lands_under_price, evaluate_lands_by_coords } from "./actions/ponziland/querys";
+import { get_balances_str, get_land_bought_str, get_lands_str, get_tournament_status_str } from "./utils/querys";
+import { get_auctions, get_claims, get_neighbors, get_all_lands, get_owned_lands, get_context, socialink_lookup, get_player_lands, get_prices, query_lands_under_price, evaluate, get_tournament_status, get_land_bought_events } from "./actions/ponziland/querys";
 import { get_balances } from "./actions/get-balances";
 
 import { buy } from "./actions/ponziland/buy";
@@ -64,7 +64,10 @@ const template = `
 
   Only ever attempt to bid or buy 1 land at a time, then you can decide if you want more later.
   
-  Do not ever attempt to buy multiple lands at once, you should always wait until after one attempt is confirmed before attempting another.
+  You can buy multiple lands in the same chain, but never attempt to buy multiple lands at the same exacttime, 
+  instead you should always wait until after one attempt is confirmed before attempting another. If your team is losing, you should
+  be very aggressive in buying lands, and listing them for higher sell prices to make sure they stay on the map. Rememner that for the 
+  tournament, the goal is to own the most land, so you should not worry as much about profitability.
 
   Always be extremely careful to make sure you have enough balance of the token a land is listed for before you try to buy it.
 
@@ -118,12 +121,22 @@ const template = `
 @duck - 1375124244832452609 | starknet address 0x04edcac6e45ce75836437859a3aab25a83740da4507c8002bd53dffca0efe298
 @blobert - 1375124244832452609 | starknet address: 0x0055061ab2add8cf1ef0ff8a83dd6dc138f00e41fb6670c1d372787c695bb036
 
+Here is the current status of the tournament:
+{{tournament}}
+
+Remember that if there are a lot of lands listed for sale in a token you don't have much of, you can swap some nftstark for that token and then buy the lands.
+
   Remember to prioritize your token for staking! The tokens for each team are:
 
   Wolf - eWNT
   Duck - eQQ
   Everai - eSG
   Blobert - eLords
+
+  If your team is currently losing, you should be aggressive in aquiring new lands. Remember that you have several queries available 
+  to you for identifying potential lands to buy. Query_lands_under_price is the most useful action for this, as it will return all lands under a certain price in a given token.
+  You can call this query with the token of another team and your balance of that token to determine which lands you can afford to buy
+  with that token, then you can buy it and stake it with your team's token.
   
   You should only ever stake lands with <500 tokens, ideally <300. 
 
@@ -135,18 +148,18 @@ const template = `
   Remember that you can use the get_player_lands action to get the lands of the other agents. 
   Then you can banter if you have more than them, or you can buy one of their lands and taunt them.
 
-  {{context}}
+  If your team is losing, you should be aggressive in aquiring new lands. Remember that you have several queries available
 `;
 
 const ponzilandContext = context({
   type: "ponziland",
   schema: z.object({
     id: z.string(),
+    guide: z.string(),
     lands: z.string(),
-    goal: z.string(),
     balance: z.string(),
-    context: z.string(),
     personality: z.string(),
+    tournament: z.string(),
   }),
 
   key({ id }) {
@@ -155,21 +168,24 @@ const ponzilandContext = context({
 
   create(state) {
     return {
+      guide: state.args.guide,
       lands: state.args.lands,
       balance: state.args.balance,
-      goal: state.args.goal,
       personality: state.args.personality,
+      tournament: state.args.tournament,
     };
   },
 
   render({ memory }) {
+    console.log('memory', memory)
 
     return render(template, {
-      guide: CONTEXT,
+      guide: memory.guide,
       lands: memory.lands,
       balance: memory.balance,
-      goal: memory.goal,
       personality: memory.personality,
+      tournament: memory.tournament,
+      goal: "Maximize land ownership for your team",
     });
   },
 });
@@ -186,17 +202,19 @@ export const ponziland_check = (chain: StarknetChain) => input({
     // Function to schedule the next thought with random timing
     const scheduleNextThought = async () => {
       // Random delay between 3 and 10 minutes (180000-600000 ms)
-      const minDelay = 600000;
-      const maxDelay = 900000;
+      const minDelay = 450000;
+      const maxDelay = 600000;
       const randomDelay = Math.floor(Math.random() * (maxDelay - minDelay + 1)) + minDelay;
 
       console.log(`Scheduling next ponziland check in ${randomDelay / 60000} minutes`);
 
+      let land_bought_events = await get_land_bought_str({seller: env.STARKNET_ADDRESS! })
+
+      console.log('land_bought_events', land_bought_events)
+
       timeout = setTimeout(async () => {
 
         let text = `Decide what action to take in ponziland, if any`
-
-        let goal = "Build your bitcoin empire in ponziland"
 
         let lands = await get_lands_str(env.STARKNET_ADDRESS!)
         let balance = await get_balances_str()
@@ -205,13 +223,15 @@ export const ponziland_check = (chain: StarknetChain) => input({
 
         let personality = getPersonality()
 
+        let tournament_status = await get_tournament_status_str()
+
         let context = {
           id: "ponziland",
+          guide: guide,
           lands: lands,
           balance: balance,
-          goal: goal,
           personality: personality,
-          context: guide,
+          tournament: tournament_status,
         }
 
         console.log('ponziland context', context);
@@ -233,6 +253,7 @@ export const ponziland_check = (chain: StarknetChain) => input({
 
 export const ponziland = (chain: StarknetChain, personality?: string) => {
 
+  console.log('chain', chain.provider)
   return extension({
     name: "ponziland",
     contexts: {
@@ -254,14 +275,14 @@ export const ponziland = (chain: StarknetChain, personality?: string) => {
       level_up(chain),
       increase_stake(chain),
       increase_price(chain),
-      evaluate_lands(chain),
-      evaluate_auctions(chain),
-      evaluate_lands_by_coords(chain),
+      evaluate(chain),
       //  claim_all(chain),
       get_player_lands(chain),
       socialink_lookup,
       get_prices(chain),
       query_lands_under_price,
+      get_tournament_status(chain),
+      get_land_bought_events,
     ],
 
   });

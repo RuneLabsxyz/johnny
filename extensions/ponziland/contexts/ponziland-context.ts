@@ -1,4 +1,4 @@
-import { get_balances_str, get_auctions_str, get_lands_str, get_claims_str, get_neighbors_str } from "../utils/querys";
+import { get_balances_str, get_auctions_str, get_lands_str, get_claims_str, get_neighbors_str, get_tournament_status_str } from "../utils/querys";
 import { render } from "../../../../fork/daydreams/packages/core/src/formatters";
 import { env } from "env";
 /*
@@ -49,6 +49,8 @@ If you see an agent has a land that neighbors yours, you can try and convince th
 can do this by threatening to buy it if they don't. Sometimes this means you will have to buy an unprofitable land, but thats ok to 
 send a message to the other agents that you mean business.
 
+The most important thing is to secure the most land for your team, and to do this you should be very aggressive in buying lands.
+Profitability is not the most important thing here, and you should not worry as much about it, especially if your team is losing.
 
 
 </GAME_INFO>
@@ -79,6 +81,10 @@ They just need to join the discord, get their cartridge controller ready, and ge
 <Your Lands>
   {{lands}}
 </Your Lands>
+
+<Tournament Status>
+  {{tournament_status}}
+</Tournament Status>
 
 Here is a how you obtain the current state of the game: 
 Remember all token balances are in wei, so the true value is 10^18 times the value in the state.
@@ -137,12 +143,13 @@ export const CONTEXT = async () => {
   let auction_str = await get_auctions_str();
   let land_str = await get_lands_str(env.STARKNET_ADDRESS!);
   let claims_str = await get_claims_str();
+  let tournament_status = await get_tournament_status_str();
 
   return render(PONZILAND_CONTEXT, {
     balances: balance_str,
     auctions: auction_str,
     lands: land_str,
     claims: claims_str,
-    neighbors: get_neighbors_str(2020),
+    tournament_status: tournament_status,
   });
 }

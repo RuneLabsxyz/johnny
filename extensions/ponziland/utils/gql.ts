@@ -41,7 +41,7 @@ export const auction_query = `query GetActiveAuctions {
   }`
   
 export const land_query = (address: string) => `query GetOwnedLands {
-  ponziLandLandModels(where:{owner:"${trimLeadingZeros(address)}"}){
+  ponziLandLandModels(where:{owner:"${trimLeadingZeros(address)}"}, first: 1000){
     edges{
       node{
         location
@@ -70,5 +70,49 @@ export const query_lands_under_price = (price: number, token: string) => {
 
   console.log('query', query);
 
+  return query;
+}
+
+export const land_staked_with_query = (address: string) => {
+  let query = `query GetLandStakedWith {
+    ponziLandLandModels(where:{token_used:"${trimLeadingZeros(address)}"}, first: 1000){
+      edges{
+        node{
+            location
+            owner
+        }
+      }
+    }
+  }`
+
+  return query;
+}
+
+export const land_bought_query = (buyer?: string, seller?: string) => {
+  let args = "";
+  if (buyer && seller ) {
+    args = `where:{buyer:"${trimLeadingZeros(buyer)}", seller:"${trimLeadingZeros(seller)}"}`;
+  } else if (buyer) {
+    args = `where:{buyer:"${trimLeadingZeros(buyer)}"}`;
+  } else if (seller) {
+    args = `where:{seller:"${trimLeadingZeros(seller)}"}`;
+  }
+  
+  let query = `query GetLandBought {
+    ponziLandLandBoughtEventModels(${args}, first: 10){
+      edges{
+        node{
+          land_location
+          buyer
+          seller
+          sold_price
+          token_used
+          
+        }
+      }
+    }
+  }`  
+
+  console.log('query', query);
   return query;
 }

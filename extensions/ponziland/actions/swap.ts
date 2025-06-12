@@ -51,8 +51,8 @@ export const swap = (chain: StarknetChain) => action({
             }
 
             const quoteParams = {
-                sellTokenAddress: pool.token0,
-                buyTokenAddress: pool.token1,
+                sellTokenAddress: trimLeadingZeros(pool!.token0),
+                buyTokenAddress: trimLeadingZeros(pool!.token1),
                 sellAmount: sellAmount,
             };
 
@@ -75,7 +75,7 @@ export const swap = (chain: StarknetChain) => action({
 
             const result = {
                 success: true,
-                transaction_hash: swapResult.transaction_hash,
+                transaction_hash: swapResult.transactionHash,
                 sell_token: token_selling.symbol,
                 buy_token: token_buying.symbol,
                 sell_amount: data.amount,

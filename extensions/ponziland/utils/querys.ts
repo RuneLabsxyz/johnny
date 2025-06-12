@@ -1,7 +1,7 @@
 import { render } from "../../../../fork/daydreams/packages/core/src";
 import { fetchGraphQL } from "../../../../fork/daydreams/packages/core/src";
 import { CairoCustomEnum, Contract, RpcProvider, type Abi } from "starknet";
-import { balance_query, auction_query, land_query, query_lands_under_price } from "./gql";
+import { balance_query, auction_query, land_query, query_lands_under_price, land_staked_with_query, land_bought_query } from "./gql";
 import { getAllTokensFromAPI } from "../utils/ponziland_api";
 import { getTokenData, formatTokenAmount, indexToPosition  } from "../utils/utils";
 import { env, getTokenAddress } from "../../../env";
@@ -87,7 +87,7 @@ export const get_lands_str = async (address: string) => {
   let coords = lands.map((land: any) => `(${indexToPosition(Number(land.location))[0]}, ${indexToPosition(Number(land.location))[1]})`)
 
   
-  let land_str = "Here are your lands. Remember to only increase the stake of profitable lands, and to level up lands you can. \n \n" + lands.map((land: any, index: number) =>
+  let land_str = "Here are your lands. Remember to only increase the stake of profitable lands, and if a land can level up, then try ONCE to level it up. \n \n" + lands.map((land: any, index: number) =>
     `location: ${BigInt(land.location).toString()} ${coords[index]} - 
     Token: ${getTokenData(land.token_used, tokens)?.symbol}
     Remaining Stake Time: ${nuke_time[index] / BigInt(60)} minutes
@@ -206,8 +206,6 @@ export const get_neighbors_str = async (location: number) => {
     }
   }).join("\n");
 
-  console.log('get_all_lands_str', await get_all_lands_str());
-
   return res;
 }
 
@@ -285,6 +283,7 @@ export const get_auction_yield_str = async (location: number) : Promise<string> 
   let max_price = (Number(income) ) / .02;
 
   let auction_price = await ponziLandContract.get_current_auction_price(BigInt(location));
+  let recent_land_bought_events = await get_land_bought_str({seller: address});
   return `
   
   Auction Price: ${formatTokenAmount(BigInt(auction_price))} estark
@@ -292,9 +291,19 @@ export const get_auction_yield_str = async (location: number) : Promise<string> 
   <detailed_income>
   ${detailed_income}
   </detailed_income>;
+  
+  Here are the recent land bought events:
+  ${recent_land_bought_events}
 
-  Maximum Listing Price For Profit: ${formatTokenAmount(BigInt(Math.floor(max_price)))} estark / ${formatTokenAmount(BigInt(Math.floor(agent_token!.ratio! / Number(max_price))))} ${agent_token!.symbol}. (If you list for more than this you will lose money)
+  You should list your lands for the highest price that they are currently being bought for, potentially more. If people are buying your lands
+  then you can list them for more and make more money from the sales.
+  Ideal Listing Price For Profit: ${formatTokenAmount(BigInt(Math.floor(max_price)))} estark / ${formatTokenAmount(BigInt(Math.floor(agent_token!.ratio! / Number(max_price))))} ${agent_token!.symbol}. (If you list for more than this you will lose money)
+
+  Maximum Listing Price: ${formatTokenAmount(BigInt(Math.floor(agent_token!.ratio! * Number(max_price) * 3)))} ${agent_token!.symbol}.
+
   Only bid on auctions if you can list it for less than this, but more than the auction price. 
+
+
   `;
 }
 
@@ -364,6 +373,7 @@ export const get_unowned_land_yield_str = async (location: number) : Promise<str
 
   let estark_price = formatTokenAmount(BigInt(Math.floor(agent_token!.ratio! / Number(land.sell_price))));
 
+  let recent_land_bought_events = await get_land_bought_str({seller: address});
   
   return `
 
@@ -379,9 +389,15 @@ export const get_unowned_land_yield_str = async (location: number) : Promise<str
   ${detailed_income}
   </detailed_income>;
 
-  Maximum Listing Price For Profit: ${formatTokenAmount(BigInt(Math.floor(agent_token!.ratio! * Number(max_price))))} ${agent_token!.symbol}. (If you list for more than this you will lose money)
+  Here are the recent land bought events:
+  ${recent_land_bought_events}
+
+  You should list your lands for the highest price that they are currently being bought for, potentially more. If people are buying your lands
+  then you can list them for more and make more money from the sales.
+
+  Ideal Price For Profit: ${formatTokenAmount(BigInt(Math.floor(agent_token!.ratio! * Number(max_price))))} ${agent_token!.symbol}. (If you list for more than this you will lose money, but thats okay, not all your lands can make money)
   
-  Only bid on auctions if you can list it for less than this, but more than the auction price. 
+  Maximum Listing Price: ${formatTokenAmount(BigInt(Math.floor(agent_token!.ratio! * Number(max_price) * 3)))} ${agent_token!.symbol}.
   `;
 }
 
@@ -517,6 +533,82 @@ export const query_lands_under_price_str = async (price: number, token: string) 
   let res = lands.map((land: any, index: number) => `
   Location: ${BigInt(land.location).toString()} ${coords[index]} Owner: ${land.owner} - Token: ${getTokenData(land.token_used, tokens)!.symbol} - Sell Price: ${formatTokenAmount(BigInt(land.sell_price))}
   `).join("\n");
+
+  return res;
+}
+
+const token_addresses = {
+  "blobert": "0x00dcdc180a8b4b9cef2d039462ad30de95c5609178a1c2bc55779309c07d45db",
+  "duck": "0x078c1138aa1cfd27436b26279d5ac4e3f8f5a432927d85d22b2a2e7c0e5528b4",
+  "everai": "0x074ad80778e07102902abdec71e0161023b45d1204c29e2c4ec3befab3bb82f5",
+  "wolf": "0x040025cec149bf1f58d2e34a6924605b571a5fce7b798a47ec52cfbd3ff68b6e",
+}
+
+const agent_addresses = {
+  "blobert": "0x0055061ab2add8cf1ef0ff8a83dd6dc138f00e41fb6670c1d372787c695bb036",
+  "duck": "0x04edcac6e45ce75836437859a3aab25a83740da4507c8002bd53dffca0efe298",
+  "everai": "0x056106a470b036cad4b2e80846f88e3fd226d7bf7319ac2f895fd75e0ad0f687",
+  "wolf": "0x078a5a96b945a532256cac2a0e65d6c4961e35158e8e797f66e78c6a6c5210de",
+}
+
+const agent_names = ["blobert", "duck", "everai", "wolf"]
+
+export const get_tournament_status_str = async () => {
+
+  let tokens = await getAllTokensFromAPI();
+
+  let res = "Here are the land totals for each team: \n\n";
+
+
+
+  let counts = await Promise.all(Object.values(token_addresses).map(async (token_address: string, index: number) => {
+    let team_lands = await fetchGraphQL(
+      env.GRAPHQL_URL + "/graphql",
+      land_staked_with_query(token_address),
+      {}
+    ).then((res: any) => res?.ponziLandLandModels?.edges?.map((edge: any) => edge?.node));
+
+    let agent_name = agent_names[index];
+    let agent_address = agent_addresses[agent_name as keyof typeof agent_addresses];
+
+    let agent_lands = await fetchGraphQL(
+      env.GRAPHQL_URL + "/graphql",
+      land_query(agent_address),
+      {}
+    ).then((res: any) => res?.ponziLandLandModels?.edges?.map((edge: any) => edge?.node));
+
+    let count = `${getTokenData(token_address, tokens)!.symbol}: ${team_lands.length} team lands - ${agent_lands.length} agent lands`;
+    console.log('count', count)
+
+    return count;
+    
+  }));
+
+  console.log(counts);
+
+  return res + counts.join("\n");
+}
+
+export const get_land_bought_str = async ({buyer, seller}: {buyer?: string, seller?: string}) => {
+  let lands = await fetchGraphQL(
+    env.GRAPHQL_URL + "/graphql",
+    land_bought_query(buyer, seller),
+    {}
+  ).then((res: any) => res?.ponziLandLandBoughtEventModels?.edges?.map((edge: any) => edge?.node));
+
+  if (!lands) {
+    return "No land bought events found"
+  }
+
+  let coords = lands.map((land: any, index: number) => `(${indexToPosition(Number(land.land_location))[0]}, ${indexToPosition(Number(land.land_location))[1]})`)
+
+  let tokens = await getAllTokensFromAPI();
+  let res = lands.map((land: any, index: number) => {
+    console.log('land', land)
+    return `
+  ${land.buyer} bought land ${BigInt(land.land_location).toString()} ${coords[index]} from ${land.seller} for ${formatTokenAmount(BigInt(land.sold_price))} ${getTokenData(land.token_used, tokens)!.symbol}
+    `
+  }).join("\n");
 
   return res;
 }

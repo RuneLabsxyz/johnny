@@ -5,7 +5,7 @@ import { Agent } from "../../../../../fork/daydreams/packages/core/src"
 import { z } from "zod"
 import { Abi, Contract } from "starknet"
 import { CONTEXT } from "../../contexts/ponziland-context"
-import { get_auctions_str, get_claims_str, get_lands_str, get_neighbors_str, get_all_lands_str, get_auction_yield_str,get_unowned_land_yield_str, get_prices_str, query_lands_under_price_str } from "../../utils/querys"
+import { get_auctions_str, get_claims_str, get_lands_str, get_neighbors_str, get_all_lands_str, get_auction_yield_str,get_unowned_land_yield_str, get_prices_str, query_lands_under_price_str, get_tournament_status_str, get_land_bought_str } from "../../utils/querys"
 import { env } from "../../../../env"
 import { lookupUserByProvider } from "extensions/ponziland/utils/ponziland_api"
 import { positionToIndex } from "extensions/ponziland/utils/utils"
@@ -79,18 +79,18 @@ export const get_claims = (chain: StarknetChain) => action({
 
 export const get_neighbors = (chain: StarknetChain) => action({
     name: "get-neighbors",
-    description: "Get all of your lands neighbors in ponziland. Remember this expects a location argument",
-    schema: z.object({ location: z.number() }),
-    async handler(data: { location: number }, ctx: any, agent: Agent) {
+    description: "Get all of the neighbors for a given list of lands. This expects a list of locations",
+    schema: z.object({ locations: z.array(z.number()).describe("The location of the lands to get neighbors for. This should always be an integer") }),
+    async handler(data: { locations: number[] }, ctx: any, agent: Agent) {
 
         //todo
-        let neighbors = await get_neighbors_str(data.location);
-
-        if (neighbors == "") {
-            return "Failed to get neighbors for location " + location + ". land may not exist."
+        let neighbors_str: string = "";
+        for (let location of data.locations) {
+            let neighbors = await get_neighbors_str(location);
+            neighbors_str += neighbors + `\n\n`;
         }
 
-        return neighbors
+        return neighbors_str;
 
     }
 });
@@ -123,15 +123,16 @@ export const get_context = (chain: StarknetChain) => action({
     }
 })
 
-export const evaluate_auctions = (chain: StarknetChain) => action({
-    name: "evaluate-auctions",
-    description: "Evaluate to potential opportunity of lands that are up for auction. This expects a list of locations. This should be called to evaluate auctions before deciding to bid or not,.",
-    schema: z.object({ locations: z.array(z.number()).describe("The location of the land to evaluate. This should always be an integer") }),
-    async handler(data: { locations: number[] }, ctx: any, agent: Agent) {
+export const evaluate = (chain: StarknetChain) => action({
+    name: "evaluate",
+    description: "Evaluate to potential opportunity of a list of lands. This expects a list of locations, or coordinates. This should be called to evaluate auctions or lands before deciding to buy or not. Try to evaluate about 3-10 locations at a time",
+    schema: z.object({ locations: z.array(z.number().or(z.object({ x: z.number(), y: z.number() }))).describe("The location of the land to evaluate. This can be either the location id or the x,y coordinates.") }),
+    async handler(data: { locations: (number | { x: number, y: number })[] }, ctx: any, agent: Agent) {
 
         let info_str: string = "";
         for (let location of data.locations) {
-            let info = await get_auction_yield_str(location);
+            const locationIndex = typeof location === 'number' ? location : positionToIndex(location.x, location.y);
+            let info = await get_auction_yield_str(locationIndex);
             info_str += info + `\n\n`;
         }
 
@@ -140,39 +141,6 @@ export const evaluate_auctions = (chain: StarknetChain) => action({
     }
 })
 
-export const evaluate_lands = (chain: StarknetChain) => action({
-    name: "evaluate-lands",
-    description: "Evaluate the potential opportunity of given lands. This expects a list of locations. This should be called to evaluate lands before deciding to buy or not,.",
-    schema: z.object({ locations: z.array(z.number()).describe("The location of the land to evaluate. This should always be an integer") }),
-    async handler(data: { locations: number[] }, ctx: any, agent: Agent) {
-
-        let info_str: string = "";
-        for (let location of data.locations) {
-            let info = await get_unowned_land_yield_str(location);
-            info_str += info + `\n\n`;
-        }
-
-        return info_str;
-
-    }
-})
-
-export const evaluate_lands_by_coords = (chain: StarknetChain) => action({
-    name: "evaluate-lands-by-coords",
-    description: "Evaluate the potential opportunity of an array of given lands. This expects a list of x and y coordinates. This should be called to evaluate lands before deciding to buy or not,.",
-    schema: z.object({ locations: z.array(z.object({ x: z.any(), y: z.any() })).describe("The coordinates of the land to evaluate. These should always be integers") }),
-    async handler(data: { locations: { x: any, y: any }[] }, ctx: any, agent: Agent) {
-
-        let info_str: string = "";
-        for (let location of data.locations) {
-            let info = await get_unowned_land_yield_str(positionToIndex(Number(location.x), Number(location.y)));
-            info_str += info + `\n\n`;
-        }
-
-        return info_str;
-
-    }
-})
 
 export const get_player_lands = (chain: StarknetChain) => action({
     name: "get-player-lands",
@@ -185,6 +153,16 @@ export const get_player_lands = (chain: StarknetChain) => action({
         return res;
 
 
+    }
+})
+
+export const get_tournament_status = (chain: StarknetChain) => action({
+    name: "get-tournament-status",
+    description: "Get the current status of the tournament. This returns the number of lands each team has. This should be used if you are unable to see the tournamnet status in the context",
+    schema: z.object({}),
+    async handler(data: {}, ctx: any, agent: Agent) {
+        let res = await get_tournament_status_str();
+        return res;
     }
 })
 
@@ -211,5 +189,15 @@ export const socialink_lookup = action({
 
         return res;
 
+    }
+})
+
+export const get_land_bought_events = action({
+    name: "get-land-bought-events",
+    description: "Get all of the land bought events in ponziland. This expects a buyer and/or seller address argument. The seller argument should be your address when checking who bought your lands, and the buyer should be included if you want to check the times a specific player bought lands from you. ",
+    schema: z.object({ buyer: z.string().optional(), seller: z.string().optional() }),
+    async handler(data: { buyer?: string, seller?: string }, ctx: any, agent: Agent) {
+        let res = await get_land_bought_str({buyer: data.buyer, seller: data.seller});
+        return res;
     }
 })
