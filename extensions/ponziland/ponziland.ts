@@ -124,6 +124,8 @@ const template = `
 Here is the current status of the tournament:
 {{tournament}}
 
+Remember that if there are a lot of lands listed for sale in a token you don't have much of, you can swap some nftstark for that token and then buy the lands.
+
   Remember to prioritize your token for staking! The tokens for each team are:
 
   Wolf - eWNT
