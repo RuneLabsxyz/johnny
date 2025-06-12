@@ -122,7 +122,7 @@ const template = `
 @blobert - 1375124244832452609 | starknet address: 0x0055061ab2add8cf1ef0ff8a83dd6dc138f00e41fb6670c1d372787c695bb036
 
 Here is the current status of the tournament:
-{{tournament_status}}
+{{tournament}}
 
   Remember to prioritize your token for staking! The tokens for each team are:
 
@@ -146,20 +146,18 @@ Here is the current status of the tournament:
   Remember that you can use the get_player_lands action to get the lands of the other agents. 
   Then you can banter if you have more than them, or you can buy one of their lands and taunt them.
 
-  If your team is losing, you should be aggressive in aquiring new lands. Remember that you have several queries available.
-
-  {{context}}
+  If your team is losing, you should be aggressive in aquiring new lands. Remember that you have several queries available
 `;
 
 const ponzilandContext = context({
   type: "ponziland",
   schema: z.object({
     id: z.string(),
+    guide: z.string(),
     lands: z.string(),
     balance: z.string(),
-    context: z.string(),
     personality: z.string(),
-    tournament_status: z.string(),
+    tournament: z.string(),
   }),
 
   key({ id }) {
@@ -172,7 +170,7 @@ const ponzilandContext = context({
       lands: state.args.lands,
       balance: state.args.balance,
       personality: state.args.personality,
-      tournament_status: state.args.tournament_status,
+      tournament: state.args.tournament,
     };
   },
 
@@ -184,7 +182,8 @@ const ponzilandContext = context({
       lands: memory.lands,
       balance: memory.balance,
       personality: memory.personality,
-      tournament_status: memory.tournament_status,
+      tournament: memory.tournament,
+      goal: "Maximize land ownership for your team",
     });
   },
 });
@@ -226,8 +225,7 @@ export const ponziland_check = (chain: StarknetChain) => input({
           lands: lands,
           balance: balance,
           personality: personality,
-          context: guide,
-          tournament_status: tournament_status,
+          tournament: tournament_status,
         }
 
         console.log('ponziland context', context);
