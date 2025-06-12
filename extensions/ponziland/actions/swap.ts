@@ -75,7 +75,7 @@ export const swap = (chain: StarknetChain) => action({
 
             const result = {
                 success: true,
-                transaction_hash: swapResult.transaction_hash,
+                transaction_hash: swapResult.transactionHash,
                 sell_token: token_selling.symbol,
                 buy_token: token_buying.symbol,
                 sell_amount: data.amount,
