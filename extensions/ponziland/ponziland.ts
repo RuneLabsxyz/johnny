@@ -6,8 +6,8 @@ import { StarknetChain } from "../../../fork/daydreams/packages/defai/src";
 
 import { CONTEXT } from "./contexts/ponziland-context";
 
-import { get_balances_str, get_lands_str, get_tournament_status_str } from "./utils/querys";
-import { get_auctions, get_claims, get_neighbors, get_all_lands, get_owned_lands, get_context, socialink_lookup, get_player_lands, get_prices, query_lands_under_price, evaluate, get_tournament_status } from "./actions/ponziland/querys";
+import { get_balances_str, get_land_bought_str, get_lands_str, get_tournament_status_str } from "./utils/querys";
+import { get_auctions, get_claims, get_neighbors, get_all_lands, get_owned_lands, get_context, socialink_lookup, get_player_lands, get_prices, query_lands_under_price, evaluate, get_tournament_status, get_land_bought_events } from "./actions/ponziland/querys";
 import { get_balances } from "./actions/get-balances";
 
 import { buy } from "./actions/ponziland/buy";
@@ -206,6 +206,10 @@ export const ponziland_check = (chain: StarknetChain) => input({
 
       console.log(`Scheduling next ponziland check in ${randomDelay / 60000} minutes`);
 
+      let land_bought_events = await get_land_bought_str({seller: env.STARKNET_ADDRESS! })
+
+      console.log('land_bought_events', land_bought_events)
+
       timeout = setTimeout(async () => {
 
         let text = `Decide what action to take in ponziland, if any`
@@ -276,6 +280,7 @@ export const ponziland = (chain: StarknetChain, personality?: string) => {
       get_prices(chain),
       query_lands_under_price,
       get_tournament_status(chain),
+      get_land_bought_events,
     ],
 
   });

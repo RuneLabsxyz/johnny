@@ -87,3 +87,32 @@ export const land_staked_with_query = (address: string) => {
 
   return query;
 }
+
+export const land_bought_query = (buyer?: string, seller?: string) => {
+  let args = "";
+  if (buyer && seller ) {
+    args = `where:{buyer:"${trimLeadingZeros(buyer)}", seller:"${trimLeadingZeros(seller)}"}`;
+  } else if (buyer) {
+    args = `where:{buyer:"${trimLeadingZeros(buyer)}"}`;
+  } else if (seller) {
+    args = `where:{seller:"${trimLeadingZeros(seller)}"}`;
+  }
+  
+  let query = `query GetLandBought {
+    ponziLandLandBoughtEventModels(${args}, first: 10){
+      edges{
+        node{
+          land_location
+          buyer
+          seller
+          sold_price
+          token_used
+          
+        }
+      }
+    }
+  }`  
+
+  console.log('query', query);
+  return query;
+}

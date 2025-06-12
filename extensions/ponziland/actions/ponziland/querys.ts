@@ -5,7 +5,7 @@ import { Agent } from "../../../../../fork/daydreams/packages/core/src"
 import { z } from "zod"
 import { Abi, Contract } from "starknet"
 import { CONTEXT } from "../../contexts/ponziland-context"
-import { get_auctions_str, get_claims_str, get_lands_str, get_neighbors_str, get_all_lands_str, get_auction_yield_str,get_unowned_land_yield_str, get_prices_str, query_lands_under_price_str, get_tournament_status_str } from "../../utils/querys"
+import { get_auctions_str, get_claims_str, get_lands_str, get_neighbors_str, get_all_lands_str, get_auction_yield_str,get_unowned_land_yield_str, get_prices_str, query_lands_under_price_str, get_tournament_status_str, get_land_bought_str } from "../../utils/querys"
 import { env } from "../../../../env"
 import { lookupUserByProvider } from "extensions/ponziland/utils/ponziland_api"
 import { positionToIndex } from "extensions/ponziland/utils/utils"
@@ -189,5 +189,15 @@ export const socialink_lookup = action({
 
         return res;
 
+    }
+})
+
+export const get_land_bought_events = action({
+    name: "get-land-bought-events",
+    description: "Get all of the land bought events in ponziland. This expects a buyer and/or seller address argument. The seller argument should be your address when checking who bought your lands, and the buyer should be included if you want to check the times a specific player bought lands from you. ",
+    schema: z.object({ buyer: z.string().optional(), seller: z.string().optional() }),
+    async handler(data: { buyer?: string, seller?: string }, ctx: any, agent: Agent) {
+        let res = await get_land_bought_str({buyer: data.buyer, seller: data.seller});
+        return res;
     }
 })
