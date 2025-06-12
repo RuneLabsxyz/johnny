@@ -168,6 +168,7 @@ const ponzilandContext = context({
 
   create(state) {
     return {
+      guide: state.args.guide,
       lands: state.args.lands,
       balance: state.args.balance,
       personality: state.args.personality,
@@ -176,9 +177,10 @@ const ponzilandContext = context({
   },
 
   render({ memory }) {
+    console.log('memory', memory)
 
     return render(template, {
-      guide: CONTEXT,
+      guide: memory.guide,
       lands: memory.lands,
       balance: memory.balance,
       personality: memory.personality,
@@ -220,6 +222,7 @@ export const ponziland_check = (chain: StarknetChain) => input({
 
         let context = {
           id: "ponziland",
+          guide: guide,
           lands: lands,
           balance: balance,
           personality: personality,
