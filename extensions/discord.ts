@@ -433,6 +433,9 @@ export const discord = extension({
             You should always be either taking actions in ponziland or sending messages that strategically relate to potential future actions in ponziland.
             You should always be directly interacting with the other agents in ponziland as much as possible, and taking actions in ponziland to win the tournament.
             This is the most important thing.
+
+            If you do not see the current state of the tournamnent in the chat context, you should include it in your message and base your message around it. 
+            Making sure to include any relevant data or actions appropriate to your teams current standings.
             </IMPORTANT>
             
             <PONZILAND CONTEXT>
