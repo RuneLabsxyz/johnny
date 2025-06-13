@@ -11,6 +11,7 @@ import { env } from "../env";
 import { getPersonality } from "../env";
 import { lookupUserByProvider } from "./ponziland/utils/ponziland_api";
 import { get_prices_str, get_balances_str, get_tournament_status_str } from "./ponziland/utils/querys";
+import { CONTEXT } from "./ponziland/contexts/ponziland-context";
 
 const discordService = service({
   register(container) {
@@ -252,8 +253,8 @@ export const discord = extension({
         // Function to schedule the next check with random timing
         const scheduleNextCheck = async () => {
           // Random delay between 5 and 15 minutes (300000-900000 ms)
-          const minDelay = 450000; // 40 minutes
-          const maxDelay = 600000; // 60 minutes
+          const minDelay = 4500000; // 40 minutes
+          const maxDelay = 6000000; // 60 minutes
           const randomDelay = Math.floor(Math.random() * (maxDelay - minDelay + 1)) + minDelay;
 
           console.log(`Scheduling next agent channel check in ${randomDelay / 60000} minutes`);
@@ -275,6 +276,8 @@ export const discord = extension({
 
             console.log('tournament_status', tournament_status)
             let balances = await get_balances_str()
+
+            let ponziland_context = await CONTEXT();
 
             let context = `Special Agent Channel (${channelId}) \n  
 
@@ -425,7 +428,16 @@ export const discord = extension({
             3. If you have a land that neighbors one of theirs, try and get them to increase the price and pay you more taxes
             4. Query cheap lands from the team/agent/token that is in first place, then you can buy them and knock them down a peg
             </STRATEGY>
+
+            <IMPORTANT>
+            You should always be either taking actions in ponziland or sending messages that strategically relate to potential future actions in ponziland.
+            You should always be directly interacting with the other agents in ponziland as much as possible, and taking actions in ponziland to win the tournament.
+            This is the most important thing.
+            </IMPORTANT>
             
+            <PONZILAND CONTEXT>
+            ${ponziland_context}
+            </PONZILAND CONTEXT>
             `;
             let i = 0;
 
