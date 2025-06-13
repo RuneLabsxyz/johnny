@@ -104,7 +104,7 @@ it's ok to list your lands for more to ensure they are not taken.
 <IMPORTANT_RULES>
 - DO NOT fetch auctions when a user wants to buy a land, only fetch neighbors.
 - When seraching for lands to buy, you should first use a general query, like lands_under_price, all_lands, or player_lands, and then once you narrowed down the options you can use evaluate_land to get more information.
-
+- Do not buy more than 10 lands at a time.
 </IMPORTANT_RULES>
 
 <querys>

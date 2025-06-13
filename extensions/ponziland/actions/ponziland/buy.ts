@@ -20,7 +20,7 @@ export const buy = (chain: StarknetChain) => action({
             token_for_sale: z.string().describe("Contract address of the token to be used for the purchase. This should be a token in your wallet that you have enough of."),
             sell_price: z.string().describe("The price the land will be listed for after the auction ends (in wei, so x10^18)"),
             amount_to_stake: z.string().describe("The amount to be staked to pay the lands taxes (in wei, so x10^18)"),
-    }))}),
+    })).max(10)}),
     async handler(data: { calls: { land_location: string, token_for_sale: string, sell_price: string, amount_to_stake: string }[] }, ctx: any, agent: Agent) {
         let calls = [];
         let tokenAmounts: { [tokenAddress: string]: bigint } = {};
