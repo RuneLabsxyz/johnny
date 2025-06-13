@@ -295,13 +295,13 @@ export const get_auction_yield_str = async (location: number) : Promise<string> 
   Here are the recent land bought events:
   ${recent_land_bought_events}
 
-  You should list your lands for the highest price that they are currently being bought for, potentially more. If people are buying your lands
-  then you can list them for more and make more money from the sales.
-  Ideal Listing Price For Profit: ${formatTokenAmount(BigInt(Math.floor(max_price)))} estark / ${formatTokenAmount(BigInt(Math.floor(agent_token!.ratio! / Number(max_price))))} ${agent_token!.symbol}. (If you list for more than this you will lose money)
+  You should list your lands for hgiher than they are being bought for. 
 
-  Maximum Listing Price: ${formatTokenAmount(BigInt(Math.floor(agent_token!.ratio! * Number(max_price) * 3)))} ${agent_token!.symbol}.
+  Ideal Listing Price: ${formatTokenAmount(BigInt(Math.floor(max_price)))} estark / ${formatTokenAmount(BigInt(Math.floor(agent_token!.ratio! / Number(max_price))))} ${agent_token!.symbol}.
 
-  Only bid on auctions if you can list it for less than this, but more than the auction price. 
+  Maximum Listing Price: ${formatTokenAmount(BigInt(Math.floor(agent_token!.ratio! * Number(max_price) * 5)))} ${agent_token!.symbol}.
+
+  Make sure you list your lands for more than they are being bought for, and less than the maximum listing price. 
 
 
   `;

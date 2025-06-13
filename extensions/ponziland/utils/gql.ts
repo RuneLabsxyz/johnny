@@ -99,7 +99,7 @@ export const land_bought_query = (buyer?: string, seller?: string) => {
   }
   
   let query = `query GetLandBought {
-    ponziLandLandBoughtEventModels(${args}, first: 10){
+    ponziLandLandBoughtEventModels(${args}, first: 25){
       edges{
         node{
           land_location
