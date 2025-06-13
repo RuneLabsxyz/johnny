@@ -23,9 +23,12 @@ The bid amount will always be in estark and the amount will be transfered when c
 Remember that if staking with eStrk you need to take that into account when bidding, as you will need the price + the stake + extra for gas.
 When you call the bid function you will need to approve the token for the ponziland-actions contract for both estark and the token you are using to stake with.
 Remember that all token values should be in wei, so x10^18.
-If your lands are low on stake you can use the increase stake function to add more stake to the land, making sure to approve the token for the ponziland-actions contract.
-The price of your land should be higher than the amount you paid for it, keeping in mind conversion rate between estark and the token it is listed for.
-Remember that all lands can be bought for their listed sell price in their staked token
+If your lands are low on stake you can use the increase stake function to add more stake to the land.
+
+Always set your lands to a price that is higher than you paid for them, and more than what they are being bought for. If they are being bought for less
+than the ideal price, you should list it for the ideal price. If they are being bought for more than the ideal price, you should list it for the highest price they are being bought for.
+
+Your lands being profitable is important, but keeping ownership and securing lands is even more important.
 
 Lands pay taxes based on their listed sell price, in the token that they are listed for sale in. For example, if you list a land for sale 
 for 10 eLords, then the tax rate per time interval is 10 * .02 = .2 eLords. This tax is distributed among all neighbors of the land.
