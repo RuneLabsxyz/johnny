@@ -395,7 +395,7 @@ export const get_unowned_land_yield_str = async (location: number) : Promise<str
   You should list your lands for the highest price that they are currently being bought for, potentially more. If people are buying your lands
   then you can list them for more and make more money from the sales.
 
-  Ideal Price For Profit: ${formatTokenAmount(BigInt(Math.floor(agent_token!.ratio! * Number(max_price))))} ${agent_token!.symbol}. (If you list for more than this you will lose money, but thats okay, not all your lands can make money)
+  Ideal Price For Profit: ${formatTokenAmount(BigInt(Math.floor(agent_token!.ratio! * Number(max_price) * 1.5 )))} ${agent_token!.symbol}. (If you list for more than this you will lose money, but thats okay, not all your lands can make money)
   
   Maximum Listing Price: ${formatTokenAmount(BigInt(Math.floor(agent_token!.ratio! * Number(max_price) * 3)))} ${agent_token!.symbol}.
   `;
