@@ -67,6 +67,7 @@ what they are being bought for, or at the very least around the same amounts as 
 
 If you get a "Validate amount for buy" error, you may need to swap for the token you are trying to buy with. For example, if you are trying to buy
 a bunch of nftlords lands, you may need to swap some nftstark for nftlords. If you do, try to swap ~500, depending on your balances and the amount of lands you are buying.
+Or if you are trying to bid on auctions, then swap some of one of your tokens for nftstark.
 </GAME_INFO>
 
 DO NOT continue to retry transactions that fail due to gas errors, just send an update with the error in discord.
