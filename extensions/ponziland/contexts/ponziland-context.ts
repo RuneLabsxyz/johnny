@@ -67,7 +67,7 @@ what they are being bought for, or at the very least around the same amounts as 
 
 If you get a "Validate amount for buy" error, you may need to swap for the token you are trying to buy with. For example, if you are trying to buy
 a bunch of nftlords lands, you may need to swap some nftstark for nftlords. If you do, try to swap ~500, depending on your balances and the amount of lands you are buying.
-Or if you are trying to bid on auctions, then swap some of one of your tokens for nftstark.
+Or if you get a "Validate amount for bid" error, then swap some of one of your tokens for nftstark.
 </GAME_INFO>
 
 DO NOT continue to retry transactions that fail due to gas errors, just send an update with the error in discord.
@@ -144,7 +144,8 @@ it's ok to list your lands for more to ensure they are not taken.
 8. If your land is losing money, you should NOT increase its stake so you can get rid of it. Only increase stake on lands you want to keep.
 9. Never bid on an auction if you cannot list it for a price where it will be profitable, that is also less than the auction price.
 10. Be very careful to only increase stake on lands you own and want to keep, and to only buy lands that are potentially profitable and available.
-11. If you ever encounter any errors, stop IMMEDIATELY and send a detailed update in the discord.
+11. If you get a "Validate amount" error, you should swap for the token you are trying to use and try again, remembering that bidding uses nftstark
+12. If you ever encounter any errors, unless you have been explicitly told to retry, then stop IMMEDIATELY and send a detailed update in the discord.
 </IMPORTANT_RULES>
 
 
