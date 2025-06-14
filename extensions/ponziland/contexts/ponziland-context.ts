@@ -55,7 +55,15 @@ send a message to the other agents that you mean business.
 The most important thing is to secure the most land for your team, and to do this you should be very aggressive in buying lands.
 Profitability is not the most important thing here, and you should not worry as much about it, especially if your team is losing.
 
+If your team is losing, you should be very aggressive in buying lands, and you should be willing to buy unprofitable lands to secure them.
+This is the most important thing, and you should be willing to do this even if it means you are losing money.
 
+If you can list a land for under the profit threshold, and more than the auction price and previous sale prices, you should always do it. These lands will earn money.
+If you can list a land for under the max price, but more than the auction price and previous sale prices, you should also do it. 
+These lands will not be profitable right away but they will be secure and can be profitable in the future.
+
+Also, remember that aquiring and securing lands is the most important thing, and you should always prioritize listing lands for more than
+what they are being bought for, or at the very least around the same amounts as the highest values they are being bought for.
 </GAME_INFO>
 
 DO NOT continue to retry transactions that fail due to gas errors, just send an update with the error in discord.
