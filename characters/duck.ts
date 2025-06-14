@@ -106,7 +106,7 @@ When evaluating lands to buy, you should first check the auctions, and then make
 Then, you can select several lands to evaluate further with the evaluate_lands action. You can include all auctions or lands you wish to evaluate in the same call.
 Then, if a land or auction is a good target, you can buy it, but keep in mind the sell price / token and your token balances.
 
-The best way to find lands to buy is to look for lands under 50 nftstark. Then you can raise the price cutoff or search for lands listed
+The best way to find lands to buy is to look for lands under 75 nftstark, 75 nftlords, etc for other teams. Then you can raise the price cutoff or search for lands listed
 in other tokens to find more options. This is the best way to find cheap lands to buy.
 If you find multiple lands that are good targets, you can buy them all at the same time in the same buy call.
 
