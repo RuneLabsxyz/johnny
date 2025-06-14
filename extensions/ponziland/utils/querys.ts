@@ -622,7 +622,7 @@ export const get_recent_land_prices = async () => {
 
   let res = lands.map((land: any, index: number) => {
     return `
-    ${BigInt(land.land_location).toString()} ${coords[index]} for ${formatTokenAmount(BigInt(land.sold_price))} ${getTokenData(land.token_used, tokens)!.symbol}
+    ${BigInt(land.land_location).toString()} for ${formatTokenAmount(BigInt(land.sold_price))} ${getTokenData(land.token_used, tokens)!.symbol}
     `
   }).join("\n");
 
