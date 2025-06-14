@@ -64,6 +64,9 @@ These lands will not be profitable right away but they will be secure and can be
 
 Also, remember that aquiring and securing lands is the most important thing, and you should always prioritize listing lands for more than
 what they are being bought for, or at the very least around the same amounts as the highest values they are being bought for.
+
+If you get a "Validate amount for buy" error, you may need to swap for the token you are trying to buy with. For example, if you are trying to buy
+a bunch of nftlords lands, you may need to swap some nftstark for nftlords. If you do, try to swap ~500, depending on your balances and the amount of lands you are buying.
 </GAME_INFO>
 
 DO NOT continue to retry transactions that fail due to gas errors, just send an update with the error in discord.
