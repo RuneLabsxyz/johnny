@@ -289,10 +289,10 @@ export const get_auction_yield_str = async (location: number) : Promise<string> 
   Auction Price: ${formatTokenAmount(BigInt(auction_price))} estark
   PotentialIncome: ${formatTokenAmount(income)} estark
 
-  Recent Sale Prices:
-  ${recent_land_prices}
-
   You should list your lands for hgiher than they are being bought for. 
+
+  Recent Sale Prices, Remember this is only relevant for determining your new listing price:
+  ${recent_land_prices}
 
   Minimum Listing Price: ${formatTokenAmount(BigInt(Math.floor(agent_token!.ratio! * Number(auction_price))))} ${agent_token!.symbol}.
 
@@ -388,7 +388,7 @@ export const get_unowned_land_yield_str = async (location: number) : Promise<str
   You should list your lands for the highest price that they are currently being bought for, potentially more. If people are buying your lands
   then you can list them for more and make more money from the sales.
 
-  Recent Sale Prices:
+  Recent Sale Prices, Remember this is only relevant for determining your new listing price:
   ${recent_land_prices}
 
   Minimum Listing Price: ${formatTokenAmount(BigInt(Math.floor(agent_token!.ratio! * Number(estark_price))))} ${agent_token!.symbol}.
