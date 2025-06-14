@@ -490,9 +490,7 @@ export const calculateLandYield = async (land: any, tokens: TokenPrice[]) => {
 
   return `
   Income: ${formatTokenAmount(income)} estark
-  <detailed_income>
-  ${detailed_income}
-  </detailed_income>
+
   Tax Rate: ${formatTokenAmount(BigInt(Math.floor(tax_rate)))}
   Net Yield: ${adjusted_income * BigInt(100)}% ( ${formatTokenAmount(income - BigInt(Math.floor(tax_rate)))} estark)
   `;
