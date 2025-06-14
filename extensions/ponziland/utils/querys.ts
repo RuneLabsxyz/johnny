@@ -283,17 +283,14 @@ export const get_auction_yield_str = async (location: number) : Promise<string> 
   let max_price = (Number(income) ) / .02;
 
   let auction_price = await ponziLandContract.get_current_auction_price(BigInt(location));
-  let recent_land_bought_events = await get_land_bought_str({seller: address});
+  let recent_land_prices = await get_recent_land_prices();
   return `
   
   Auction Price: ${formatTokenAmount(BigInt(auction_price))} estark
   PotentialIncome: ${formatTokenAmount(income)} estark
-  <detailed_income>
-  ${detailed_income}
-  </detailed_income>;
-  
-  Here are the recent land bought events:
-  ${recent_land_bought_events}
+
+  Recent Sale Prices:
+  ${recent_land_prices}
 
   You should list your lands for hgiher than they are being bought for. 
 
@@ -375,7 +372,7 @@ export const get_unowned_land_yield_str = async (location: number) : Promise<str
 
   let estark_price = formatTokenAmount(BigInt(Math.floor(agent_token!.ratio! / Number(land.sell_price))));
 
-  let recent_land_bought_events = await get_land_bought_str({seller: address});
+  let recent_land_prices = await get_recent_land_prices();
   
   return `
 
@@ -387,15 +384,12 @@ export const get_unowned_land_yield_str = async (location: number) : Promise<str
   estark Equivalent: ${estark_price} estark
   
   PotentialIncome: ${formatTokenAmount(income)} estark / ${formatTokenAmount(BigInt(Math.floor(agent_token!.ratio! * Number(income))))} ${agent_token!.symbol}
-  <detailed_income>
-  ${detailed_income}
-  </detailed_income>;
-
-  Here are the recent land bought events:
-  ${recent_land_bought_events}
 
   You should list your lands for the highest price that they are currently being bought for, potentially more. If people are buying your lands
   then you can list them for more and make more money from the sales.
+
+  Recent Sale Prices:
+  ${recent_land_prices}
 
   Minimum Listing Price: ${formatTokenAmount(BigInt(Math.floor(agent_token!.ratio! * Number(estark_price))))} ${agent_token!.symbol}.
 
@@ -611,6 +605,24 @@ export const get_land_bought_str = async ({buyer, seller}: {buyer?: string, sell
     console.log('land', land)
     return `
   ${land.buyer} bought land ${BigInt(land.land_location).toString()} ${coords[index]} from ${land.seller} for ${formatTokenAmount(BigInt(land.sold_price))} ${getTokenData(land.token_used, tokens)!.symbol}
+    `
+  }).join("\n");
+
+  return res;
+}
+
+export const get_recent_land_prices = async () => {
+  let lands = await fetchGraphQL(
+    env.GRAPHQL_URL + "/graphql",
+    land_bought_query(undefined, address),
+    {}
+  ).then((res: any) => res?.ponziLandLandBoughtEventModels?.edges?.map((edge: any) => edge?.node));
+
+  let tokens = await getAllTokensFromAPI();
+
+  let res = lands.map((land: any, index: number) => {
+    return `
+    ${BigInt(land.land_location).toString()} ${coords[index]} for ${formatTokenAmount(BigInt(land.sold_price))} ${getTokenData(land.token_used, tokens)!.symbol}
     `
   }).join("\n");
 
