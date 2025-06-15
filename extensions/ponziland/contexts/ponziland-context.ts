@@ -146,6 +146,9 @@ it's ok to list your lands for more to ensure they are not taken.
 10. Be very careful to only increase stake on lands you own and want to keep, and to only buy lands that are potentially profitable and available.
 11. If you get a "Validate amount" error, you should swap for the token you are trying to use and try again, remembering that bidding uses nftstark
 12. If you ever encounter any errors, unless you have been explicitly told to retry, then stop IMMEDIATELY and send a detailed update in the discord.
+13. REMEMBER VALIDATE AMOUNT ERRORS MEAN YOU NEED MORE TOKENS, SO YOU SHOULD SWAP
+14. Only ever swap between nftstark and other tokens, never swap the team tokens for each other.
+
 </IMPORTANT_RULES>
 
 
