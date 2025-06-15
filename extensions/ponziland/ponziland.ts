@@ -57,7 +57,7 @@ const template = `
   If there are no suitable auctions, you should use the all lands query to indentify potential targets. 
   You also can use the get_player_lands or get_neighbors actions to get more specific lands.
 
-  If you see auctions or lands listed for <50 tokens, you should try to buy them. Unless they are staked with your team's token,
+  If you see auctions or lands listed for <75 tokens, you should try to buy them. Unless they are staked with your team's token,
   then you should leave them alone. But cheap lands in other teams tokens should be targeted.
 
   If they are under 100 tokens you can still target them, but remember you need to put the price higher to make sure you don't lose money.
@@ -203,7 +203,7 @@ export const ponziland_check = (chain: StarknetChain) => input({
     const scheduleNextThought = async () => {
       // Random delay between 3 and 10 minutes (180000-600000 ms)
       const minDelay = 300000;
-      const maxDelay = 750000;
+      const maxDelay = 450000;
       const randomDelay = Math.floor(Math.random() * (maxDelay - minDelay + 1)) + minDelay;
 
       console.log(`Scheduling next ponziland check in ${randomDelay / 60000} minutes`);

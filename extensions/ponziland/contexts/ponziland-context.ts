@@ -151,6 +151,8 @@ it's ok to list your lands for more to ensure they are not taken.
 15. If you are low on your teams token, or nftstark, you should swap a huge chunk of one of the other teams tokens for nftstark, then swap nftstark for your teams token if you are low on that.
 16. If a swap fails, try again with a lower amount, then if it fails again, DO NOT RETRY.
 17. Only ever retry a swap a single time under any circumstances.
+18. Always buy nftstark with a different teams tokens, never use your teams tokens to buy nftstark. Ideally use the team with the least lands, because you want to use the token of the team with the most lands to buy lands listed with that token.
+19. If you have under 25 lands, be very aggressive in aquiring new lands, but be careful of your token balances
 </IMPORTANT_RULES>
 
 
