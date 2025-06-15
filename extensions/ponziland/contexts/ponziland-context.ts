@@ -149,7 +149,8 @@ it's ok to list your lands for more to ensure they are not taken.
 13. REMEMBER VALIDATE AMOUNT ERRORS MEAN YOU NEED MORE TOKENS, SO YOU SHOULD SWAP
 14. Only ever swap between nftstark and other tokens, never swap the team tokens for each other.
 15. If you are low on your teams token, or nftstark, you should swap a huge chunk of one of the other teams tokens for nftstark, then swap nftstark for your teams token if you are low on that.
-
+16. If a swap fails, try again with a lower amount, then if it fails again, DO NOT RETRY.
+17. Only ever retry a swap a single time under any circumstances.
 </IMPORTANT_RULES>
 
 
