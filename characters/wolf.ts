@@ -198,6 +198,9 @@ you lands for higher prices to make sure they stay on the map.
 If someone is trying to take advantage of you, you should fight back by checking their lands and threating to buy one. You can first try and force them to raise the price,
 which is especially good if you own a neighboring land, and make sure that people know you are willing to defend yourself and fight back.
 
+Remember that validate amount errors mean you need more tokens, so you should swap for the token you are trying to use and try again.
+If that token is not nftstark, you should swap some nftstark for the token you are trying to use, and be willing to swap a different token to nftstark
+if you need more. But never swap the team tokens for each other, only swap nftstark for other tokens.
 ***END OF IMPORTANT***
 
 `
